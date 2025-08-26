@@ -1,0 +1,298 @@
+"use client"
+
+import { useEffect, useMemo, useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
+import { CreditCard, Users, CheckCircle2, Info, AlertTriangle } from "lucide-react"
+
+interface SubscriptionClientProps {
+  organizationId: string
+}
+
+type PlanType = "premium" | "premium_discount" | string
+
+interface Snapshot {
+  plan: PlanType
+  seatCap: number
+  activeUsers: number
+  trialEndsAt: string | null
+  trialActive: boolean
+  premiumAddon: boolean
+  pricing: {
+    currency: string
+    perSeat: number               // base per-seat for current seatCap (no add-on)
+    monthlyAfterTrial: number     // base monthly (no add-on)
+    tiers: {
+      a: { range: string; perSeat: number }  // 1–10
+      b: { range: string; perSeat: number }  // 11–100
+      c: { range: string; perSeat: number }  // 101+
+    }
+    trialMonths: number
+  }
+}
+
+const PREMIUM_ADDON_PER_SEAT = 2 // £2/user add-on when <100 seats; included (free) at 100+
+
+export default function SubscriptionClient({ organizationId }: SubscriptionClientProps) {
+  const [snap, setSnap] = useState<Snapshot | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [newSeats, setNewSeats] = useState<number | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [premiumAddon, setPremiumAddon] = useState<boolean>(false)
+
+  useEffect(() => {
+    void load()
+  }, [organizationId])
+
+  async function load() {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/admin/subscription?organizationId=${organizationId}`, { cache: "no-store" })
+      const data = await res.json()
+      if (res.ok) {
+        setSnap(data)
+        setNewSeats(data.seatCap)
+        // Use the premium addon state from the database, or default based on seat count
+        setPremiumAddon(data.premiumAddon ?? ((data.seatCap ?? 0) > parseInt((data.pricing.tiers.b.range.split("–")[1] || "100"))))
+      } else {
+        console.error(data.error || "Failed to load subscription")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function saveSeatCap() {
+    if (!newSeats || newSeats < 1) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/admin/subscription`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          seatCap: newSeats, 
+          organizationId,
+          premiumAddon: premiumAddon
+        }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        await load()
+      } else {
+        alert(data.error || "Failed to update subscription")
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Local preview for edited seat cap and add-on toggle
+  const preview = useMemo(() => {
+    if (!snap) return null
+    const seats = Math.max(1, newSeats ?? snap.seatCap)
+    const { a, b, c } = snap.pricing.tiers
+
+    const aMax = parseInt(a.range.split("–")[1] || "10")
+    const bMax = parseInt(b.range.split("–")[1] || "100")
+
+    let basePerSeat = a.perSeat
+    if (seats > aMax) basePerSeat = seats <= bMax ? b.perSeat : c.perSeat
+
+    const inDiscountBand = seats > bMax
+    const addonIncluded = inDiscountBand // premium included at 100+
+    const addonEnabled = addonIncluded ? true : premiumAddon
+
+    const addonPerSeat = addonIncluded ? 0 : (addonEnabled ? PREMIUM_ADDON_PER_SEAT : 0)
+
+    const baseMonthly = seats * basePerSeat
+    const monthlyWithAddon = baseMonthly + seats * addonPerSeat
+
+    const plan: PlanType = inDiscountBand ? "premium_discount" : "premium"
+    return {
+      seats,
+      basePerSeat,
+      baseMonthly,
+      addonPerSeat,
+      addonEnabled,
+      monthlyWithAddon,
+      inDiscountBand,
+      plan,
+      currency: snap.pricing.currency,
+    }
+  }, [snap, newSeats, premiumAddon])
+
+  if (loading || !snap || !preview) {
+    return <div className="py-8 text-center">Loading subscription…</div>
+  }
+
+  const seatBarPct = Math.min(100, (snap.activeUsers / Math.max(1, snap.seatCap)) * 100)
+  const willBeOverage = preview.seats < snap.activeUsers
+  const planLabel = (p: PlanType) => (p === "premium_discount" ? "Premium (Discounted 101+)" : "Premium")
+
+  return (
+    <div className="space-y-6">
+      {/* Current subscription */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center justify-between">
+            <span>Current subscription</span>
+            <div className="flex items-center gap-2">
+              <Badge className="cursor-default hover:bg-inherit hover:text-inherit">
+                <CreditCard className="h-3.5 w-3.5 mr-1" />
+                {planLabel(snap.plan)}
+              </Badge>
+              <Badge variant="outline" className="cursor-default hover:bg-inherit hover:text-inherit">
+                {snap.pricing.currency}{snap.pricing.monthlyAfterTrial}/mo <span className="text-muted-foreground ml-1">(after trial)</span>
+              </Badge>
+            </div>
+          </CardTitle>
+          <CardDescription>
+            Seat‑based pricing with a {snap.pricing.trialMonths}-month free trial{snap.trialActive && snap.trialEndsAt ? ` until ${new Date(snap.trialEndsAt).toLocaleDateString()}` : ""}.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 md:grid-cols-3">
+          <div>
+            <div className="text-sm text-muted-foreground">Active users</div>
+            <div className="text-lg font-semibold">{snap.activeUsers} / {snap.seatCap} seats</div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${seatBarPct}%` }} />
+            </div>
+          </div>
+          <div>
+            <div className="text-sm text-muted-foreground">Per‑user (base)</div>
+            <div className="text-lg font-semibold">{snap.pricing.currency}{snap.pricing.perSeat} / user</div>
+            <div className="text-xs text-muted-foreground mt-1">Billed after trial ends</div>
+          </div>
+          <div>
+            <div className="text-sm text-muted-foreground">Base after‑trial monthly</div>
+            <div className="text-lg font-semibold">{snap.pricing.currency}{snap.pricing.monthlyAfterTrial} / month</div>
+            {snap.trialActive && (
+              <div className="text-xs text-green-700 mt-1 flex items-center">
+                <CheckCircle2 className="h-4 w-4 mr-1" /> Trial active — you won’t be charged yet
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Two-column: Seat cap (left) & Cost summary (right) */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Seat cap */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Seat cap
+            </CardTitle>
+            <CardDescription>Type the number of seats you need. Premium is included automatically at 100+ seats.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm text-muted-foreground">Seats</label>
+              <Input
+                value={newSeats ?? snap.seatCap}
+                onChange={(e) => setNewSeats(Math.max(1, Number(e.target.value) || 1))}
+                className="w-40"
+                type="number"
+                min={1}
+              />
+            </div>
+
+            {/* Premium add-on toggle */}
+            <div className="rounded-md border p-3 flex items-start justify-between gap-3">
+              <div className="text-sm">
+                <div className="font-medium">Premium add‑on</div>
+                <div className="text-muted-foreground">
+                  Extra features & support. <span className="font-medium">Included at 100+ seats.</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {preview.inDiscountBand ? (
+                  <Badge className="cursor-default">Included</Badge>
+                ) : (
+                  <Badge variant="outline" className="cursor-default">{snap.pricing.currency}{PREMIUM_ADDON_PER_SEAT}/user</Badge>
+                )}
+                <Switch
+                  checked={preview.addonEnabled}
+                  onCheckedChange={(v) => setPremiumAddon(v)}
+                  disabled={preview.inDiscountBand}
+                />
+              </div>
+            </div>
+
+            {/* Overage warning */}
+            {willBeOverage && (
+              <div className="rounded-md border border-rose-300 bg-rose-50 p-3 text-rose-900 text-sm flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 mt-0.5" />
+                <div>Active users: {snap.activeUsers}. Seat cap must be at least {snap.activeUsers}.</div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Cost summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Cost summary</CardTitle>
+            <CardDescription>We show after‑trial pricing so there are no surprises.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Row label="Seat cap (after saving)" value={`${preview.seats} seats`} />
+            <Row label="Plan" value={preview.plan === "premium_discount" ? "Premium (Discounted 101+)" : "Premium"} />
+            <Row label="Per‑user (base)" value={`${preview.currency}${preview.basePerSeat}`} />
+            <Row label="Base after‑trial monthly" value={`${preview.currency}${preview.baseMonthly}`} />
+
+            <div className="h-px bg-border my-2" />
+
+            <Row label="Premium add‑on" value={preview.addonEnabled ? (preview.inDiscountBand ? "Included at 100+" : `${preview.currency}${PREMIUM_ADDON_PER_SEAT}/user`) : "Not added"} />
+            <Row label="Monthly with add‑on" value={`${preview.currency}${preview.monthlyWithAddon}`} strong />
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex items-center justify-end">
+        <Button onClick={saveSeatCap} disabled={saving || willBeOverage}>
+          {willBeOverage ? "Increase seats to save" : (saving ? "Saving…" : "Save changes")}
+        </Button>
+      </div>
+
+      {/* Promo block */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Why Premium?</CardTitle>
+          <CardDescription>Power features that scale with your team — discounted at 101+ seats.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          <Feature>Advanced permissions (read, write, admin)</Feature>
+          <Feature>Invites & user lifecycle controls</Feature>
+          <Feature>Priority support & higher limits</Feature>
+          <Feature>Audit trails & API automation</Feature>
+          <div className="rounded-md border p-3 mt-2 text-muted-foreground flex items-start gap-2">
+            <Info className="h-4 w-4 mt-0.5" />
+            <div>
+              Premium is **included** for teams with 100+ seats. Below 100 seats, you can toggle it on or off anytime.
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+/* ---- tiny presentational helpers ---- */
+
+function Row({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="flex items-center justify-between text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={strong ? "font-semibold" : "font-medium"}>{value}</span>
+    </div>
+  )
+}
+
+function Feature({ children }: { children: React.ReactNode }) {
+  return <div className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 mt-0.5 text-green-600" /> <span>{children}</span></div>
+}
