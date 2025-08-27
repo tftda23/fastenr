@@ -1,5 +1,5 @@
 import { getDashboardStats, getChurnRiskAccounts, getNPSSurveys } from "@/lib/supabase/queries"
-import { AnalyticsClient } from "@/components/analytics/analytics-client"
+import { EnhancedAnalyticsClient } from "@/components/analytics/enhanced-analytics-client"
 
 export default async function AnalyticsPage() {
   try {
@@ -16,7 +16,7 @@ export default async function AnalyticsPage() {
           <p className="text-muted-foreground">Comprehensive analytics and insights powered by fastenr.</p>
         </div>
 
-        <AnalyticsClient dashboardStats={dashboardStats} churnRiskAccounts={churnRiskAccounts} npsData={npsData} />
+        <EnhancedAnalyticsClient dashboardStats={dashboardStats} churnRiskAccounts={churnRiskAccounts} npsData={npsData} />
       </div>
     )
   } catch {
