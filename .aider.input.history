@@ -1,0 +1,63 @@
+
+# 2025-08-26 23:04:44.872296
++hello
+
+# 2025-08-26 23:04:49.537970
++y
+
+# 2025-08-26 23:07:30.320478
++n
+
+# 2025-08-26 23:07:33.988112
++hello
+
+# 2025-08-26 23:09:09.423112
++n
+
+# 2025-08-26 23:09:14.696281
++hello
+
+# 2025-08-26 23:10:01.265425
++n
+
+# 2025-08-26 23:10:03.670251
++hello
+
+# 2025-08-26 23:12:24.289504
++y
+
+# 2025-08-26 23:17:29.415197
++/undo
+
+# 2025-08-26 23:22:14.226600
++for some reason /dashboard/billing shows the dashboard nav rather than the admin nav even though the nav item is in the admin nav perhaps because it is at the wrong route /dashboard/billing rather than /dashboard/admin/billing we dont want to break anything though if we move it we should also check for references etc and update as needed
+
+# 2025-08-26 23:27:08.548838
++y
+
+# 2025-08-26 23:32:02.316069
++still getting 404 on http://localhost:3001/dashboard/admin/billing and the nav bar is still showing the main dashboard nav rather than the admin nav when focussing or loaded billing 
+
+# 2025-08-26 23:32:10.310123
++y
+
+# 2025-08-26 23:32:22.151829
++n
+
+# 2025-08-27 00:21:53.295432
++billing is still using the dashboard navbar in the app clicking billing in the admin nav should instead load billing at the page loaction dashboard/admin/billing
+
+# 2025-08-27 00:22:36.698493
++n
+
+# 2025-08-27 00:25:12.803167
++update dashboard/health components/health/health-client.tsx to go to the account detail page of the relevant account like a link on the whole card
+
+# 2025-08-27 00:25:18.595293
++y
+
+# 2025-08-27 00:32:39.906328
++/undo
+
+# 2025-08-27 00:32:56.548375
++exit

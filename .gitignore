@@ -8,6 +8,7 @@
 
 # testing
 /coverage
+/.test-logs
 
 # next.js
 /.next/
@@ -36,55 +37,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# IDE and editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-Thumbs.db
-ehthumbs.db
-
-# Logs
-logs
-*.log
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Temporary folders
-tmp/
-temp/
-
-# Database
-*.db
-*.sqlite
-
-# Backup files
-*.backup
-*.bak
-
-# Development temporary files
-tmp_rovodev_*
-.aider*
+# Test logs and reports (keep private)
+.test-logs/
+test-reports/
+*.test.log
