@@ -86,13 +86,6 @@ export default function SurveysClient({
             Create Survey
           </Button>
 
-          {/* Coming Soon Badge */}
-          <div className="flex items-center space-x-2 px-3 py-1 bg-amber-50 dark:bg-amber-900/20 rounded-full border border-amber-200 dark:border-amber-800">
-            <Calendar className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-            <span className="text-sm text-amber-700 dark:text-amber-300 font-medium">
-              Automatic Scheduling - Coming Soon
-            </span>
-          </div>
         </div>
       </div>
 
