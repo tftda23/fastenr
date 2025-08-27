@@ -78,6 +78,9 @@ fastenr is a modern customer success platform that moves beyond traditional CRM 
 | Resource | Purpose | Audience |
 |----------|---------|----------|
 | **[Production Readiness Audit](./PRODUCTION_READINESS_AUDIT.md)** | Pre-deployment checklist | DevOps, Project Managers |
+| **[Testing Quick Start](./TESTING_QUICK_START.md)** | Fast testing guide | Developers, DevOps |
+| **[Complete Testing Guide](./TESTING_GUIDE.md)** | Comprehensive testing docs | QA, DevOps, Developers |
+| **[Phase 1 Verification](./PHASE_1_VERIFICATION_REPORT.md)** | Critical fixes verification | Project Managers, DevOps |
 | **[Jira Issues Template](./JIRA_ISSUES_TEMPLATE.md)** | Project management templates | Product Managers |
 | **[Security Guide](./docs/SECURITY.md)** | Security best practices | Security Teams, DevOps |
 | **[Monitoring & Logging](./docs/MONITORING.md)** | Observability setup | SRE, DevOps |
@@ -85,7 +88,8 @@ fastenr is a modern customer success platform that moves beyond traditional CRM 
 ### 📋 By User Role
 - **👥 Customer Success Managers**: [Customer Management](./docs/CUSTOMER_MANAGEMENT.md) → [Analytics](./docs/ANALYTICS.md) → [Surveys](./docs/SURVEYS.md)
 - **⚙️ Administrators**: [Integrations](./docs/INTEGRATIONS.md) → [Automation](./docs/AUTOMATION.md) → [Security](./docs/SECURITY.md)
-- **💻 Developers**: [API Docs](./docs/API.md) → [Architecture](./docs/ARCHITECTURE.md) → [Development Guide](./docs/DEVELOPMENT.md)
+- **💻 Developers**: [API Docs](./docs/API.md) → [Architecture](./docs/ARCHITECTURE.md) → [Testing Guide](./TESTING_GUIDE.md)
+- **🧪 QA/DevOps**: [Testing Quick Start](./TESTING_QUICK_START.md) → [Production Audit](./PRODUCTION_READINESS_AUDIT.md) → [Phase 1 Verification](./PHASE_1_VERIFICATION_REPORT.md)
 - **📊 Business Users**: [Analytics](./docs/ANALYTICS.md) → [Customer Management](./docs/CUSTOMER_MANAGEMENT.md) → [Surveys](./docs/SURVEYS.md)
 
 ---
@@ -137,7 +141,28 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000) to access the application.
 
-### 5. Initial Setup
+### 5. Production Testing & Validation
+
+Before deploying, validate your application with our comprehensive testing suite:
+
+```bash
+# Quick test (no server needed) - Recommended for most cases
+npm run test:production:no-server
+
+# Full test (auto-starts server) - Complete validation
+npm run test:with-server
+
+# Build validation - Perfect for deployment
+npm run test:build
+```
+
+**📋 Testing Documentation:**
+- **[Quick Start Guide](./TESTING_QUICK_START.md)** - Get testing in 2 minutes
+- **[Complete Testing Guide](./TESTING_GUIDE.md)** - Comprehensive documentation
+- **[Production Readiness Audit](./PRODUCTION_READINESS_AUDIT.md)** - Current status and requirements
+- **[Phase 1 Verification Report](./PHASE_1_VERIFICATION_REPORT.md)** - Detailed verification of critical fixes
+
+### 6. Initial Setup
 1. Create your first organization account
 2. Configure email settings in `/dashboard/admin/email`
 3. Set up integrations in `/dashboard/admin/integrations`
