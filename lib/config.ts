@@ -3,23 +3,23 @@
 export const config = {
   // App URL configuration
   app: {
-    url: process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || 'http://localhost:3000',
+    url: process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://fastenr.com'),
     name: 'Fastenr',
     description: 'Customer Success Platform',
   },
 
   // API configuration
   api: {
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://fastenr.com'),
   },
 
   // External service URLs
   services: {
     hubspot: {
-      redirectUri: process.env.HUBSPOT_REDIRECT_URI || `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/integrations/hubspot/callback`,
+      redirectUri: process.env.HUBSPOT_REDIRECT_URI || `${process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://fastenr.com')}/api/integrations/hubspot/callback`,
     },
     salesforce: {
-      redirectUri: process.env.SALESFORCE_REDIRECT_URI || `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/integrations/salesforce/callback`,
+      redirectUri: process.env.SALESFORCE_REDIRECT_URI || `${process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://fastenr.com')}/api/integrations/salesforce/callback`,
     },
   },
 

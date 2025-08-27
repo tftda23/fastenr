@@ -72,7 +72,7 @@ function createSurveyEmailHtml(data: SurveyEmailData, recipientName?: string): s
             <div>${data.content}</div>
             
             <p style="text-align: center;">
-              <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || 'http://localhost:3000'}/surveys/${data.surveyId}" class="survey-link">
+              <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://fastenr.com')}/surveys/${data.surveyId}" class="survey-link">
                 Take Survey
               </a>
             </p>

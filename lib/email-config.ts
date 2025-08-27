@@ -10,7 +10,7 @@ export function getEmailConfig() {
     fromSurveys: process.env.EMAIL_FROM_SURVEYS || 'surveys@fastenr.com',
     fromNotifications: process.env.EMAIL_FROM_NOTIFICATIONS || 'notifications@fastenr.com',
     fromName: process.env.EMAIL_FROM_NAME || 'Customer Success Team',
-    appUrl: process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || 'http://localhost:3000'
+    appUrl: process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://fastenr.com')
   }
 }
 
