@@ -19,7 +19,7 @@ export default async function AnalyticsPage() {
         <AnalyticsClient dashboardStats={dashboardStats} churnRiskAccounts={churnRiskAccounts} npsData={npsData} />
       </div>
     )
-  } catch (error) {
+  } catch {
     return (
       <div className="space-y-6">
         <div>

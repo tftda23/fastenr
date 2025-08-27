@@ -12,7 +12,7 @@ export default async function EditAccountPage({ params }: { params: { id: string
   try {
     const account = await getAccountById(params.id)
     return <AccountForm account={account} isEditing={true} />
-  } catch (error) {
+  } catch {
     notFound()
   }
 }

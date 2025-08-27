@@ -162,7 +162,7 @@ async function runOne(sb: any, orgId: string, token: string, object: SyncObject,
 
   const phase = (state?.phase ?? "initial") as "initial" | "continuous"
   let cursor = state?.cursor ?? null
-  let since = phase === "continuous" ? state?.since : null
+  const since = phase === "continuous" ? state?.since : null
 
   let pages = 0
   let maxUpdated = state?.since ? new Date(state.since).getTime() : 0

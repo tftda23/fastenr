@@ -15,7 +15,7 @@ export default async function AccountDetailsPage({ params }: { params: { id: str
     ])
 
     return <AccountDetails account={account} canEdit={canEdit} canDelete={canDelete} />
-  } catch (error) {
+  } catch {
     // Account not found
     notFound()
   }
