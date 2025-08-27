@@ -300,7 +300,7 @@ export async function getCustomerGoals(accountId?: string) {
     }
 
     // Optional: log to help distinguish empty vs blocked
-    console.log("customer_goals count:", count)
+    // Customer goals count retrieved
 
     return data as (CustomerGoal & { accounts: { id: string; name: string } })[]
   } catch (e) {

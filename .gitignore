@@ -87,3 +87,4 @@ temp/
 
 # Development temporary files
 tmp_rovodev_*
+.aider*

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const outcome = searchParams.get("outcome") ?? undefined
     const accountFilter = searchParams.get("accountFilter") ?? undefined
 
-    console.log("[v0][GET] Params received:", { accountId, page, limit, search, type, outcome, accountFilter })
+    // GET request parameters received
 
     const result = await getEngagements(accountId, page, limit, search, type, outcome, accountFilter)
 
@@ -41,14 +41,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    console.log("[v0][POST] Body received:", body)
+    // POST request body received
 
     if (!body || typeof body !== "object") {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
     }
 
     const engagement = await createEngagement(body)
-    console.log("[v0][POST] Engagement created:", engagement)
+    // Engagement created successfully
 
     return NextResponse.json({ data: engagement }, { status: 201 })
   } catch (error) {

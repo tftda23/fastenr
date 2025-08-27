@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +17,16 @@ import {
   Globe,
   Award,
 } from "lucide-react"
+
+export const metadata: Metadata = {
+  title: "Home - Customer Success Platform",
+  description: "Welcome to Fastenr - the comprehensive customer success platform that helps you track health scores, manage engagements, reduce churn, and drive sustainable growth.",
+  openGraph: {
+    title: "Fastenr - Transform Your Customer Success",
+    description: "The all-in-one platform for customer success teams to reduce churn and drive growth.",
+    url: "/home",
+  },
+}
 
 export default function HomePage() {
   return (
@@ -49,16 +60,16 @@ export default function HomePage() {
               Built for Customer Success Teams
             </Badge>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-              Stop Using Sales Tools for <span className="text-primary">Customer Success</span>
+              Transform Your <span className="text-primary">Customer Success</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-4xl mx-auto leading-relaxed">
-              Customer success teams deserve their own platform. Track engagement, prevent churn, and drive adoption
-              with tools built specifically for your success.
+              Reduce churn by up to 40% and increase customer lifetime value. Track health scores, automate engagements, 
+              and turn customer insights into revenue growth.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth/signup">
-                <Button size="lg" className="text-lg px-8 py-6">
-                  Start Free Trial
+                <Button size="lg" className="text-lg px-8 py-6 bg-primary hover:bg-primary/90">
+                  Start Free 90-Day Trial
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -68,6 +79,9 @@ export default function HomePage() {
                 </Button>
               </Link>
             </div>
+            <p className="text-sm text-muted-foreground mt-6">
+              ✓ No credit card required • ✓ Full access • ✓ Cancel anytime
+            </p>
           </div>
         </div>
       </section>

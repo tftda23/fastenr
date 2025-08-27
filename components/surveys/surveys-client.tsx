@@ -63,12 +63,12 @@ export default function SurveysClient({
 
   const handleEditSurvey = (survey: Survey) => {
     // TODO: Implement edit functionality
-    console.log("Edit survey:", survey.id)
+    // Edit survey functionality
   }
 
   const handleDeleteSurvey = (surveyId: string) => {
     // TODO: Implement delete functionality
-    console.log("Delete survey:", surveyId)
+    // Delete survey functionality
   }
 
   const handleSendSurvey = (survey: Survey) => {

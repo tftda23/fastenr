@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create invitation link
-    const link = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/invite?token=${inv.token}`
+    const link = `${process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || "http://localhost:3000"}/invite?token=${inv.token}`
 
     // Get organization details for email
     const { data: organization } = await supabase

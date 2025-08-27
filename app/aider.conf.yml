@@ -1,0 +1,16 @@
+# ~/.aider.conf.yml — fast, responsive setup
+model: ollama/llama3:8b
+weak_model: ollama/llama3:8b
+
+# Talk to your local Ollama (OpenAI-compatible) endpoint
+openai_api_base: http://localhost:11434/v1
+openai_api_key: ollama
+
+# Keep the repo-map tiny so startup & prompts are quick
+map_tokens: 512
+
+# Prefer streaming so you see diffs as they’re generated
+stream: true
+
+# Safer, cleaner diffs (good default)
+edit_format: whole

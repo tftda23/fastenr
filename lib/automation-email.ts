@@ -152,7 +152,7 @@ async function logAutomationEmail(
 ) {
   try {
     // This could be expanded to log to a dedicated automation_logs table
-    console.log(`Automation email sent: ${templateKey} for account ${context.accountName} (${context.accountId}) - ${sentCount}/${recipientCount} sent`)
+    // Automation email sent successfully
   } catch (error) {
     console.error("Error logging automation email:", error)
   }

@@ -2,12 +2,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 
 // Check if Supabase environment variables are available
-console.log("[v0] Checking Supabase config:", {
-  url: process.env.NEXT_PUBLIC_SUPABASE_URL ? "✓ Set" : "✗ Missing",
-  anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✓ Set" : "✗ Missing",
-  urlLength: process.env.NEXT_PUBLIC_SUPABASE_URL?.length || 0,
-  anonKeyLength: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length || 0,
-})
+// Supabase configuration check
 
 export const isSupabaseConfigured =
   process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -15,7 +10,7 @@ export const isSupabaseConfigured =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.length > 0
 
-console.log("[v0] isSupabaseConfigured:", isSupabaseConfigured)
+// Supabase configuration status logged
 
 export function createClient() {
   if (!isSupabaseConfigured) {

@@ -7,10 +7,10 @@ export function getEmailConfig() {
   return {
     configured: isEmailConfigured(),
     apiKey: process.env.RESEND_API_KEY ? '***configured***' : 'not set',
-    fromSurveys: process.env.EMAIL_FROM_SURVEYS || 'surveys@yourdomain.com',
-    fromNotifications: process.env.EMAIL_FROM_NOTIFICATIONS || 'notifications@yourdomain.com',
+    fromSurveys: process.env.EMAIL_FROM_SURVEYS || 'surveys@fastenr.com',
+    fromNotifications: process.env.EMAIL_FROM_NOTIFICATIONS || 'notifications@fastenr.com',
     fromName: process.env.EMAIL_FROM_NAME || 'Customer Success Team',
-    appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    appUrl: process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || 'http://localhost:3000'
   }
 }
 
@@ -22,7 +22,7 @@ export function validateEmailConfig(): { valid: boolean; errors: string[] } {
   }
   
   if (!process.env.NEXT_PUBLIC_APP_URL) {
-    errors.push('NEXT_PUBLIC_APP_URL is not set (surveys links will use localhost)')
+    errors.push('NEXT_PUBLIC_APP_URL and APP_BASE_URL are not set (surveys links will use localhost)')
   }
   
   const fromSurveys = process.env.EMAIL_FROM_SURVEYS

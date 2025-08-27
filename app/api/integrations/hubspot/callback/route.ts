@@ -80,7 +80,7 @@ export async function GET(req: Request) {
     })
 
     // ✅ Redirect back to dashboard integrations page
-    const base = process.env.APP_BASE_URL ?? "http://localhost:3000"
+    const base = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || "http://localhost:3000"
     return NextResponse.redirect(
       new URL(`/dashboard/admin/integrations?connected=hubspot`, base)
     )

@@ -2,10 +2,7 @@
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
-console.log("[v0] Client Supabase config:", {
-  url: process.env.NEXT_PUBLIC_SUPABASE_URL ? "✓ Set" : "✗ Missing",
-  anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✓ Set" : "✗ Missing",
-})
+// Client Supabase configuration check
 
 // Check if Supabase environment variables are available
 export const isSupabaseConfigured =

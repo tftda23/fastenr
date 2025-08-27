@@ -72,7 +72,7 @@ function createSurveyEmailHtml(data: SurveyEmailData, recipientName?: string): s
             <div>${data.content}</div>
             
             <p style="text-align: center;">
-              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/surveys/${data.surveyId}" class="survey-link">
+              <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.APP_BASE_URL || 'http://localhost:3000'}/surveys/${data.surveyId}" class="survey-link">
                 Take Survey
               </a>
             </p>
@@ -216,7 +216,7 @@ export async function sendSurveyEmail(
 ) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY not configured, falling back to mock email');
-    console.log(`[MOCK EMAIL] Survey ${surveyData.surveyId} sent to ${recipients.length} recipients:`, recipients);
+    // Mock email sent for survey
     return { success: true, sent_count: recipients.length, mock: true };
   }
 
@@ -262,7 +262,7 @@ export async function sendNotificationEmail(
 ) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY not configured, falling back to mock email');
-    console.log(`[MOCK EMAIL] Notification sent to ${recipients.length} recipients:`, notificationData);
+    // Mock notification email sent
     return { success: true, sent_count: recipients.length, mock: true };
   }
 
@@ -308,7 +308,7 @@ export async function sendInvitationEmail(
 ) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY not configured, falling back to mock email');
-    console.log(`[MOCK EMAIL] Invitation sent to ${recipient.email}:`, invitationData);
+    // Mock invitation email sent
     return { success: true, sent_count: 1, mock: true };
   }
 
@@ -344,8 +344,8 @@ export async function testEmailConfiguration(): Promise<boolean> {
   try {
     // Test with a simple email to verify configuration
     await getResendClient().emails.send({
-      from: 'test@yourdomain.com',
-      to: 'test@example.com',
+      from: process.env.EMAIL_FROM_NOTIFICATIONS || 'notifications@fastenr.com',
+      to: 'test@fastenr.com',
       subject: 'Test Email Configuration',
       html: '<p>This is a test email to verify Resend configuration.</p>',
     });

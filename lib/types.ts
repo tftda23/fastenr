@@ -3,6 +3,11 @@ export interface Organization {
   name: string
   created_at: string
   updated_at: string
+  stripe_customer_id?: string
+  seat_cap?: number
+  plan?: string
+  trial_ends_at?: string
+  premium_addon?: boolean
 }
 
 export interface UserProfile {
@@ -174,4 +179,41 @@ export interface AutomationRun {
   finished_at: string | null;
   result?: Record<string, any> | null;
   error?: string | null;
+}
+
+// Billing types
+export interface Invoice {
+  id: string
+  organization_id: string
+  stripe_invoice_id?: string
+  invoice_number: string
+  status: 'draft' | 'open' | 'paid' | 'void' | 'uncollectible'
+  billing_period_start: string
+  billing_period_end: string
+  due_date: string
+  subtotal: number
+  tax_amount: number
+  total_amount: number
+  amount_paid: number
+  amount_due: number
+  line_items: any[]
+  customer_details: any
+  pdf_url?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface PaymentMethod {
+  id: string
+  organization_id: string
+  stripe_payment_method_id: string
+  stripe_customer_id: string
+  type: string
+  brand?: string
+  last4?: string
+  exp_month?: number
+  exp_year?: number
+  is_default: boolean
+  created_at: string
+  updated_at: string
 }

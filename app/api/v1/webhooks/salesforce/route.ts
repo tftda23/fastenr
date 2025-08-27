@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         break
 
       default:
-        console.log(`Unhandled Salesforce event: ${event_type}`)
+        // Unhandled Salesforce event
     }
 
     return createApiResponse({ message: "Webhook processed successfully" })
@@ -58,7 +58,7 @@ async function handleAccountSync(supabase: any, data: any) {
       await supabase.from("accounts").update(accountData).eq("id", existingAccount.id)
     } else {
       // Create new account (would need organization mapping logic)
-      console.log("New Salesforce account would be created:", data.Id)
+      // New Salesforce account would be created
     }
   } catch (error) {
     console.error("Error syncing Salesforce account:", error)

@@ -39,7 +39,7 @@ export default async function DashboardPage() {
   }
 
   if (!profile) {
-    console.log("Profile not found for user:", user.id, "- redirecting to onboarding")
+    // Profile not found, redirecting to onboarding
     redirect("/onboarding")
   }
 

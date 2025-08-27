@@ -52,5 +52,5 @@ async function handleCompanyUpdate(event: any) {
 
 async function handleContactUpdate(event: any) {
   // Handle contact updates if needed
-  console.log("Contact update received:", event)
+  // Contact update received
 }

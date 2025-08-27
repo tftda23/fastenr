@@ -100,43 +100,6 @@ export default function EmailSettingsClient() {
         </CardContent>
       </Card>
 
-      {/* Custom Domain Section - Coming Soon */}
-      <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5" />
-            Custom Email Domain
-            <Badge variant="secondary">Coming Soon</Badge>
-          </CardTitle>
-          <CardDescription>
-            Send emails from your own domain for better branding and deliverability
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <div>
-              <h4 className="font-medium">Planned Features</h4>
-              <ul className="text-sm text-muted-foreground space-y-1 ml-4">
-                <li>• Custom domain configuration (e.g., mail.yourcompany.com)</li>
-                <li>• DKIM and SPF record management</li>
-                <li>• Domain verification wizard</li>
-                <li>• Enhanced email deliverability</li>
-                <li>• Professional sender reputation</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium">Benefits</h4>
-              <ul className="text-sm text-muted-foreground space-y-1 ml-4">
-                <li>• Emails appear to come from your domain</li>
-                <li>• Improved spam filtering bypass</li>
-                <li>• Better brand recognition</li>
-                <li>• Enhanced security and trust</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }
