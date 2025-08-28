@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
   MoreHorizontal, Eye, Edit, Trash2, Mail, Phone, 
-  Building2, Crown, Users, Filter, RefreshCw
+  Building2, Crown, Users, Filter, RefreshCw, Briefcase
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -25,13 +25,15 @@ import {
   ContactGroup, 
   ContactsResponse, 
   ContactFilters, 
-  ContactSortOptions 
+  ContactSortOptions,
+  Account
 } from '@/lib/types'
 import { format } from 'date-fns'
 
 interface ContactsTableProps {
   contacts: ContactsResponse
   contactGroups: ContactGroup[]
+  accounts: Account[]
   filters: ContactFilters
   sort: ContactSortOptions
   currentPage: number
@@ -119,6 +121,7 @@ const StatusBadge = ({ status }: { status?: string }) => {
 export function ContactsTable({
   contacts,
   contactGroups,
+  accounts,
   filters,
   sort,
   currentPage,
@@ -137,9 +140,10 @@ export function ContactsTable({
         header: "Name",
         cell: ({ row }) => {
           const contact = row.original
+          const fullName = contact.full_name || `${contact.first_name} ${contact.last_name}`
           return (
             <div className="space-y-1">
-              <div className="font-medium">{contact.full_name}</div>
+              <div className="font-medium">{fullName}</div>
               <div className="text-sm text-muted-foreground">
                 {contact.title && (
                   <div className="flex items-center gap-1">
@@ -312,7 +316,7 @@ export function ContactsTable({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
               <Input
@@ -320,6 +324,28 @@ export function ContactsTable({
                 value={filters.search || ''}
                 onChange={(e) => onFilterChange({ search: e.target.value })}
               />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Account</label>
+              <Select 
+                value={filters.account_id || 'all'} 
+                onValueChange={(value) => onFilterChange({ 
+                  account_id: value === 'all' ? undefined : value 
+                })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All accounts" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Accounts</SelectItem>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -402,6 +428,7 @@ export function ContactsTable({
               size="sm"
               onClick={() => onFilterChange({
                 search: undefined,
+                account_id: undefined,
                 seniority_level: undefined,
                 decision_maker_level: undefined,
                 contact_status: undefined,

@@ -1,9 +1,6 @@
 import { getDashboardStats, getChurnRiskAccounts } from "@/lib/supabase/queries"
 import { createClient } from "@/lib/supabase/server"
-import StatsCards from "@/components/dashboard/stats-cards"
-import ChurnRiskChart from "@/components/dashboard/churn-risk-chart"
-import HealthScoreDistribution from "@/components/dashboard/health-score-distribution"
-import RecentActivity from "@/components/dashboard/recent-activity"
+import { DashboardClient } from "@/components/dashboard/dashboard-client"
 import { redirect } from "next/navigation"
 
 export default async function DashboardPage() {
@@ -47,7 +44,7 @@ export default async function DashboardPage() {
     const [stats, churnRiskAccounts] = await Promise.all([getDashboardStats(), getChurnRiskAccounts(10)])
 
     // Get accounts for health distribution
-    const { data: accounts } = await supabase.from("accounts").select("id, health_score, name")
+    const { data: accounts } = await supabase.from("accounts").select("id, health_score, name, owner_id").eq("organization_id", profile.organization_id)
 
     // Mock recent activities (in real app, this would come from a proper query)
     const recentActivities = [
@@ -89,39 +86,15 @@ export default async function DashboardPage() {
     }
 
     return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {profile.full_name} • {profile.role}
-          </p>
-        </div>
-
-        {/* Stats Cards */}
-        <StatsCards stats={stats} />
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Churn Risk Analysis */}
-          <div className="lg:col-span-2">
-            <ChurnRiskChart
-              accounts={
-                churnRiskAccounts?.map((account) => ({
-                  ...account,
-                  href: `/accounts/${account.id}`, // ✅ link to account detail
-                })) || []
-              }
-            />
-          </div>
-
-          {/* Health Score Distribution */}
-          <HealthScoreDistribution accounts={accounts || []} />
-
-          {/* Recent Activity */}
-          <RecentActivity activities={recentActivities} />
-        </div>
-      </div>
+      <DashboardClient
+        initialStats={stats}
+        initialChurnRiskAccounts={churnRiskAccounts || []}
+        initialAccounts={accounts || []}
+        initialActivities={recentActivities}
+        currentUserId={profile.id}
+        userFullName={profile.full_name}
+        userRole={profile.role}
+      />
     )
   } catch (error) {
     console.error("Dashboard error:", error)

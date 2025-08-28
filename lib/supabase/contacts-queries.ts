@@ -1,4 +1,5 @@
-import { createServerClient } from './server'
+import { createClient, createServerClient } from './server'
+import { getCurrentUserOrganization } from './queries'
 import { 
   Contact, 
   ContactGroup, 
@@ -7,24 +8,32 @@ import {
   ContactFilters,
   ContactSortOptions,
   DecisionMakerAnalysis,
-  OrgChartData,
-  ContactAnalytics
+  OrgChartData
 } from '../types'
 
 // Contact CRUD operations
 export async function getContacts(
-  organizationId: string,
   filters?: ContactFilters,
   sort?: ContactSortOptions,
   page = 1,
   limit = 50
 ) {
-  const supabase = createServerClient()
+  console.log('getContacts - Called with:', { filters, sort, page, limit })
+  const { user, organization } = await getCurrentUserOrganization()
+  console.log('getContacts - user:', user?.id, 'organization:', organization?.id)
+  console.log('getContacts - user object:', JSON.stringify(user, null, 2))
+  console.log('getContacts - organization object:', JSON.stringify(organization, null, 2))
+  if (!user || !organization) {
+    console.error('getContacts - Authentication failed: user or organization missing')
+    throw new Error("User not authenticated")
+  }
+
+  const supabase = createClient()
   
   let query = supabase
-    .from('contact_summary')
-    .select('*')
-    .eq('organization_id', organizationId)
+    .from('contacts')
+    .select('*', { count: 'exact' })
+    .eq('organization_id', organization.id)
 
   // Apply filters
   if (filters) {
@@ -44,7 +53,7 @@ export async function getContacts(
       query = query.eq('relationship_strength', filters.relationship_strength)
     }
     if (filters.search) {
-      query = query.or(`full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,title.ilike.%${filters.search}%`)
+      query = query.or(`first_name.ilike.%${filters.search}%,last_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,title.ilike.%${filters.search}%`)
     }
     if (filters.tags && filters.tags.length > 0) {
       query = query.overlaps('tags', filters.tags)
@@ -53,10 +62,10 @@ export async function getContacts(
 
   // Apply sorting
   if (sort) {
-    const column = sort.field === 'name' ? 'full_name' : sort.field
+    const column = sort.field === 'name' ? 'first_name' : sort.field
     query = query.order(column, { ascending: sort.direction === 'asc' })
   } else {
-    query = query.order('full_name', { ascending: true })
+    query = query.order('first_name', { ascending: true })
   }
 
   // Apply pagination
@@ -64,27 +73,43 @@ export async function getContacts(
   const to = from + limit - 1
   query = query.range(from, to)
 
+  console.log('getContacts - About to execute query for org:', organization.id)
   const { data, error, count } = await query
 
+  console.log('getContacts - Query result:', { 
+    dataLength: data?.length, 
+    count, 
+    error: error ? JSON.stringify(error, null, 2) : null,
+    sampleData: data?.slice(0, 2)
+  })
+  
   if (error) {
+    console.error('getContacts - Database error:', JSON.stringify(error, null, 2))
     throw new Error(`Failed to fetch contacts: ${error.message}`)
   }
 
-  return {
+  const result = {
     data: data as Contact[],
     count,
     page,
     limit
   }
+  
+  console.log('getContacts - Returning result:', result)
+  return result
 }
 
 export async function getContactById(contactId: string) {
-  const supabase = createServerClient()
+  const { user, organization } = await getCurrentUserOrganization()
+  if (!user || !organization) throw new Error("User not authenticated")
+
+  const supabase = createClient()
   
   const { data, error } = await supabase
-    .from('contact_summary')
+    .from('contacts')
     .select('*')
     .eq('id', contactId)
+    .eq('organization_id', organization.id)
     .single()
 
   if (error) {
@@ -94,16 +119,22 @@ export async function getContactById(contactId: string) {
   return data as Contact
 }
 
-export async function createContact(contactData: ContactFormData, organizationId: string, userId: string) {
-  const supabase = createServerClient()
+export async function createContact(contactData: ContactFormData) {
+  const { user, organization } = await getCurrentUserOrganization()
+  if (!user || !organization) throw new Error("User not authenticated")
+
+  const supabase = createClient()
+  
+  // Extract group_ids from contactData since it's not a database column
+  const { group_ids, ...dbContactData } = contactData
   
   const { data, error } = await supabase
     .from('contacts')
     .insert({
-      ...contactData,
-      organization_id: organizationId,
-      created_by: userId,
-      updated_by: userId
+      ...dbContactData,
+      organization_id: organization.id,
+      created_by: user.id,
+      updated_by: user.id
     })
     .select()
     .single()
@@ -113,8 +144,8 @@ export async function createContact(contactData: ContactFormData, organizationId
   }
 
   // If group_ids provided, add to groups
-  if (contactData.group_ids && contactData.group_ids.length > 0) {
-    await addContactToGroups(data.id, contactData.group_ids, userId)
+  if (group_ids && group_ids.length > 0) {
+    await addContactToGroups(data.id, group_ids, user.id)
   }
 
   return data as Contact
@@ -156,8 +187,11 @@ export async function deleteContact(contactId: string) {
 }
 
 // Contact Groups operations
-export async function getContactGroups(organizationId: string) {
-  const supabase = createServerClient()
+export async function getContactGroups() {
+  const { user, organization } = await getCurrentUserOrganization()
+  if (!user || !organization) throw new Error("User not authenticated")
+
+  const supabase = createClient()
   
   const { data, error } = await supabase
     .from('contact_groups')
@@ -168,7 +202,7 @@ export async function getContactGroups(organizationId: string) {
         contacts(id, first_name, last_name, email, title)
       )
     `)
-    .eq('organization_id', organizationId)
+    .eq('organization_id', organization.id)
     .order('name')
 
   if (error) {
@@ -185,15 +219,20 @@ export async function getContactGroups(organizationId: string) {
   return groups as ContactGroup[]
 }
 
-export async function createContactGroup(groupData: ContactGroupFormData, organizationId: string, userId: string) {
-  const supabase = createServerClient()
+export async function createContactGroup(groupData: ContactGroupFormData) {
+  const { user, organization } = await getCurrentUserOrganization()
+  if (!user || !organization) throw new Error("User not authenticated")
+
+  const supabase = createClient()
   
   const { data, error } = await supabase
     .from('contact_groups')
     .insert({
       ...groupData,
-      organization_id: organizationId,
-      created_by: userId
+      organization_id: organization.id,
+      created_by: user.id,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     })
     .select()
     .single()
@@ -384,96 +423,6 @@ export async function getDecisionMakerAnalysis(organizationId: string, accountId
   return data as DecisionMakerAnalysis[]
 }
 
-// Contact analytics
-export async function getContactAnalytics(organizationId: string): Promise<ContactAnalytics> {
-  const supabase = createServerClient()
-  
-  // Get all contacts for analysis
-  const { data: contacts, error } = await supabase
-    .from('contact_summary')
-    .select('*')
-    .eq('organization_id', organizationId)
-
-  if (error) {
-    throw new Error(`Failed to fetch contact analytics: ${error.message}`)
-  }
-
-  // Calculate analytics
-  const total_contacts = contacts.length
-
-  const by_seniority = contacts.reduce((acc, c) => {
-    const level = c.seniority_level || 'Unknown'
-    acc[level] = (acc[level] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-
-  const by_decision_maker_level = contacts.reduce((acc, c) => {
-    const level = c.decision_maker_level || 'Unknown'
-    acc[level] = (acc[level] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-
-  const by_relationship_strength = contacts.reduce((acc, c) => {
-    const strength = c.relationship_strength || 'unknown'
-    acc[strength] = (acc[strength] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-
-  // Group by account
-  const accountGroups = contacts.reduce((acc, c) => {
-    if (!c.account_id) return acc
-    
-    if (!acc[c.account_id]) {
-      acc[c.account_id] = {
-        account_id: c.account_id,
-        account_name: c.account_name || 'Unknown',
-        contacts: []
-      }
-    }
-    acc[c.account_id].contacts.push(c)
-    return acc
-  }, {} as Record<string, any>)
-
-  const by_account = Object.values(accountGroups).map((group: any) => ({
-    account_id: group.account_id,
-    account_name: group.account_name,
-    contact_count: group.contacts.length,
-    decision_maker_coverage: group.contacts.filter((c: any) => 
-      ['Primary', 'Influencer'].includes(c.decision_maker_level)
-    ).length
-  }))
-
-  const engagement_frequency = contacts.reduce((acc, c) => {
-    const freq = c.engagement_frequency || 'unknown'
-    acc[freq] = (acc[freq] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-
-  // Recent additions (last 30 days)
-  const thirtyDaysAgo = new Date()
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-  const recent_additions = contacts.filter(c => 
-    new Date(c.created_at) > thirtyDaysAgo
-  ).slice(0, 10)
-
-  // Stale contacts (no engagement in 90 days)
-  const ninetyDaysAgo = new Date()
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90)
-  const stale_contacts = contacts.filter(c => 
-    !c.last_engagement_date || new Date(c.last_engagement_date) < ninetyDaysAgo
-  ).slice(0, 10)
-
-  return {
-    total_contacts,
-    by_seniority,
-    by_decision_maker_level,
-    by_relationship_strength,
-    by_account,
-    engagement_frequency,
-    recent_additions,
-    stale_contacts
-  }
-}
 
 // Engagement participants
 export async function addEngagementParticipants(engagementId: string, contactIds: string[]) {

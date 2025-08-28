@@ -9,20 +9,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useToast } from '@/hooks/use-toast'
-import { ContactGroup, ContactFormData } from '@/lib/types'
+import { ContactGroup, ContactFormData, Account } from '@/lib/types'
 
 interface CreateContactDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   contactGroups: ContactGroup[]
   onSuccess: () => void
+  accounts?: Account[]
+  defaultAccountId?: string
 }
 
 export function CreateContactDialog({
   open,
   onOpenChange,
   contactGroups,
-  onSuccess
+  onSuccess,
+  accounts = [],
+  defaultAccountId
 }: CreateContactDialogProps) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
@@ -33,6 +37,7 @@ export function CreateContactDialog({
     phone: '',
     title: '',
     department: '',
+    account_id: defaultAccountId || '',
     seniority_level: undefined,
     decision_maker_level: undefined,
     relationship_strength: 'neutral',
@@ -70,6 +75,7 @@ export function CreateContactDialog({
           phone: '',
           title: '',
           department: '',
+          account_id: defaultAccountId || '',
           seniority_level: undefined,
           decision_maker_level: undefined,
           relationship_strength: 'neutral',
@@ -117,6 +123,27 @@ export function CreateContactDialog({
           {/* Basic Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Basic Information</h3>
+            
+            {/* Account Selection - Required */}
+            <div className="space-y-2">
+              <Label htmlFor="account_id">Account *</Label>
+              <Select 
+                value={formData.account_id || ''} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, account_id: value }))}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an account" />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

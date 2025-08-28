@@ -2,13 +2,36 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { TrendingUp } from "lucide-react"
+import { TrendingUp, Loader2 } from "lucide-react"
 
 interface HealthScoreDistributionProps {
   accounts: Array<{ health_score: number; name: string }>
+  loading?: boolean
 }
 
-export default function HealthScoreDistribution({ accounts }: HealthScoreDistributionProps) {
+export default function HealthScoreDistribution({ accounts, loading = false }: HealthScoreDistributionProps) {
+  
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Health Score Distribution
+          </CardTitle>
+          <CardDescription>Account health breakdown</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="flex items-center space-x-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-muted-foreground">Loading distribution...</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
   // Calculate distribution
   const distribution = {
     excellent: accounts.filter((a) => a.health_score >= 80).length,

@@ -2,14 +2,15 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { AlertTriangle, TrendingDown, TrendingUp } from "lucide-react"
+import { AlertTriangle, TrendingDown, TrendingUp, Loader2 } from "lucide-react"
 import type { ChurnRiskAccount } from "@/lib/types"
 
 interface ChurnRiskChartProps {
   accounts: ChurnRiskAccount[]
+  loading?: boolean
 }
 
-export default function ChurnRiskChart({ accounts }: ChurnRiskChartProps) {
+export default function ChurnRiskChart({ accounts, loading = false }: ChurnRiskChartProps) {
   const getRiskLevel = (score: number) => {
     if (score >= 80) return { label: "Critical", color: "bg-red-100 text-red-800", icon: AlertTriangle }
     if (score >= 60) return { label: "High", color: "bg-orange-100 text-orange-800", icon: TrendingDown }
@@ -41,8 +42,16 @@ export default function ChurnRiskChart({ accounts }: ChurnRiskChartProps) {
         <CardDescription>Accounts ranked by churn risk score</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {accounts.map((account) => {
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="flex items-center space-x-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-muted-foreground">Loading churn risk data...</span>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {accounts.map((account) => {
             const risk = getRiskLevel(account.churn_risk_score)
             const RiskIcon = risk.icon
 
@@ -74,8 +83,9 @@ export default function ChurnRiskChart({ accounts }: ChurnRiskChartProps) {
                 </div>
               </div>
             )
-          })}
-        </div>
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   )

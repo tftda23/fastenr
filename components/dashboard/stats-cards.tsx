@@ -1,12 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, TrendingUp, AlertTriangle, DollarSign, Star } from "lucide-react"
+import { Users, TrendingUp, AlertTriangle, DollarSign, Star, Loader2 } from "lucide-react"
 import type { DashboardStats } from "@/lib/types"
 
 interface StatsCardsProps {
   stats: DashboardStats
+  loading?: boolean
 }
 
-export default function StatsCards({ stats }: StatsCardsProps) {
+export default function StatsCards({ stats, loading = false }: StatsCardsProps) {
   const cards = [
     {
       title: "Total Accounts",
@@ -66,9 +67,18 @@ export default function StatsCards({ stats }: StatsCardsProps) {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{card.value}</div>
-            <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
-            <p className="text-xs text-green-600 mt-1">{card.trend}</p>
+            {loading ? (
+              <div className="flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-foreground">{card.value}</div>
+                <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
+                <p className="text-xs text-green-600 mt-1">{card.trend}</p>
+              </>
+            )}
           </CardContent>
         </Card>
       ))}

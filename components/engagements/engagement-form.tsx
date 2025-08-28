@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Save, X } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Loader2, Save, X, Users, User, Search } from "lucide-react"
 import Link from "next/link"
-import type { Engagement, Account } from "@/lib/types"
+import type { Engagement, Account, Contact } from "@/lib/types"
 
 interface EngagementFormProps {
   engagement?: Engagement
@@ -25,6 +26,9 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
 
   const [isLoading, setIsLoading] = useState(false)
   const [accounts, setAccounts] = useState<Account[]>([])
+  const [contacts, setContacts] = useState<Contact[]>([])
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([])
+  const [contactSearch, setContactSearch] = useState("")
   const [formData, setFormData] = useState({
     account_id: engagement?.account_id || preselectedAccountId || "",
     type: engagement?.type || "meeting",
@@ -33,12 +37,22 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
     outcome: engagement?.outcome || "no_outcome_set",
     scheduled_at: engagement?.scheduled_at ? engagement.scheduled_at.slice(0, 16) : "",
     completed_at: engagement?.completed_at ? engagement.completed_at.slice(0, 16) : "",
-    attendees: engagement?.attendees ? JSON.stringify(engagement.attendees) : "[]",
   })
 
   useEffect(() => {
     loadAccounts()
+    loadContacts()
+    if (engagement && isEditing) {
+      loadEngagementParticipants()
+    }
   }, [])
+
+  // Load contacts when account changes
+  useEffect(() => {
+    if (formData.account_id) {
+      loadContacts(formData.account_id)
+    }
+  }, [formData.account_id])
 
   const loadAccounts = async () => {
     try {
@@ -49,6 +63,35 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
       }
     } catch (error) {
       console.error("Error loading accounts:", error)
+    }
+  }
+
+  const loadContacts = async (accountId?: string) => {
+    try {
+      const params = new URLSearchParams()
+      if (accountId) {
+        params.set('account_id', accountId)
+      }
+      const response = await fetch(`/api/contacts?${params.toString()}`)
+      const result = await response.json()
+      if (response.ok) {
+        setContacts(result.data || [])
+      }
+    } catch (error) {
+      console.error("Failed to load contacts:", error)
+    }
+  }
+
+  const loadEngagementParticipants = async () => {
+    if (!engagement?.id) return
+    try {
+      const response = await fetch(`/api/engagements/${engagement.id}/participants`)
+      const result = await response.json()
+      if (response.ok) {
+        setSelectedContacts(result.map((p: any) => p.contact_id))
+      }
+    } catch (error) {
+      console.error("Failed to load engagement participants:", error)
     }
   }
 
@@ -63,7 +106,7 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
         completed_at: formData.completed_at || null,
         outcome: formData.outcome || null,
         description: formData.description || null,
-        attendees: formData.attendees ? JSON.parse(formData.attendees) : [],
+        participants: selectedContacts, // Send selected contact IDs
       }
 
       const url = isEditing ? `/api/engagements/${engagement?.id}` : "/api/engagements"
@@ -77,6 +120,17 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
 
       if (!response.ok) {
         throw new Error("Failed to save engagement")
+      }
+
+      const result = await response.json()
+
+      // If creating a new engagement, also save participants
+      if (!isEditing && result.id && selectedContacts.length > 0) {
+        await fetch(`/api/engagements/${result.id}/participants`, {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contactIds: selectedContacts }),
+        })
       }
 
       router.push("/dashboard/engagements")
@@ -216,17 +270,84 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
               </div>
             </div>
 
-            {/* Attendees */}
+            {/* Contact Participants */}
             <div className="space-y-2">
-              <Label htmlFor="attendees">Attendees (JSON)</Label>
-              <Textarea
-                id="attendees"
-                value={formData.attendees}
-                onChange={(e) => handleChange("attendees", e.target.value)}
-                placeholder='[{"name": "John Smith", "email": "john@example.com", "role": "CEO"}]'
-                rows={3}
-              />
-              <p className="text-xs text-muted-foreground">JSON array of attendee objects</p>
+              <Label>Participants</Label>
+              {formData.account_id ? (
+                <div className="space-y-3">
+                  {/* Search */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search contacts..."
+                      value={contactSearch}
+                      onChange={(e) => setContactSearch(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  
+                  {/* Contact Selection */}
+                  <div className="max-h-48 overflow-y-auto border rounded-md">
+                    {contacts
+                      .filter(contact => {
+                        const searchLower = contactSearch.toLowerCase()
+                        const fullName = `${contact.first_name} ${contact.last_name}`.toLowerCase()
+                        const email = contact.email?.toLowerCase() || ''
+                        return fullName.includes(searchLower) || email.includes(searchLower)
+                      })
+                      .map((contact) => (
+                        <div key={contact.id} className="flex items-center space-x-3 p-3 hover:bg-muted/50">
+                          <Checkbox
+                            id={`contact-${contact.id}`}
+                            checked={selectedContacts.includes(contact.id)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedContacts([...selectedContacts, contact.id])
+                              } else {
+                                setSelectedContacts(selectedContacts.filter(id => id !== contact.id))
+                              }
+                            }}
+                          />
+                          <div className="flex items-center space-x-3 flex-1">
+                            <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                              <User className="h-4 w-4 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium truncate">
+                                {contact.first_name} {contact.last_name}
+                              </div>
+                              <div className="text-sm text-muted-foreground truncate">
+                                {contact.email}
+                              </div>
+                              {contact.title && (
+                                <div className="text-xs text-muted-foreground truncate">
+                                  {contact.title}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    
+                    {contacts.length === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p>No contacts available for this account</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Selected count */}
+                  <div className="text-sm text-muted-foreground">
+                    {selectedContacts.length} contact{selectedContacts.length !== 1 ? 's' : ''} selected
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>Select an account first to choose participants</p>
+                </div>
+              )}
             </div>
 
             {/* Actions */}

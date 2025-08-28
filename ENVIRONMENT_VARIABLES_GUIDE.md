@@ -2,6 +2,30 @@
 
 This guide explains all environment variables used in Fastenr and how to configure them for different environments.
 
+## 🧠 **AI Configuration** 
+
+### **OpenAI Setup**
+```bash
+# OpenAI API key for AI insights functionality
+# Get your API key from: https://platform.openai.com/api-keys
+OPENAI_API_KEY=sk-your-openai-api-key-here
+
+# Optional AI configuration (with defaults shown)
+OPENAI_MODEL=gpt-4                    # Options: gpt-4, gpt-4-turbo, gpt-3.5-turbo
+OPENAI_MAX_TOKENS=2000                # Maximum tokens for AI response
+OPENAI_TEMPERATURE=0.3                # Creativity level (0.0-1.0, lower = more focused)
+
+# Fallback behavior when no API key is provided
+AI_FALLBACK_TO_MOCK=true              # Set to false to require real AI
+```
+
+### **AI Security Notes**
+- **Never commit** your OpenAI API key to version control
+- Store the key in `.env.local` for development
+- Use secure environment variable management in production
+- The system automatically sanitizes data before sending to AI (no PII)
+- Only business metrics and categorical data are sent to the AI service
+
 ## 🔧 **Core App Configuration**
 
 ### **URL Configuration**

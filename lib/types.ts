@@ -21,21 +21,32 @@ export interface Account {
   id: string
   name: string
   organization_id: string
+  owner_id?: string
   health_score?: number
   arr?: number
   churn_risk_score?: number
   status?: 'active' | 'churned' | 'at_risk' | 'onboarding'
   created_at: string
   updated_at: string
+  
+  // Populated fields from joins
+  owner?: User
+  owner_name?: string
 }
 
 export interface Engagement {
   id: string
   account_id: string
+  organization_id: string
   type: string
+  title: string
+  description?: string
   outcome?: string
-  notes?: string
-  engagement_date: string
+  scheduled_at?: string
+  completed_at?: string
+  duration_minutes?: number
+  tags?: string[]
+  attendees?: any[] // Legacy field - being replaced by engagement_participants
   created_at: string
   updated_at: string
   created_by: string
@@ -311,21 +322,6 @@ export interface GoalWithContacts extends CustomerGoal {
 }
 
 // Contact analytics types
-export interface ContactAnalytics {
-  total_contacts: number
-  by_seniority: Record<string, number>
-  by_decision_maker_level: Record<string, number>
-  by_relationship_strength: Record<string, number>
-  by_account: Array<{
-    account_id: string
-    account_name: string
-    contact_count: number
-    decision_maker_coverage: number
-  }>
-  engagement_frequency: Record<string, number>
-  recent_additions: Contact[]
-  stale_contacts: Contact[] // Contacts without recent engagement
-}
 
 // Export all types
 export type {
@@ -356,6 +352,5 @@ export type {
   OrgChartData,
   AutomationContactTarget,
   EngagementWithParticipants,
-  GoalWithContacts,
-  ContactAnalytics
+  GoalWithContacts
 }
