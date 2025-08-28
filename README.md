@@ -60,6 +60,8 @@ fastenr is a modern customer success platform that moves beyond traditional CRM 
 | Feature | Documentation | Key Capabilities |
 |---------|---------------|------------------|
 | **[Customer Management](./docs/CUSTOMER_MANAGEMENT.md)** | Account tracking, health scoring, engagement management | 360° customer view, health monitoring |
+| **[Contact Management](./CONTACTS_SYSTEM_SUMMARY.md)** | Enterprise contact management with org charts | Stakeholder mapping, decision maker tracking |
+| **[AI-Powered Insights](./AI_SETUP_GUIDE.md)** | OpenAI integration for intelligent recommendations | Smart analysis, predictive insights |
 | **[Analytics & Reporting](./docs/ANALYTICS.md)** | Health analytics, churn prediction, business metrics | Real-time insights, predictive analytics |
 | **[Automation System](./docs/AUTOMATION.md)** | Workflow builder, triggers, email automation | Smart workflows, proactive interventions |
 | **[Survey System](./docs/SURVEYS.md)** | NPS surveys, custom surveys, feedback collection | Customer feedback, satisfaction tracking |
