@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, Save, X } from "lucide-react"
 import Link from "next/link"
-import type { Account } from "@/lib/types"
+import type { Account, User } from "@/lib/types"
 
 interface AccountFormProps {
   account?: Account
@@ -21,12 +21,14 @@ interface AccountFormProps {
 export default function AccountForm({ account, isEditing = false }: AccountFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [users, setUsers] = useState<User[]>([])
   const [formData, setFormData] = useState({
     name: account?.name || "",
     industry: account?.industry || "",
     size: account?.size || "",
     arr: account?.arr?.toString() || "",
     status: account?.status || "active",
+    owner_id: account?.owner_id || "unassigned",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,10 +42,15 @@ export default function AccountForm({ account, isEditing = false }: AccountFormP
         size: formData.size || null,
         arr: formData.arr ? Number.parseFloat(formData.arr) : null,
         status: formData.status,
+        owner_id: formData.owner_id === "unassigned" ? null : formData.owner_id,
       }
+
+      console.log('Account form payload:', payload)
 
       const url = isEditing ? `/api/accounts/${account?.id}` : "/api/accounts"
       const method = isEditing ? "PUT" : "POST"
+
+      console.log('Making request to:', method, url)
 
       const response = await fetch(url, {
         method,
@@ -51,8 +58,12 @@ export default function AccountForm({ account, isEditing = false }: AccountFormP
         body: JSON.stringify(payload),
       })
 
+      console.log('Response status:', response.status, response.statusText)
+
       if (!response.ok) {
-        throw new Error("Failed to save account")
+        const errorBody = await response.text()
+        console.error('Error response body:', errorBody)
+        throw new Error(`Failed to save account: ${response.status} ${errorBody}`)
       }
 
       router.push("/dashboard/accounts")
@@ -62,6 +73,28 @@ export default function AccountForm({ account, isEditing = false }: AccountFormP
       // In a real app, you'd show a toast notification here
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadUsers()
+  }, [])
+
+  const loadUsers = async () => {
+    try {
+      console.log('Loading users from /api/users')
+      const response = await fetch('/api/users')
+      console.log('Users API response status:', response.status)
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Users data received:', data)
+        setUsers(data)
+      } else {
+        const errorText = await response.text()
+        console.error('Users API error:', response.status, errorText)
+      }
+    } catch (error) {
+      console.error('Failed to load users:', error)
     }
   }
 
@@ -106,6 +139,28 @@ export default function AccountForm({ account, isEditing = false }: AccountFormP
                   required
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="owner_id">Account Owner</Label>
+                <Select value={formData.owner_id} onValueChange={(value) => handleChange("owner_id", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select owner" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                    {users.map((user) => {
+                      console.log('Rendering user option:', user)
+                      return (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.full_name || user.email}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="industry">Industry</Label>
                 <Input

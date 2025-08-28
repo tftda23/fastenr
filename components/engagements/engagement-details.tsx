@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -22,12 +22,20 @@ import {
   GraduationCap,
 } from "lucide-react"
 import Link from "next/link"
-import type { Engagement } from "@/lib/types"
+import type { Engagement, Contact, EngagementParticipant } from "@/lib/types"
 
 interface EngagementWithDetails extends Engagement {
   // Joins may be missing/null if RLS blocks them — mark as optional
   accounts?: { name?: string; churn_risk_score?: number; arr?: number } | null
   users?: { full_name?: string } | null
+}
+
+interface ContactParticipant {
+  id: string
+  contact_id: string
+  participation_type?: string
+  response_status?: string
+  contacts: Contact
 }
 
 interface EngagementDetailsProps {
@@ -39,6 +47,28 @@ interface EngagementDetailsProps {
 export default function EngagementDetails({ engagement, canEdit, canDelete }: EngagementDetailsProps) {
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
+  const [participants, setParticipants] = useState<ContactParticipant[]>([])
+  const [loadingParticipants, setLoadingParticipants] = useState(true)
+
+  useEffect(() => {
+    loadParticipants()
+  }, [engagement.id])
+
+  const loadParticipants = async () => {
+    try {
+      const response = await fetch(`/api/engagements/${engagement.id}/participants`)
+      if (response.ok) {
+        const data = await response.json()
+        setParticipants(data)
+      } else {
+        console.error('Failed to load participants:', response.statusText)
+      }
+    } catch (error) {
+      console.error('Error loading participants:', error)
+    } finally {
+      setLoadingParticipants(false)
+    }
+  }
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this engagement? This action cannot be undone.")) return
@@ -190,36 +220,64 @@ export default function EngagementDetails({ engagement, canEdit, canDelete }: En
             </Card>
           )}
 
-          {/* Attendees */}
-          {Array.isArray(engagement.attendees) && engagement.attendees.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Attendees
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {engagement.attendees.map((attendee: any, index: number) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
-                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <User className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">{attendee?.name || "Unknown"}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {attendee?.email && attendee?.role
-                            ? `${attendee.email} • ${attendee.role}`
-                            : attendee?.email || attendee?.role || "No details"}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+          {/* Participants */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Participants
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingParticipants ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  Loading participants...
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              ) : participants.length > 0 ? (
+                <div className="space-y-3">
+                  {participants.map((participant) => {
+                    const contact = participant.contacts
+                    const fullName = contact.full_name || `${contact.first_name} ${contact.last_name}`
+                    return (
+                      <div key={participant.id} className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
+                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                          <User className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-foreground">{fullName}</p>
+                          <div className="text-sm text-muted-foreground space-y-1">
+                            {contact.email && (
+                              <div className="flex items-center gap-1">
+                                <Mail className="h-3 w-3" />
+                                <a href={`mailto:${contact.email}`} className="hover:underline">
+                                  {contact.email}
+                                </a>
+                              </div>
+                            )}
+                            {contact.title && (
+                              <div className="text-xs">
+                                {contact.title}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        {participant.participation_type && (
+                          <Badge variant="outline">
+                            {participant.participation_type}
+                          </Badge>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No participants added</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Tags */}
           {Array.isArray(engagement.tags) && engagement.tags.length > 0 && (

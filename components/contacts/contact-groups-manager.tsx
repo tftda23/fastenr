@@ -14,6 +14,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Contact, ContactGroup } from '@/lib/types'
+import { CreateContactGroupDialog } from './create-contact-group-dialog'
+import { EditContactGroupDialog } from './edit-contact-group-dialog'
+import { AddContactsToGroupDialog } from './add-contacts-to-group-dialog'
 
 interface ContactGroupsManagerProps {
   contactGroups: ContactGroup[]
@@ -27,9 +30,46 @@ export function ContactGroupsManager({
   onRefresh
 }: ContactGroupsManagerProps) {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showAddContactsDialog, setShowAddContactsDialog] = useState(false)
+  const [groupToEdit, setGroupToEdit] = useState<ContactGroup | null>(null)
 
   const selectedGroupData = contactGroups.find(g => g.id === selectedGroup)
   const groupContacts = selectedGroupData?.contacts || []
+
+  const handleEditGroup = (group: ContactGroup) => {
+    setGroupToEdit(group)
+    setShowEditDialog(true)
+  }
+
+  const handleDeleteGroup = async (groupId: string) => {
+    if (!confirm('Are you sure you want to delete this group? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/contact-groups/${groupId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        // If the deleted group was selected, clear selection
+        if (selectedGroup === groupId) {
+          setSelectedGroup(null)
+        }
+        onRefresh()
+      } else {
+        console.error('Failed to delete group')
+      }
+    } catch (error) {
+      console.error('Error deleting group:', error)
+    }
+  }
+
+  const handleAddContacts = () => {
+    setShowAddContactsDialog(true)
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -37,7 +77,7 @@ export function ContactGroupsManager({
       <div className="lg:col-span-1 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium">Contact Groups</h3>
-          <Button size="sm">
+          <Button size="sm" onClick={() => setShowCreateDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />
             New Group
           </Button>
@@ -75,12 +115,15 @@ export function ContactGroupsManager({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditGroup(group)}>
                         <Edit className="mr-2 h-4 w-4" />
                         Edit group
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem 
+                        className="text-red-600"
+                        onClick={() => handleDeleteGroup(group.id)}
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete group
                       </DropdownMenuItem>
@@ -169,12 +212,20 @@ export function ContactGroupsManager({
                       </div>
                     </div>
                   ))}
+                  
+                  {/* Add More Contacts Button */}
+                  <div className="pt-2 border-t">
+                    <Button variant="outline" size="sm" onClick={handleAddContacts} className="w-full">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add More Contacts
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8">
                   <Users className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                   <p className="text-muted-foreground">No contacts in this group</p>
-                  <Button size="sm" className="mt-2">
+                  <Button size="sm" className="mt-2" onClick={handleAddContacts}>
                     Add Contacts
                   </Button>
                 </div>
@@ -193,6 +244,39 @@ export function ContactGroupsManager({
           </Card>
         )}
       </div>
+
+      {/* Create Group Dialog */}
+      <CreateContactGroupDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onSuccess={() => {
+          onRefresh()
+          setShowCreateDialog(false)
+        }}
+      />
+
+      {/* Edit Group Dialog */}
+      <EditContactGroupDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        onSuccess={() => {
+          onRefresh()
+          setShowEditDialog(false)
+        }}
+        group={groupToEdit}
+      />
+
+      {/* Add Contacts Dialog */}
+      <AddContactsToGroupDialog
+        open={showAddContactsDialog}
+        onOpenChange={setShowAddContactsDialog}
+        onSuccess={() => {
+          onRefresh()
+          setShowAddContactsDialog(false)
+        }}
+        group={selectedGroupData}
+        allContacts={contacts}
+      />
     </div>
   )
 }

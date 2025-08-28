@@ -12,11 +12,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import {
   Building, Edit, Trash2, TrendingUp, AlertTriangle, DollarSign,
-  Calendar, Globe, MessageSquare, Target, Star, Plus,
+  Calendar, Globe, MessageSquare, Target, Star, Plus, Users, Mail, Phone, UserPlus,
 } from "lucide-react"
 import type {
-  Account, Engagement, CustomerGoal, HealthMetric, ApiResponse, PaginatedResponse,
+  Account, Engagement, CustomerGoal, HealthMetric, ApiResponse, PaginatedResponse, Contact,
 } from "@/lib/types"
+import { OrgChartView } from "@/components/contacts/org-chart-view"
+import { AIInsightsButton } from "@/components/ai/ai-insights-button"
 
 type HealthBlock = {
   health_score: number
@@ -241,13 +243,14 @@ interface AccountDetailsProps {
   account: Account
   canEdit: boolean
   canDelete: boolean
+  accountContacts?: Contact[]
 }
 
-export default function AccountDetails({ account, canEdit, canDelete }: AccountDetailsProps) {
+export default function AccountDetails({ account, canEdit, canDelete, accountContacts = [] }: AccountDetailsProps) {
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const [activeTab, setActiveTab] = useState<"overview" | "engagements" | "goals" | "health">("overview")
+  const [activeTab, setActiveTab] = useState<"overview" | "engagements" | "goals" | "health" | "contacts">("overview")
 
   const [engagements, setEngagements] = useState<Engagement[] | null>(null)
   const [engagementsError, setEngagementsError] = useState<string | null>(null)
@@ -370,6 +373,10 @@ export default function AccountDetails({ account, canEdit, canDelete }: AccountD
           </div>
         </div>
         <div className="flex space-x-2">
+          <AIInsightsButton 
+            pageType="account-detail" 
+            pageContext={{ accountId: account.id }}
+          />
           <Button variant="outline" onClick={handleCreateEngagement}>
             <Plus className="h-4 w-4 mr-2" />
             Log Engagement
@@ -453,6 +460,8 @@ export default function AccountDetails({ account, canEdit, canDelete }: AccountD
           <TabsTrigger value="engagements">Engagements</TabsTrigger>
           <TabsTrigger value="goals">Goals</TabsTrigger>
           <TabsTrigger value="health">Health & NPS</TabsTrigger>
+          <TabsTrigger value="contacts">Contacts ({accountContacts.length})</TabsTrigger>
+          <TabsTrigger value="orgchart">Org Chart</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -538,6 +547,103 @@ export default function AccountDetails({ account, canEdit, canDelete }: AccountD
               {healthError && <ErrorState message={healthError} />}
               {health && <HealthPanel data={health} />}
               {health === null && !healthLoading && !healthError && <LoadingRow />}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="contacts">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Account Contacts ({accountContacts.length})
+                </div>
+                <Button size="sm" asChild>
+                  <Link href={`/dashboard/contacts?account_id=${account.id}`}>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Add Contact
+                  </Link>
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {accountContacts.length > 0 ? (
+                <div className="space-y-4">
+                  {accountContacts.map((contact) => (
+                    <div key={contact.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Users className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{contact.first_name} {contact.last_name}</p>
+                          <p className="text-sm text-muted-foreground">{contact.title || 'No title'}</p>
+                          <div className="flex items-center gap-4 mt-1">
+                            {contact.email && (
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Mail className="h-3 w-3" />
+                                {contact.email}
+                              </div>
+                            )}
+                            {contact.phone && (
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Phone className="h-3 w-3" />
+                                {contact.phone}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {contact.decision_maker_level && (
+                          <Badge variant="secondary">{contact.decision_maker_level}</Badge>
+                        )}
+                        {contact.relationship_strength && (
+                          <Badge 
+                            variant={contact.relationship_strength === 'champion' ? 'default' : 'outline'}
+                            className={contact.relationship_strength === 'champion' ? 'bg-green-100 text-green-800' : ''}
+                          >
+                            {contact.relationship_strength}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No contacts yet</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Add contacts to track stakeholders and decision makers for this account.
+                  </p>
+                  <Button asChild>
+                    <Link href={`/dashboard/contacts?account_id=${account.id}`}>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add First Contact
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="orgchart">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building className="h-5 w-5" />
+                Organization Chart - {account.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <OrgChartView
+                contacts={accountContacts}
+                accountId={account.id}
+                onRefresh={() => window.location.reload()}
+              />
             </CardContent>
           </Card>
         </TabsContent>

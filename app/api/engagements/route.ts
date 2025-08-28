@@ -14,10 +14,14 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get("type") ?? undefined
     const outcome = searchParams.get("outcome") ?? undefined
     const accountFilter = searchParams.get("accountFilter") ?? undefined
+    
+    // Calendar date range parameters
+    const startDate = searchParams.get("start") ?? undefined
+    const endDate = searchParams.get("end") ?? undefined
 
     // GET request parameters received
 
-    const result = await getEngagements(accountId, page, limit, search, type, outcome, accountFilter)
+    const result = await getEngagements(accountId, page, limit, search, type, outcome, accountFilter, startDate, endDate)
 
     return NextResponse.json(result, { status: 200 })
   } catch (error) {

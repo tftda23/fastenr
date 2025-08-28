@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import type { Account, Engagement, NPSSurvey, CustomerGoal } from "@/lib/types"
+import type { Account, Engagement, NPSSurvey, CustomerGoal, User } from "@/lib/types"
 import type { AutomationWorkflow } from '@/lib/types';
 
 // Get current user's organization ID
@@ -59,7 +59,7 @@ export async function checkUserPermission(requiredRole: "read" | "read_write" | 
 }
 
 // Account queries
-export async function getAccounts(page = 1, limit = 20, search?: string) {
+export async function getAccounts(page = 1, limit = 20, search?: string, ownerId?: string) {
   const { user, organization } = await getCurrentUserOrganization()
   if (!user || !organization) throw new Error("User not authenticated")
 
@@ -77,12 +77,42 @@ export async function getAccounts(page = 1, limit = 20, search?: string) {
     query = query.or(`name.ilike.%${search}%,industry.ilike.%${search}%`)
   }
 
+  if (ownerId) {
+    query = query.eq("owner_id", ownerId)
+  }
+
   const { data, error, count } = await query
 
   if (error) throw error
 
+  // Get owner information for accounts that have owner_id
+  const accountsWithOwnerIds = (data || []).filter(account => account.owner_id)
+  const ownerIds = accountsWithOwnerIds.map(account => account.owner_id)
+  
+  let owners: User[] = []
+  if (ownerIds.length > 0) {
+    const { data: ownersData, error: ownersError } = await supabase
+      .from("user_profiles")
+      .select("id, full_name, email")
+      .in("id", ownerIds)
+    
+    if (!ownersError) {
+      owners = ownersData || []
+    }
+  }
+
+  // Add owner information to accounts
+  const accountsWithOwner = (data || []).map(account => {
+    const owner = owners.find(o => o.id === account.owner_id) || null
+    return {
+      ...account,
+      owner,
+      owner_name: owner?.full_name || null
+    }
+  })
+
   return {
-    data: data as Account[],
+    data: accountsWithOwner as Account[],
     total: count || 0,
     page,
     limit,
@@ -95,10 +125,39 @@ export async function getAccountById(id: string) {
   if (!user || !organization) throw new Error("User not authenticated")
 
   const supabase = createClient()
-  const { data, error } = await supabase.from("accounts").select("*").eq("id", id).single()
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("*")
+    .eq("id", id)
+    .eq("organization_id", organization.id)
+    .maybeSingle()
 
   if (error) throw error
-  return data as Account
+  
+  if (!data) return null
+  
+  // Get owner information if account has owner_id
+  let owner: User | null = null
+  if (data.owner_id) {
+    const { data: ownerData, error: ownerError } = await supabase
+      .from("user_profiles")
+      .select("id, full_name, email")
+      .eq("id", data.owner_id)
+      .maybeSingle()
+    
+    if (!ownerError && ownerData) {
+      owner = ownerData
+    }
+  }
+  
+  // Add owner information to account
+  const accountWithOwner = {
+    ...data,
+    owner,
+    owner_name: owner?.full_name || null
+  }
+  
+  return accountWithOwner as Account | null
 }
 
 export async function createAccount(account: Omit<Account, "id" | "created_at" | "updated_at" | "organization_id">) {
@@ -120,13 +179,29 @@ export async function createAccount(account: Omit<Account, "id" | "created_at" |
 }
 
 export async function updateAccount(id: string, updates: Partial<Account>) {
+  console.log('updateAccount called with:', { id, updates })
+  
   const { user, organization } = await getCurrentUserOrganization()
+  console.log('Current user and org:', { user: user?.id, org: organization?.id })
+  
   if (!user || !organization) throw new Error("User not authenticated")
 
   const supabase = createClient()
+  console.log('Making supabase update call...')
+  
   const { data, error } = await supabase.from("accounts").update(updates).eq("id", id).select().single()
+  
+  console.log('Supabase update result:', { data, error })
 
-  if (error) throw error
+  if (error) {
+    console.error('Supabase error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    })
+    throw new Error(`Database error: ${error.message} (${error.code})`)
+  }
   return data as Account
 }
 
@@ -149,6 +224,8 @@ export async function getEngagements(
   type?: string,
   outcome?: string,
   accountFilter?: string,
+  startDate?: string,
+  endDate?: string,
 ) {
   const { user, organization } = await getCurrentUserOrganization()
   if (!user || !organization) throw new Error("User not authenticated")
@@ -180,6 +257,10 @@ export async function getEngagements(
   if (type && type !== "all") query = query.eq("type", type)
   if (outcome && outcome !== "all") query = query.eq("outcome", outcome)
   if (accountFilter && accountFilter !== "all") query = query.eq("account_id", accountFilter)
+  
+  // Date range filtering for calendar view
+  if (startDate) query = query.gte("scheduled_at", startDate)
+  if (endDate) query = query.lte("scheduled_at", endDate)
 
   const { data, error, count } = await query
 
@@ -432,17 +513,24 @@ export async function updateGoalProgress(goalId: string) {
 }
 
 // Dashboard queries
-export async function getDashboardStats() {
+export async function getDashboardStats(ownerId?: string) {
   const { user, organization } = await getCurrentUserOrganization()
   if (!user || !organization) throw new Error("User not authenticated")
 
   const supabase = createClient()
 
   // Get account statistics
-  const { data: accounts } = await supabase
+  let query = supabase
     .from("accounts")
-    .select("status, health_score, churn_risk_score, arr")
+    .select("status, health_score, churn_risk_score, arr, owner_id")
     .eq("organization_id", organization.id)
+
+  // Filter by owner if specified
+  if (ownerId) {
+    query = query.eq("owner_id", ownerId)
+  }
+
+  const { data: accounts } = await query
 
   if (!accounts) return null
 
@@ -476,13 +564,13 @@ export async function getDashboardStats() {
   }
 }
 
-export async function getChurnRiskAccounts(limit = 10) {
+export async function getChurnRiskAccounts(limit = 10, ownerId?: string) {
   const { user, organization } = await getCurrentUserOrganization()
   if (!user || !organization) throw new Error("User not authenticated")
 
   const supabase = createClient()
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("accounts")
     .select(`
       id,
@@ -490,11 +578,19 @@ export async function getChurnRiskAccounts(limit = 10) {
       churn_risk_score,
       health_score,
       arr,
+      owner_id,
       engagements(completed_at)
     `)
     .eq("organization_id", organization.id)
     .order("churn_risk_score", { ascending: false })
     .limit(limit)
+
+  // Filter by owner if specified
+  if (ownerId) {
+    query = query.eq("owner_id", ownerId)
+  }
+
+  const { data, error } = await query
 
   if (error) throw error
 
@@ -597,6 +693,23 @@ export async function updateAutomation(workflowId: string, updates: Partial<Auto
       if (insErr) throw insErr;
     }
   }
+}
+
+// Get organization users for owner selection
+export async function getOrganizationUsers() {
+  const { user, organization } = await getCurrentUserOrganization()
+  if (!user || !organization) throw new Error("User not authenticated")
+
+  const supabase = createClient()
+  
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("id, full_name, email")
+    .eq("organization_id", organization.id)
+    .order("full_name")
+  
+  if (error) throw error
+  return data as User[]
 }
 
 export async function toggleAutomation(workflowId: string, enabled: boolean) {

@@ -8,10 +8,11 @@ import { Contact } from '@/lib/types'
 
 interface OrgChartViewProps {
   contacts: Contact[]
+  accountId?: string
   onRefresh: () => void
 }
 
-export function OrgChartView({ contacts, onRefresh }: OrgChartViewProps) {
+export function OrgChartView({ contacts, accountId, onRefresh }: OrgChartViewProps) {
   // Simple org chart implementation
   const managersMap = new Map<string, Contact[]>()
   const rootContacts: Contact[] = []
@@ -44,7 +45,7 @@ export function OrgChartView({ contacts, onRefresh }: OrgChartViewProps) {
                   </span>
                 </div>
                 <div>
-                  <div className="font-medium">{contact.full_name}</div>
+                  <div className="font-medium">{contact.first_name} {contact.last_name}</div>
                   <div className="text-sm text-muted-foreground">{contact.title}</div>
                   {contact.department && (
                     <div className="text-xs text-muted-foreground">{contact.department}</div>

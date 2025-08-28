@@ -30,6 +30,7 @@ export default function CreateAutomationDialog({ organizationId, onCreated, onCl
   const [scopeAll, setScopeAll] = useState(true);
   const [accounts, setAccounts] = useState<{ id: string; name: string }[]>([]);
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+  const [users, setUsers] = useState<{ id: string; full_name?: string; email: string }[]>([]);
   const [saving, setSaving] = useState(false);
 
   // UI-driven configuration instead of JSON
@@ -53,6 +54,19 @@ export default function CreateAutomationDialog({ organizationId, onCreated, onCl
         const res = await fetch(`/api/accounts?limit=200`, { cache: "no-store" });
         const json = await res.json();
         setAccounts(json.data ?? []);
+      } catch {
+        // ignore
+      }
+    })();
+
+    // load users for assignee dropdown
+    (async () => {
+      try {
+        const res = await fetch('/api/users');
+        if (res.ok) {
+          const users = await res.json();
+          setUsers(users);
+        }
       } catch {
         // ignore
       }
@@ -297,12 +311,23 @@ export default function CreateAutomationDialog({ organizationId, onCreated, onCl
                   />
                 </div>
                 <div>
-                  <Label>Assignee Email</Label>
-                  <Input
-                    value={actionConfig.task_assignee}
-                    onChange={(e) => setActionConfig(prev => ({ ...prev, task_assignee: e.target.value }))}
-                    placeholder="csm@company.com"
-                  />
+                  <Label>Assignee</Label>
+                  <Select 
+                    value={actionConfig.task_assignee} 
+                    onValueChange={(value) => setActionConfig(prev => ({ ...prev, task_assignee: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select assignee" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Unassigned</SelectItem>
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.full_name || user.email}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             )}

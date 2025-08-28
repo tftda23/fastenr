@@ -23,13 +23,17 @@ import {
   ArrowLeft,
   ClipboardList,
   Mail,
+  Building,
+  Calendar,
 } from "lucide-react"
 import { signOut } from "@/lib/actions"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Accounts", href: "/dashboard/accounts", icon: Users },
+  { name: "Accounts", href: "/dashboard/accounts", icon: Building },
+  { name: "Contacts", href: "/dashboard/contacts", icon: Users },
   { name: "Engagements", href: "/dashboard/engagements", icon: MessageSquare },
+  { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
   { name: "Goals", href: "/dashboard/goals", icon: Target },
   { name: "Surveys", href: "/dashboard/surveys", icon: ClipboardList },
   { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },

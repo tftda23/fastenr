@@ -1,32 +1,13 @@
 import { Suspense } from 'react'
-import { ContactsClient } from '@/components/contacts/contacts-client'
+import { ContactsPageWrapper } from '@/components/contacts/contacts-page-wrapper'
 import { getContacts, getContactGroups } from '@/lib/supabase/contacts-queries'
-import { createServerClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getAccounts } from '@/lib/supabase/queries'
 
 export default async function ContactsPage({
   searchParams
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const supabase = createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/auth/login')
-  }
-
-  // Get user's organization
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('organization_id')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile?.organization_id) {
-    redirect('/onboarding')
-  }
-
   try {
     // Parse search params for filters
     const filters = {
@@ -45,44 +26,51 @@ export default async function ContactsPage({
 
     const page = typeof searchParams.page === 'string' ? parseInt(searchParams.page) : 1
 
-    // Fetch data
-    const [contactsResult, contactGroups] = await Promise.all([
-      getContacts(profile.organization_id, filters, sort, page),
-      getContactGroups(profile.organization_id)
+    // Fetch data using the same pattern as engagements and accounts
+    console.log('ContactsPage - About to fetch data with filters:', filters)
+    console.log('ContactsPage - Sort:', sort, 'Page:', page)
+    
+    const [contactsResult, contactGroups, accountsResult] = await Promise.all([
+      getContacts(filters, sort, page),
+      getContactGroups(),
+      getAccounts(1, 100) // Get up to 100 accounts for the filter
     ])
+    
+    console.log('ContactsPage - Fetched contactsResult:', JSON.stringify(contactsResult, null, 2))
+    console.log('ContactsPage - Contacts data length:', contactsResult?.data?.length)
+    console.log('ContactsPage - Contacts count:', contactsResult?.count)
+    console.log('ContactsPage - Fetched contactGroups:', JSON.stringify(contactGroups, null, 2))
+    console.log('ContactsPage - Contact groups length:', contactGroups?.length)
 
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Contacts</h1>
-          <p className="text-muted-foreground">
-            Manage customer contacts, stakeholders, and decision makers
-          </p>
+      <div className="h-full flex flex-col">
+        <div className="flex-1">
+          <Suspense fallback={<div>Loading contacts...</div>}>
+            <ContactsPageWrapper 
+              initialContacts={contactsResult}
+              contactGroups={contactGroups}
+              accounts={accountsResult.data}
+              initialFilters={filters}
+              initialSort={sort}
+              initialPage={page}
+            />
+          </Suspense>
         </div>
-
-        <Suspense fallback={<div>Loading contacts...</div>}>
-          <ContactsClient 
-            initialContacts={contactsResult}
-            contactGroups={contactGroups}
-            initialFilters={filters}
-            initialSort={sort}
-            initialPage={page}
-          />
-        </Suspense>
       </div>
     )
   } catch (error) {
-    console.error('Error loading contacts:', error)
+    console.error("Error loading contacts:", error)
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Contacts</h1>
-          <p className="text-muted-foreground">
-            Manage customer contacts, stakeholders, and decision makers
-          </p>
-        </div>
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Failed to load contacts. Please try again.</p>
+      <div className="h-full flex flex-col">
+        <div className="flex-1">
+          <ContactsPageWrapper 
+            initialContacts={{ data: [], count: 0, page: 1, limit: 50 }} 
+            contactGroups={[]} 
+            accounts={[]} 
+            initialFilters={{}} 
+            initialSort={{ field: 'name', direction: 'asc' }} 
+            initialPage={1} 
+          />
         </div>
       </div>
     )
