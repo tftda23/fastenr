@@ -129,6 +129,25 @@ NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=http://localhost:3000  # Update for production
 ```
 
+## 📝 **Logging Configuration**
+
+Control application logging levels and output:
+
+```bash
+# Log level (ERROR, WARN, INFO, DEBUG, TRACE)
+# Production default: WARN (only warnings and errors)
+# Development default: DEBUG (detailed logging)
+# Test default: ERROR (only errors)
+LOG_LEVEL=INFO
+
+# Examples:
+# LOG_LEVEL=ERROR    # Only critical errors
+# LOG_LEVEL=WARN     # Warnings and errors (recommended for production)
+# LOG_LEVEL=INFO     # General information, warnings, and errors
+# LOG_LEVEL=DEBUG    # Detailed debugging information (development)
+# LOG_LEVEL=TRACE    # Most verbose logging (troubleshooting)
+```
+
 ## 🚀 **Deployment Checklist**
 
 ### **Before Deploying to Production:**

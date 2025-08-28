@@ -1,20 +1,21 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/logger'
 
 export async function GET() {
   try {
-    console.log('Users API: Starting request')
+    logger.apiRequest('GET', '/api/users')
     
     const supabase = createServerClient()
     
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) {
-      console.error('Users API: User not authenticated:', userError)
+      logger.authError('User authentication failed', userError || new Error('No user found'))
       return NextResponse.json({ error: 'User not authenticated' }, { status: 401 })
     }
     
-    console.log('Users API: Current user:', user.email)
+    logger.auth('User authenticated', user.id, { email: user.email })
     
     // Get user's profile to find organization_id
     const { data: profile, error: profileError } = await supabase
@@ -24,8 +25,7 @@ export async function GET() {
       .single()
     
     if (profileError) {
-      console.error('Users API: Failed to get user profile:', profileError)
-      console.log('Users API: User ID from auth:', user.id)
+      logger.dbError('Failed to get user profile', profileError, { userId: user.id })
       
       // Let's check if there are any users in the table at all
       const { data: allUsers, error: allUsersError } = await supabase
@@ -33,19 +33,17 @@ export async function GET() {
         .select('id, email, organization_id')
         .limit(5)
       
-      console.log('Users API: Sample users in table:', allUsers)
-      console.log('Users API: Sample users error:', allUsersError)
+      logger.debug('Sample users in table', { userId: user.id }, { count: allUsers?.length, hasError: !!allUsersError })
       
       return NextResponse.json({ error: 'Failed to get user profile', details: profileError.message }, { status: 500 })
     }
     
     if (!profile) {
-      console.error('Users API: User profile not found for ID:', user.id)
+      logger.error('User profile not found', { userId: user.id })
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 })
     }
     
-    console.log('Users API: User profile:', profile)
-    console.log('Users API: User organization_id:', profile.organization_id)
+    logger.debug('User profile retrieved', { userId: user.id, organizationId: profile.organization_id })
     
     // Get all users in the same organization
     const { data: users, error: usersError } = await supabase
@@ -55,16 +53,15 @@ export async function GET() {
       .order('full_name')
     
     if (usersError) {
-      console.error('Users API: Failed to fetch users:', usersError)
+      logger.dbError('Failed to fetch users', usersError, { organizationId: profile.organization_id })
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
     }
     
-    console.log('Users API: Found users:', users?.length)
-    console.log('Users API: Users data:', users)
+    logger.info('Users fetched successfully', { organizationId: profile.organization_id, count: users?.length || 0 })
     
     return NextResponse.json(users || [])
   } catch (error) {
-    console.error('Error in users API:', error)
+    logger.apiError('GET', '/api/users', error instanceof Error ? error : new Error(String(error)))
     return NextResponse.json(
       { error: 'Failed to fetch users', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

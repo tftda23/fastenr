@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createServerClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
+import { logger } from '@/lib/logger'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
     } catch (err) {
-      console.error('Webhook signature verification failed:', err)
+      logger.security('Webhook signature verification failed', { component: 'Stripe' }, err)
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
     }
 
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true })
 
   } catch (error) {
-    console.error('Webhook error:', error)
+    logger.apiError('POST', '/api/webhooks/stripe', error instanceof Error ? error : new Error(String(error)), { component: 'Stripe' })
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }

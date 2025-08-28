@@ -750,7 +750,7 @@ CREATE INDEX idx_automation_runs_created_at ON automation_runs(created_at);
 
 - **[Customer Management](./CUSTOMER_MANAGEMENT.md)** - Customer data for automation triggers
 - **[Analytics](./ANALYTICS.md)** - Automation performance analytics
-- **[Email Setup Guide](../EMAIL_SETUP_GUIDE.md)** - Email configuration for automation
+- **[Email Setup Guide](../setup/EMAIL_SETUP_GUIDE.md)** - Email configuration for automation
 - **[API Documentation](./API.md)** - Complete automation API reference
 
 ---

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Logo } from "@/components/ui/logo"
 import {
   BarChart3,
   Users,
@@ -78,9 +79,7 @@ export default function Sidebar({ userProfile }: SidebarProps) {
     <div className="flex h-full w-64 flex-col bg-background border-r border-border fixed left-0 top-0 z-40">
       {/* Logo */}
       <div className="flex h-16 items-center px-6 border-b border-border">
-        <h1 className="text-xl font-semibold text-foreground">
-          <span className="font-bold">fastenr</span>
-        </h1>
+        <Logo variant="black" size="sm" />
       </div>
 
       {/* Navigation */}

@@ -8,7 +8,11 @@ export interface CreateSurveyData {
   content: string
   logo_url?: string | null
   links?: any[]
-  account_id: string            // <-- NEW
+  account_id: string
+  template_type?: string
+  contributes_to_health_score?: boolean
+  scheduled_date?: string | null
+  is_scheduled?: boolean
 }
 
 export interface Recipient {
@@ -27,13 +31,17 @@ export async function createSurvey(
     .insert({
       organization_id: organizationId,
       created_by: userId,
-      account_id: data.account_id,         // <-- NEW
+      account_id: data.account_id,
       title: data.title,
       subject: data.subject,
       content: data.content,
       logo_url: data.logo_url,
       links: data.links || [],
-      status: "draft",
+      status: data.is_scheduled ? "scheduled" : "draft",
+      template_type: data.template_type || "custom",
+      contributes_to_health_score: data.contributes_to_health_score || false,
+      scheduled_date: data.scheduled_date,
+      is_scheduled: data.is_scheduled || false,
     })
     .select()
     .single()
@@ -130,4 +138,83 @@ export async function getSurveyRecipients(surveyId: string, organizationId: stri
 
   if (error) throw error
   return data
+}
+
+export async function processSurveyResponse(
+  surveyId: string,
+  recipientId: string,
+  responseData: any,
+  organizationId: string
+) {
+  // First, save the survey response
+  const { data: response, error: responseError } = await supabase
+    .from("survey_responses")
+    .insert({
+      survey_id: surveyId,
+      recipient_id: recipientId,
+      response_data: responseData,
+    })
+    .select()
+    .single()
+
+  if (responseError) throw responseError
+
+  // Update recipient status
+  await supabase
+    .from("survey_recipients")
+    .update({ 
+      status: "responded", 
+      responded_at: new Date().toISOString() 
+    })
+    .eq("id", recipientId)
+
+  // Check if this survey contributes to health score
+  const { data: survey } = await supabase
+    .from("surveys")
+    .select("contributes_to_health_score, account_id, template_type")
+    .eq("id", surveyId)
+    .eq("organization_id", organizationId)
+    .single()
+
+  if (survey?.contributes_to_health_score && survey.account_id) {
+    // Calculate health score based on response
+    let healthScore = 50 // default neutral score
+    
+    if (survey.template_type?.includes("nps")) {
+      // NPS scoring: 0-6 = detractor (low score), 7-8 = passive (neutral), 9-10 = promoter (high score)
+      const npsScore = responseData.nps_score || responseData.rating
+      if (npsScore >= 9) healthScore = 85
+      else if (npsScore >= 7) healthScore = 65
+      else if (npsScore >= 4) healthScore = 40
+      else healthScore = 20
+    } else if (survey.template_type === "quarterly") {
+      // For quarterly surveys, use average of all ratings
+      const ratings = Object.values(responseData).filter(val => typeof val === 'number') as number[]
+      if (ratings.length > 0) {
+        const avgRating = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
+        healthScore = Math.round((avgRating / 5) * 100) // Convert 5-star to 100-point scale
+      }
+    }
+
+    // Create health score entry
+    const { error: healthError } = await supabase
+      .from("nps_scores")
+      .insert({
+        organization_id: organizationId,
+        account_id: survey.account_id,
+        score: healthScore,
+        source: "survey",
+        metadata: {
+          survey_id: surveyId,
+          survey_type: survey.template_type,
+          response_data: responseData
+        }
+      })
+
+    if (healthError) {
+      console.error("Failed to create health score entry:", healthError)
+    }
+  }
+
+  return response
 }

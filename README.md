@@ -52,7 +52,7 @@ fastenr is a modern customer success platform that moves beyond traditional CRM 
 | Guide | Description | Time | Audience |
 |-------|-------------|------|----------|
 | **[Getting Started](#-quick-start)** | Set up development environment | 15 min | Developers |
-| **[Email Setup](./EMAIL_SETUP_GUIDE.md)** | Configure email functionality | 10 min | Administrators |
+| **[Email Setup](./docs/setup/EMAIL_SETUP_GUIDE.md)** | Configure email functionality | 10 min | Administrators |
 | **[Social Login Setup](./SOCIAL_LOGIN_SETUP.md)** | Add Google/GitHub authentication | 15 min | Administrators |
 | **[Production Deployment](#-deployment)** | Deploy to production | 30 min | DevOps |
 
@@ -81,16 +81,16 @@ fastenr is a modern customer success platform that moves beyond traditional CRM 
 |----------|---------|----------|
 | **[Production Readiness Audit](./PRODUCTION_READINESS_AUDIT.md)** | Pre-deployment checklist | DevOps, Project Managers |
 | **[Testing Quick Start](./TESTING_QUICK_START.md)** | Fast testing guide | Developers, DevOps |
-| **[Complete Testing Guide](./TESTING_GUIDE.md)** | Comprehensive testing docs | QA, DevOps, Developers |
+| **[Complete Testing Guide](./docs/development/TESTING_GUIDE.md)** | Comprehensive testing docs | QA, DevOps, Developers |
 | **[Phase 1 Verification](./PHASE_1_VERIFICATION_REPORT.md)** | Critical fixes verification | Project Managers, DevOps |
-| **[Jira Issues Template](./JIRA_ISSUES_TEMPLATE.md)** | Project management templates | Product Managers |
+| **[Jira Issues Template](./docs/development/JIRA_ISSUES_TEMPLATE.md)** | Project management templates | Product Managers |
 | **[Security Guide](./docs/SECURITY.md)** | Security best practices | Security Teams, DevOps |
 | **[Monitoring & Logging](./docs/MONITORING.md)** | Observability setup | SRE, DevOps |
 
 ### 📋 By User Role
 - **👥 Customer Success Managers**: [Customer Management](./docs/CUSTOMER_MANAGEMENT.md) → [Analytics](./docs/ANALYTICS.md) → [Surveys](./docs/SURVEYS.md)
 - **⚙️ Administrators**: [Integrations](./docs/INTEGRATIONS.md) → [Automation](./docs/AUTOMATION.md) → [Security](./docs/SECURITY.md)
-- **💻 Developers**: [API Docs](./docs/API.md) → [Architecture](./docs/ARCHITECTURE.md) → [Testing Guide](./TESTING_GUIDE.md)
+- **💻 Developers**: [API Docs](./docs/API.md) → [Architecture](./docs/ARCHITECTURE.md) → [Testing Guide](./docs/development/TESTING_GUIDE.md)
 - **🧪 QA/DevOps**: [Testing Quick Start](./TESTING_QUICK_START.md) → [Production Audit](./PRODUCTION_READINESS_AUDIT.md) → [Phase 1 Verification](./PHASE_1_VERIFICATION_REPORT.md)
 - **📊 Business Users**: [Analytics](./docs/ANALYTICS.md) → [Customer Management](./docs/CUSTOMER_MANAGEMENT.md) → [Surveys](./docs/SURVEYS.md)
 
@@ -160,7 +160,7 @@ npm run test:build
 
 **📋 Testing Documentation:**
 - **[Quick Start Guide](./TESTING_QUICK_START.md)** - Get testing in 2 minutes
-- **[Complete Testing Guide](./TESTING_GUIDE.md)** - Comprehensive documentation
+- **[Complete Testing Guide](./docs/development/TESTING_GUIDE.md)** - Comprehensive documentation
 - **[Production Readiness Audit](./PRODUCTION_READINESS_AUDIT.md)** - Current status and requirements
 - **[Phase 1 Verification Report](./PHASE_1_VERIFICATION_REPORT.md)** - Detailed verification of critical fixes
 

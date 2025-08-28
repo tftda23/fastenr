@@ -2,17 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { aggregateDataForAI, sanitizeDataForAI } from '@/lib/ai/data-aggregator'
 import { getDashboardPrompt, getAccountsPrompt, getAccountDetailPrompt, getContactsPrompt, getCalendarPrompt } from '@/lib/ai/prompts'
 import { aiService } from '@/lib/ai/service'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { pageType, pageContext } = body
 
-    console.log('AI Insights API - Request:', { pageType, pageContext })
+    logger.apiRequest('POST', '/api/ai/insights', { pageType, component: 'AI' })
 
     // Aggregate data based on page type and context
     const data = await aggregateDataForAI({ pageType, pageContext })
-    console.log('AI Insights API - Data aggregated:', {
+    logger.debug('Data aggregated for AI', { pageType, component: 'AI' }, {
       accountsCount: data.accounts.length,
       engagementsCount: data.engagements.length,
       contactsCount: data.contacts?.length || 0
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
         throw new Error(`Unsupported page type: ${pageType}`)
     }
 
-    console.log('AI Insights API - Generated prompt length:', prompt.length)
+    logger.debug('Generated AI prompt', { pageType, component: 'AI' }, { promptLength: prompt.length })
 
     let response
     
@@ -52,14 +53,14 @@ export async function POST(request: NextRequest) {
     
     if (aiService.isConfigured()) {
       try {
-        console.log('AI Insights API - Using real AI service')
+        logger.debug('Using real AI service', { pageType, component: 'AI' })
         response = await aiService.generateInsights(prompt)
-        console.log('AI Insights API - Successfully generated real AI insights:', response.insights.length, 'insights')
+        logger.info('AI insights generated successfully', { pageType, component: 'AI' }, { insightsCount: response.insights.length })
       } catch (aiError) {
-        console.error('AI Insights API - Real AI failed:', aiError)
+        logger.error('Real AI service failed', { pageType, component: 'AI' }, aiError)
         
         if (fallbackToMock) {
-          console.log('AI Insights API - Falling back to mock insights due to AI error')
+          logger.warn('Falling back to mock insights due to AI error', { pageType, component: 'AI' })
           response = await generateMockInsights(pageType, sanitizedData, pageContext)
         } else {
           throw aiError
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       }
     } else {
       if (fallbackToMock) {
-        console.log('AI Insights API - Using mock insights (AI not configured)')
+        logger.info('Using mock insights (AI not configured)', { pageType, component: 'AI' })
         response = await generateMockInsights(pageType, sanitizedData, pageContext)
       } else {
         throw new Error('AI service is not configured. Please set OPENAI_API_KEY environment variable.')
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response)
   } catch (error) {
-    console.error('AI Insights API Error:', error)
+    logger.apiError('POST', '/api/ai/insights', error instanceof Error ? error : new Error(String(error)), { pageType, component: 'AI' })
     
     // Determine appropriate error status and message
     let status = 500

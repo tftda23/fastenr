@@ -14,7 +14,7 @@ This documentation covers every aspect of fastenr, from basic setup to advanced 
 | Guide | Description | Time Required |
 |-------|-------------|---------------|
 | **[Main README](../README.md)** | Project overview and quick setup | 5 minutes |
-| **[Email Setup](../EMAIL_SETUP_GUIDE.md)** | Configure email functionality | 10 minutes |
+| **[Email Setup](../docs/setup/EMAIL_SETUP_GUIDE.md)** | Configure email functionality | 10 minutes |
 | **[Social Login Setup](../SOCIAL_LOGIN_SETUP.md)** | Add Google/GitHub authentication | 15 minutes |
 | **[Production Deployment](#deployment-guides)** | Deploy to production | 30 minutes |
 

@@ -6,6 +6,9 @@ import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import ErrorBoundary from "@/components/ui/error-boundary"
 
+// Initialize console override for production
+import "@/lib/console-override"
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",

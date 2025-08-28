@@ -1,6 +1,7 @@
 // Standardized error handling utilities for consistent error management
 
 import { NextResponse } from 'next/server'
+import { logger } from './logger'
 
 // Standard error types
 export enum ErrorType {
@@ -129,7 +130,7 @@ export const createError = {
 // API error response handler
 export function handleApiError(error: unknown): NextResponse {
   // Log error for debugging
-  console.error('API Error:', error)
+  logger.error('API Error', {}, error)
 
   // Handle StandardError instances
   if (error instanceof StandardError) {
@@ -226,7 +227,7 @@ export function useErrorHandler() {
     const { message, type, shouldRetry } = handleClientError(error)
     
     // You can integrate with your toast system here
-    console.error(`${type}: ${message}`, { shouldRetry })
+    logger.error(`${type}: ${message}`, { shouldRetry, component: 'ErrorHandler' })
     
     return { message, type, shouldRetry }
   }

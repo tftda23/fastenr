@@ -17,6 +17,7 @@ const BYPASS_PREFIXES = [
   "/api/etl",
   "/api/webhooks",
   "/api/health",
+  "/home", // Public home page - no auth required
 ]
 
 export async function middleware(request: NextRequest) {
@@ -40,6 +41,6 @@ export async function middleware(request: NextRequest) {
  */
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|txt)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|home|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|txt)$).*)",
   ],
 }

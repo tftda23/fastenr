@@ -11,6 +11,7 @@ import {
   Phone, Mail, MapPin, Calendar, MoreHorizontal,
   UserPlus, UsersIcon, Briefcase, Crown
 } from 'lucide-react'
+import { devLog } from '@/lib/logger'
 import { ContactsTable } from './contacts-table'
 import { ContactGroupsManager } from './contact-groups-manager'
 import { 
@@ -47,17 +48,11 @@ export function ContactsClient({
   const [loading, setLoading] = useState(false)
   const [selectedTab, setSelectedTab] = useState('list')
 
-  // Debug logging
-  console.log('ContactsClient - RENDER - initialContacts:', JSON.stringify(initialContacts, null, 2))
-  console.log('ContactsClient - RENDER - initialContacts data length:', initialContacts?.data?.length)
-  console.log('ContactsClient - RENDER - initialContacts count:', initialContacts?.count)
-  console.log('ContactsClient - RENDER - current contacts state:', JSON.stringify(contacts, null, 2))
-  console.log('ContactsClient - RENDER - current contacts data length:', contacts?.data?.length)
-  console.log('ContactsClient - RENDER - contactGroups:', contactGroups?.length)
+  // Debug logging removed for production security
 
   // Refresh contacts data
   const refreshContacts = useCallback(async () => {
-    console.log('ContactsClient - refreshContacts called')
+    // Refresh contacts called
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -78,22 +73,17 @@ export function ContactsClient({
       params.set('sort_direction', sort.direction)
       params.set('page', currentPage.toString())
       
-      console.log('ContactsClient - About to fetch from API with params:', params.toString())
       const response = await fetch(`/api/contacts?${params}`)
-      console.log('ContactsClient - API response status:', response.status, response.statusText)
       
       if (response.ok) {
         const data = await response.json()
-        console.log('ContactsClient - API response data:', JSON.stringify(data, null, 2))
-        console.log('ContactsClient - API response data length:', data?.data?.length)
         setContacts(data)
       } else {
-        console.error('ContactsClient - Failed to fetch contacts:', response.status, response.statusText)
-        const errorText = await response.text()
-        console.error('ContactsClient - Error response:', errorText)
+        // Only log errors, not sensitive data
+        devLog.error('Failed to fetch contacts:', response.status, response.statusText)
       }
     } catch (error) {
-      console.error('Failed to refresh contacts:', error)
+      devLog.error('Failed to refresh contacts:', error)
     } finally {
       setLoading(false)
     }
@@ -113,7 +103,7 @@ export function ContactsClient({
         setGroups(data.data)
       }
     } catch (error) {
-      console.error('Failed to refresh groups:', error)
+      devLog.error('Failed to refresh groups:', error)
     }
   }, [])
 

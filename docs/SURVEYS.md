@@ -753,7 +753,7 @@ CREATE INDEX idx_nps_surveys_score ON nps_surveys(score);
 
 - **[Customer Management](./CUSTOMER_MANAGEMENT.md)** - Customer data for survey targeting
 - **[Automation System](./AUTOMATION.md)** - Automated survey workflows
-- **[Email Setup Guide](../EMAIL_SETUP_GUIDE.md)** - Email configuration for surveys
+- **[Email Setup Guide](../setup/EMAIL_SETUP_GUIDE.md)** - Email configuration for surveys
 - **[Analytics](./ANALYTICS.md)** - Survey response analytics
 
 ---

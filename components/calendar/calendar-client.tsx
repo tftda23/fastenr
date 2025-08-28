@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { AIInsightsButton } from '@/components/ai/ai-insights-button'
+import { devLog } from '@/lib/logger'
 import { CreateEngagementDialog } from './create-engagement-dialog'
 import { EngagementDetailsModal } from './engagement-details-modal'
 
@@ -66,14 +67,12 @@ export default function CalendarClient() {
       const response = await fetch(`/api/engagements?start=${startDate.toISOString()}&end=${endDate.toISOString()}`)
       if (response.ok) {
         const result = await response.json()
-        console.log('Calendar API response:', result)
         // Handle both direct array and paginated response formats
         const engagementsData = Array.isArray(result) ? result : (result.data || [])
-        console.log('Processed engagements data:', engagementsData)
         setEngagements(engagementsData)
       }
     } catch (error) {
-      console.error('Error fetching engagements:', error)
+      devLog.error('Error fetching engagements:', error)
     } finally {
       setLoading(false)
     }
@@ -103,7 +102,7 @@ export default function CalendarClient() {
 
   const getEngagementsForDate = (date: Date) => {
     if (!Array.isArray(engagements)) {
-      console.warn('Engagements is not an array:', engagements)
+      // Engagements data is not in expected format
       return []
     }
     return engagements.filter(engagement => {

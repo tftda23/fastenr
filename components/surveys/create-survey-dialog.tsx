@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Upload, Plus, X, Link as LinkIcon } from "lucide-react"
+import { Upload, Plus, X, Link as LinkIcon, Sparkles, Star, TrendingUp, Calendar, Clock, Send } from "lucide-react"
 import { createSurvey } from "@/lib/surveys"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -50,10 +50,80 @@ export default function CreateSurveyDialog({
     subject: "",
     content: "",
     logoUrl: "",
-    accountId: "",                 // <-- NEW
+    accountId: "",
+    template: "custom",
+    sendOption: "draft", // draft, schedule, send_now
+    scheduledDate: "",
+    scheduledTime: ""
   })
   const [links, setLinks] = useState<SurveyLink[]>([])
   const [newLink, setNewLink] = useState({ title: "", url: "" })
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("custom")
+
+  const surveyTemplates = [
+    {
+      id: "custom",
+      name: "Custom Survey",
+      description: "Create your own survey from scratch",
+      icon: Sparkles,
+      healthScore: false,
+      template: {
+        title: "",
+        subject: "",
+        content: ""
+      }
+    },
+    {
+      id: "nps-simple",
+      name: "NPS (1-10 Rating)",
+      description: "Simple Net Promoter Score survey",
+      icon: Star,
+      healthScore: true,
+      template: {
+        title: "We'd Love Your Feedback",
+        subject: "How likely are you to recommend us?",
+        content: "Hi there!\n\nWe're always working to improve our service and would love to hear from you. Could you take 30 seconds to let us know how we're doing?\n\nYour feedback helps us serve you better."
+      }
+    },
+    {
+      id: "nps-detailed",
+      name: "NPS (5 Questions)",
+      description: "Comprehensive NPS with follow-up questions",
+      icon: TrendingUp,
+      healthScore: true,
+      template: {
+        title: "Customer Experience Survey",
+        subject: "Help us improve - quick 2-minute survey",
+        content: "Hello!\n\nAs a valued customer, your opinion matters to us. We'd appreciate a few minutes of your time to complete our customer experience survey.\n\nThis survey includes 5 quick questions about your recent experience and helps us understand how we can serve you better."
+      }
+    },
+    {
+      id: "quarterly",
+      name: "Quarterly Review",
+      description: "Comprehensive quarterly feedback survey",
+      icon: Calendar,
+      healthScore: true,
+      template: {
+        title: "Quarterly Customer Review",
+        subject: "Your quarterly feedback is important to us",
+        content: "Hi there!\n\nAs we wrap up another quarter, we'd love to get your thoughts on how things have been going with our partnership.\n\nThis quarterly review helps us understand your evolving needs and ensures we're providing the best possible service."
+      }
+    }
+  ]
+
+  const handleTemplateSelect = (templateId: string) => {
+    const template = surveyTemplates.find(t => t.id === templateId)
+    if (template) {
+      setSelectedTemplate(templateId)
+      setFormData(prev => ({
+        ...prev,
+        template: templateId,
+        title: template.template.title,
+        subject: template.template.subject,
+        content: template.template.content
+      }))
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -82,8 +152,9 @@ export default function CreateSurveyDialog({
       router.refresh()
 
       // Reset form
-      setFormData({ title: "", subject: "", content: "", logoUrl: "", accountId: "" })
+      setFormData({ title: "", subject: "", content: "", logoUrl: "", accountId: "", template: "custom" })
       setLinks([])
+      setSelectedTemplate("custom")
     } catch (error) {
       console.error("Error creating survey:", error)
       toast({
@@ -116,6 +187,53 @@ export default function CreateSurveyDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Template Selection */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Choose Survey Template</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {surveyTemplates.map((template) => {
+                  const IconComponent = template.icon
+                  return (
+                    <div
+                      key={template.id}
+                      className={`cursor-pointer rounded-lg border-2 p-4 transition-all hover:shadow-md ${
+                        selectedTemplate === template.id
+                          ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                      onClick={() => handleTemplateSelect(template.id)}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <IconComponent className="h-5 w-5 mt-0.5 text-blue-600" />
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-medium text-sm">{template.name}</h3>
+                            {template.healthScore && (
+                              <Badge variant="secondary" className="text-xs">
+                                Health Score
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {template.description}
+                          </p>
+                          {!template.healthScore && template.id === "custom" && (
+                            <p className="text-xs text-orange-600">
+                              Note: Custom surveys don't contribute to health scores
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Account */}
           <div className="space-y-2">
             <Label htmlFor="account">Account</Label>
@@ -146,7 +264,13 @@ export default function CreateSurveyDialog({
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="Customer Satisfaction Survey"
                 required
+                disabled={selectedTemplate !== "custom"}
               />
+              {selectedTemplate !== "custom" && (
+                <p className="text-xs text-muted-foreground">
+                  Template fields are pre-filled but can be customized
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -157,6 +281,7 @@ export default function CreateSurveyDialog({
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 placeholder="We'd love your feedback!"
                 required
+                disabled={selectedTemplate !== "custom"}
               />
             </div>
 
@@ -169,6 +294,7 @@ export default function CreateSurveyDialog({
                 placeholder="Thank you for being a valued customer. We'd appreciate a few minutes of your time..."
                 rows={4}
                 required
+                disabled={selectedTemplate !== "custom"}
               />
             </div>
           </div>
@@ -244,6 +370,11 @@ export default function CreateSurveyDialog({
             <Button type="submit" disabled={loading || !formData.accountId}>
               {loading ? "Creating..." : "Create Survey"}
             </Button>
+            {selectedTemplate !== "custom" && (
+              <p className="text-xs text-center text-muted-foreground mt-2">
+                This survey template will contribute to your customer health scores
+              </p>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

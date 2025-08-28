@@ -3,49 +3,69 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import {
-  ArrowRight,
-  Target,
-  TrendingUp,
-  Users,
-  Shield,
-  BarChart3,
+import { 
+  ArrowRight, 
+  BarChart3, 
+  Users, 
+  Zap, 
+  Shield, 
+  Globe,
   CheckCircle,
   Star,
-  Zap,
-  Heart,
-  Globe,
+  TrendingUp,
+  Target,
+  Mail,
+  Calendar,
+  MessageSquare,
+  Building2,
+  Sparkles,
+  Clock,
   Award,
+  Rocket,
+  Heart,
+  Brain,
+  Eye,
+  Settings,
+  PieChart,
+  LineChart,
+  Activity,
+  UserCheck,
+  Bell,
+  Filter,
+  Search,
+  Plus,
+  MoreHorizontal,
+  Phone,
+  MapPin
 } from "lucide-react"
+import { Logo } from "@/components/ui/logo"
 
 export const metadata: Metadata = {
-  title: "Home - Customer Success Platform",
-  description: "Welcome to Fastenr - the comprehensive customer success platform that helps you track health scores, manage engagements, reduce churn, and drive sustainable growth.",
+  title: "Fastenr - Customer Success Platform",
+  description: "Transform your customer relationships with AI-powered insights, automated workflows, and comprehensive analytics. Reduce churn, increase expansion, and drive sustainable growth.",
   openGraph: {
     title: "Fastenr - Transform Your Customer Success",
-    description: "The all-in-one platform for customer success teams to reduce churn and drive growth.",
+    description: "The all-in-one platform for customer success teams to reduce churn and drive growth with AI-powered insights.",
     url: "/home",
   },
 }
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation */}
-      <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-foreground">
-                <span className="font-bold">fastenr</span>
-              </Link>
-            </div>
-            <div className="flex items-center gap-4">
+            <Logo variant="black" size="md" />
+            <div className="flex items-center space-x-4">
               <Link href="/auth/login">
                 <Button variant="ghost">Sign In</Button>
               </Link>
               <Link href="/auth/signup">
-                <Button>Get Started</Button>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                  Get Started
+                </Button>
               </Link>
             </div>
           </div>
@@ -53,490 +73,146 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/5 py-20 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
-            <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
-              Built for Customer Success Teams
+            <Badge className="mb-6 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200">
+              <Sparkles className="h-4 w-4 mr-2" />
+              AI-Powered Customer Success Platform
             </Badge>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-              Transform Your <span className="text-primary">Customer Success</span>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Transform Your
+              </span>
+              <br />
+              <span className="text-gray-900">Customer Success</span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-4xl mx-auto leading-relaxed">
-              Reduce churn by up to 40% and increase customer lifetime value. Track health scores, automate engagements, 
-              and turn customer insights into revenue growth.
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Reduce churn by 40%, increase expansion revenue by 60%, and delight customers with 
+              AI-powered insights, automated workflows, and comprehensive analytics.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth/signup">
-                <Button size="lg" className="text-lg px-8 py-6 bg-primary hover:bg-primary/90">
-                  Start Free 90-Day Trial
+                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-6">
+                  Start Free Trial
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/auth/login">
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 bg-transparent">
-                  Sign In
-                </Button>
-              </Link>
+              <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2">
+                <Eye className="mr-2 h-5 w-5" />
+                Watch Demo
+              </Button>
             </div>
-            <p className="text-sm text-muted-foreground mt-6">
-              ✓ No credit card required • ✓ Full access • ✓ Cancel anytime
-            </p>
           </div>
         </div>
+        
+        {/* Floating Elements */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-r from-pink-400 to-red-400 rounded-full opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-gradient-to-r from-green-400 to-blue-400 rounded-full opacity-20 animate-pulse delay-2000"></div>
       </section>
 
-      {/* Problem Statement */}
-      <section className="py-20 bg-muted/30">
+      {/* Feature Showcase */}
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">The Problem with Current Tools</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Customer success teams are forced to use sales CRMs or support ticketing systems that weren't designed for
-              their unique needs.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-destructive/20 bg-destructive/5">
-              <CardHeader>
-                <CardTitle className="text-destructive flex items-center gap-2">
-                  <Shield className="h-6 w-6" />
-                  Sales Tools Miss the Mark
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Sales CRMs focus on closing deals, not nurturing existing relationships. They lack the engagement
-                  tracking and health scoring that CS teams need.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-destructive/20 bg-destructive/5">
-              <CardHeader>
-                <CardTitle className="text-destructive flex items-center gap-2">
-                  <Users className="h-6 w-6" />
-                  Support Tools Are Reactive
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Support platforms wait for problems to occur. Customer success is about being proactive and preventing
-                  issues before they happen.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-destructive/20 bg-destructive/5">
-              <CardHeader>
-                <CardTitle className="text-destructive flex items-center gap-2">
-                  <TrendingUp className="h-6 w-6" />
-                  No Success Metrics
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Generic tools don't track what matters: customer health, adoption rates, expansion opportunities, and
-                  success milestones.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Value Proposition */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <Badge className="mb-6 bg-secondary/10 text-secondary border-secondary/20">Our Philosophy</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-                Customer Success Needs Its Own Platform
-              </h2>
-              <p className="text-lg text-muted-foreground mb-6">
-                At <span className="font-bold text-foreground">fastenr</span>, we believe customer success is
-                fundamentally different from sales and support. It requires specialized tools, metrics, and workflows
-                designed around retention, expansion, and customer health.
-              </p>
-              <p className="text-lg text-muted-foreground mb-8">
-                We're opinionated about what works because we've seen what doesn't. Our platform provides actionable
-                insights and proven methodologies to help you prevent churn and drive growth.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/auth/signup">
-                  <Button size="lg">
-                    Try It Free
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8">
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary text-primary-foreground p-3 rounded-lg">
-                    <Target className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Purpose-Built</h3>
-                    <p className="text-muted-foreground">Designed specifically for CS workflows</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="bg-secondary text-secondary-foreground p-3 rounded-lg">
-                    <BarChart3 className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Data-Driven</h3>
-                    <p className="text-muted-foreground">Actionable insights, not just reports</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary text-primary-foreground p-3 rounded-lg">
-                    <Zap className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Proactive</h3>
-                    <p className="text-muted-foreground">Prevent churn before it happens</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              Everything You Need for Customer Success
+            <h2 className="text-4xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Everything You Need
+              </span>
+              <br />
+              <span className="text-gray-900">To Succeed</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Comprehensive tools designed to help you understand, engage, and grow your customer relationships.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              From AI-powered insights to automated workflows, fastenr provides all the tools 
+              your customer success team needs to drive growth and reduce churn.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="bg-primary/10 text-primary p-3 rounded-lg w-fit">
-                  <Heart className="h-6 w-6" />
-                </div>
-                <CardTitle>Customer Health Scoring</CardTitle>
-                <CardDescription>
-                  Real-time health scores based on engagement, usage, and satisfaction metrics
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    Automated health calculations
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    Risk alerts and notifications
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    Trend analysis and predictions
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="bg-secondary/10 text-secondary p-3 rounded-lg w-fit">
-                  <Users className="h-6 w-6" />
-                </div>
-                <CardTitle>Engagement Tracking</CardTitle>
-                <CardDescription>
-                  Monitor all customer touchpoints and interactions across your organization
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    Multi-channel engagement logs
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    Interaction frequency analysis
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    Communication preferences
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="bg-primary/10 text-primary p-3 rounded-lg w-fit">
-                  <Target className="h-6 w-6" />
-                </div>
-                <CardTitle>Goal Management</CardTitle>
-                <CardDescription>
-                  Track both your team's success metrics and your customers' business objectives
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    Team performance tracking
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    Customer success milestones
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    ROI measurement
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="bg-secondary/10 text-secondary p-3 rounded-lg w-fit">
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-                <CardTitle>Adoption Analytics</CardTitle>
-                <CardDescription>
-                  Understand how customers use your product and identify expansion opportunities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    Feature usage tracking
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    Onboarding progress
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    Expansion readiness scores
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="bg-primary/10 text-primary p-3 rounded-lg w-fit">
-                  <BarChart3 className="h-6 w-6" />
-                </div>
-                <CardTitle>Churn Prevention</CardTitle>
-                <CardDescription>Proactive alerts and automated workflows to prevent customer churn</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    Early warning systems
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    Automated intervention workflows
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    Retention playbooks
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="bg-secondary/10 text-secondary p-3 rounded-lg w-fit">
-                  <Globe className="h-6 w-6" />
-                </div>
-                <CardTitle>Account Intelligence</CardTitle>
-                <CardDescription>
-                  Comprehensive account views with relationship mapping and stakeholder tracking
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    Stakeholder relationship maps
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    Account hierarchy visualization
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-secondary" />
-                    Decision maker identification
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Different Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">Why Customer Success Is Different</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Understanding the unique challenges and requirements of customer success teams.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-16">
-            <div>
-              <h3 className="text-2xl font-bold text-foreground mb-6">Sales vs. Customer Success</h3>
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="bg-destructive/10 text-destructive p-2 rounded-lg">
-                    <Target className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">Sales: Acquisition Focus</h4>
-                    <p className="text-muted-foreground">
-                      Sales teams focus on closing new deals, with metrics like pipeline value and conversion rates.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="bg-primary/10 text-primary p-2 rounded-lg">
-                    <Heart className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">CS: Retention & Growth</h4>
-                    <p className="text-muted-foreground">
-                      Customer success focuses on retention, expansion, and long-term customer health and satisfaction.
-                    </p>
-                  </div>
-                </div>
-              </div>
+          {/* Dashboard Mockup */}
+          <div className="mb-20">
+            <div className="text-center mb-8">
+              <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-200 mb-4">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Smart Dashboard
+              </Badge>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Real-Time Customer Health</h3>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Get instant visibility into customer health scores, churn risk, and expansion opportunities 
+                with our AI-powered dashboard.
+              </p>
             </div>
-
-            <div>
-              <h3 className="text-2xl font-bold text-foreground mb-6">Support vs. Customer Success</h3>
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="bg-destructive/10 text-destructive p-2 rounded-lg">
-                    <Shield className="h-5 w-5" />
-                  </div>
+            
+            <Card className="max-w-6xl mx-auto shadow-2xl border-0 bg-gradient-to-br from-white to-gray-50">
+              <CardContent className="p-8">
+                {/* Dashboard Header */}
+                <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h4 className="font-semibold text-foreground mb-2">Support: Reactive Problem Solving</h4>
-                    <p className="text-muted-foreground">
-                      Support teams wait for issues to arise and focus on resolution time and ticket volume.
-                    </p>
+                    <h4 className="text-2xl font-bold text-gray-900">Customer Success Dashboard</h4>
+                    <p className="text-gray-600">Real-time insights and analytics</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Badge className="bg-green-100 text-green-700">Live</Badge>
+                    <Button size="sm" className="bg-blue-600">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Widget
+                    </Button>
                   </div>
                 </div>
-                <div className="flex gap-4">
-                  <div className="bg-secondary/10 text-secondary p-2 rounded-lg">
-                    <Zap className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">CS: Proactive Success Management</h4>
-                    <p className="text-muted-foreground">
-                      Customer success proactively ensures customers achieve their goals and maximize value from your
-                      product.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Testimonials */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">Trusted by Customer Success Teams</h2>
-            <p className="text-xl text-muted-foreground">
-              See how teams are transforming their customer relationships with fastenr.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="bg-background">
-              <CardContent className="pt-6">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "Finally, a platform that understands customer success. We've reduced churn by 40% since switching
-                  from our old CRM."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 text-primary p-2 rounded-full">
-                    <Users className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">Sarah Chen</p>
-                    <p className="text-sm text-muted-foreground">VP Customer Success, TechCorp</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-background">
-              <CardContent className="pt-6">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "The health scoring and engagement tracking have completely changed how we manage our accounts. We're
-                  now proactive instead of reactive."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="bg-secondary/10 text-secondary p-2 rounded-full">
-                    <TrendingUp className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">Marcus Rodriguez</p>
-                    <p className="text-sm text-muted-foreground">Director of CS, GrowthCo</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-background">
-              <CardContent className="pt-6">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "Our expansion revenue has grown 60% since we started using fastenr's adoption analytics to identify
-                  upsell opportunities."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 text-primary p-2 rounded-full">
-                    <Award className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">Emily Watson</p>
-                    <p className="text-sm text-muted-foreground">CS Manager, ScaleUp Inc</p>
-                  </div>
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                  <Card className="border-l-4 border-l-green-500 bg-gradient-to-r from-green-50 to-emerald-50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-green-600 font-medium">Healthy Accounts</p>
+                          <p className="text-2xl font-bold text-green-700">847</p>
+                          <p className="text-xs text-green-600">↗ +12% this month</p>
+                        </div>
+                        <Heart className="h-8 w-8 text-green-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border-l-4 border-l-yellow-500 bg-gradient-to-r from-yellow-50 to-orange-50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-yellow-600 font-medium">At Risk</p>
+                          <p className="text-2xl font-bold text-yellow-700">23</p>
+                          <p className="text-xs text-yellow-600">↘ -8% this month</p>
+                        </div>
+                        <Bell className="h-8 w-8 text-yellow-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-blue-600 font-medium">Expansion Ready</p>
+                          <p className="text-2xl font-bold text-blue-700">156</p>
+                          <p className="text-xs text-blue-600">↗ +24% this month</p>
+                        </div>
+                        <TrendingUp className="h-8 w-8 text-blue-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border-l-4 border-l-purple-500 bg-gradient-to-r from-purple-50 to-pink-50">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-purple-600 font-medium">NPS Score</p>
+                          <p className="text-2xl font-bold text-purple-700">72</p>
+                          <p className="text-xs text-purple-600">↗ +5 points</p>
+                        </div>
+                        <Star className="h-8 w-8 text-purple-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </CardContent>
             </Card>
@@ -545,51 +221,79 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-primary to-secondary">
+      <section className="py-24 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Transform Your Customer Success?</h2>
-          <p className="text-xl text-white/90 mb-8">
-            Join hundreds of customer success teams who have made the switch to a platform built for their needs.
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Ready to Transform Your Customer Success?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of customer success teams who trust fastenr to reduce churn, 
+            increase expansion revenue, and delight their customers.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/signup">
-              <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-                Start Your Free Trial
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-6">
+                Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/auth/login">
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-primary bg-transparent"
-              >
-                Sign In
-              </Button>
-            </Link>
+            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600 text-lg px-8 py-6">
+              <Calendar className="mr-2 h-5 w-5" />
+              Book Demo
+            </Button>
           </div>
-          <p className="text-white/80 mt-6">No credit card required • 14-day free trial • Setup in minutes</p>
+          <p className="text-blue-200 text-sm mt-6">
+            No credit card required • 14-day free trial • Setup in minutes
+          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-background border-t border-border py-12">
+      <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <Link href="/" className="text-2xl font-bold text-foreground mb-4 inline-block">
-              <span className="font-bold">fastenr</span>
-            </Link>
-            <p className="text-muted-foreground mb-6">
-              The customer success platform built for customer success teams.
-            </p>
-            <div className="flex justify-center gap-6">
-              <Link href="/auth/login" className="text-muted-foreground hover:text-foreground">
-                Sign In
-              </Link>
-              <Link href="/auth/signup" className="text-muted-foreground hover:text-foreground">
-                Get Started
-              </Link>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <div className="mb-4">
+                <Logo variant="white" size="md" />
+              </div>
+              <p className="text-gray-400">
+                The AI-powered customer success platform that helps you reduce churn and drive growth.
+              </p>
             </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Product</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/dashboard" className="hover:text-white">Dashboard</Link></li>
+                <li><Link href="/dashboard/analytics" className="hover:text-white">Analytics</Link></li>
+                <li><Link href="/dashboard/contacts" className="hover:text-white">Contacts</Link></li>
+                <li><Link href="/dashboard/surveys" className="hover:text-white">Surveys</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Company</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/about" className="hover:text-white">About</Link></li>
+                <li><Link href="/careers" className="hover:text-white">Careers</Link></li>
+                <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
+                <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Support</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link href="/support" className="hover:text-white">Help Center</Link></li>
+                <li><Link href="/documentation" className="hover:text-white">Documentation</Link></li>
+                <li><Link href="/api-docs" className="hover:text-white">API</Link></li>
+                <li><Link href="/status" className="hover:text-white">Status</Link></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 fastenr. All rights reserved.</p>
           </div>
         </div>
       </footer>
