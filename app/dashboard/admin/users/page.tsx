@@ -3,6 +3,9 @@ import { getCurrentUserOrganization } from "@/lib/supabase/queries"
 import { redirect } from "next/navigation"
 import UsersClient from "@/components/admin/users-client"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Users - Admin | fastenr",
   description: "Manage organization users and permissions",

@@ -1,6 +1,9 @@
 import { getChurnRiskAccounts, getDashboardStats } from "@/lib/supabase/queries"
 import { HealthClient } from "@/components/health/health-client"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function HealthPage() {
   try {
     const [churnRiskAccounts, dashboardStats] = await Promise.all([

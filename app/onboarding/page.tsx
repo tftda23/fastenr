@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server"
 import { getCurrentUserOrganization } from "@/lib/supabase/queries"
 import { OnboardingForm } from "@/components/onboarding/onboarding-form"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function OnboardingPage() {
   const supabase = createClient()
   const {

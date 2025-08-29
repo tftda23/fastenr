@@ -4,6 +4,9 @@ import { redirect } from "next/navigation"
 import AutomationClient from "@/components/admin/automation-client"
 import { getAutomations } from "@/lib/supabase/automation.server"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Automation - Admin | fastenr",
   description: "Manage automated workflows and triggers",

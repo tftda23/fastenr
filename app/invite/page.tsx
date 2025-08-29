@@ -3,6 +3,9 @@ import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import InviteAcceptForm from "@/components/auth/invite-accept-form"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 interface InvitePageProps {
   searchParams: {
     token?: string

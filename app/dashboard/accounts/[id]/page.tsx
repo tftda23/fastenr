@@ -3,6 +3,9 @@ import { getContacts } from "@/lib/supabase/contacts-queries"
 import { notFound, redirect } from "next/navigation"
 import AccountDetails from "@/components/accounts/account-details"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function AccountDetailsPage({ params }: { params: { id: string } }) {
   if (params.id === "new") {
     redirect("/dashboard/accounts/new")

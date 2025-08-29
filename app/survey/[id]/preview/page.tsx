@@ -2,6 +2,9 @@ import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import SurveyPreview from "@/components/surveys/survey-preview"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 interface PreviewPageProps {
   params: { id: string }
 }

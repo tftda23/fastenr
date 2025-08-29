@@ -3,6 +3,9 @@ import { redirect } from "next/navigation"
 import SignUpForm from "@/components/auth/signup-form"
 import { Logo } from "@/components/ui/logo"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function SignUpPage() {
   // If Supabase is not configured, show setup message
   if (!isSupabaseConfigured) {

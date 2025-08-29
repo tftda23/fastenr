@@ -1,6 +1,9 @@
 import { Metadata } from "next"
 import { BillingPortal } from "@/components/billing/billing-portal"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Billing - Fastenr",
   description: "Manage your subscription and billing",

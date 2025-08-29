@@ -5,6 +5,9 @@ import { redirect } from "next/navigation"
 import { getCurrentUserOrganization } from "@/lib/auth"
 import SurveysClient from "@/components/surveys/surveys-client"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function SurveysPage() {
   const supabase = createClient()
   const { user, organization } = await getCurrentUserOrganization()

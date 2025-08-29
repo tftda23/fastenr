@@ -1,6 +1,9 @@
 import { getDashboardStats, getChurnRiskAccounts, getNPSSurveys } from "@/lib/supabase/queries"
 import { EnhancedAnalyticsClient } from "@/components/analytics/enhanced-analytics-client"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function AnalyticsPage() {
   try {
     const [dashboardStats, churnRiskAccounts, npsData] = await Promise.all([

@@ -3,6 +3,9 @@ import { ContactsPageWrapper } from '@/components/contacts/contacts-page-wrapper
 import { getContacts, getContactGroups } from '@/lib/supabase/contacts-queries'
 import { getAccounts } from '@/lib/supabase/queries'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function ContactsPage({
   searchParams
 }: {

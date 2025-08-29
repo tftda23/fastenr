@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server"
 import { DashboardClient } from "@/components/dashboard/dashboard-client"
 import { redirect } from "next/navigation"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const supabase = createClient()
 

@@ -3,6 +3,9 @@ import { getCurrentUserOrganization } from "@/lib/supabase/queries"
 import { redirect } from "next/navigation"
 import UserSettingsClient from "@/components/settings/user-settings-client"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Settings | fastenr",
   description: "Manage your personal settings and preferences",

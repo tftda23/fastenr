@@ -3,6 +3,9 @@ import { getCurrentUserOrganization } from "@/lib/supabase/queries"
 import { redirect } from "next/navigation"
 import IntegrationsClient from "@/components/admin/integrations-client"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Integrations - Admin | fastenr",
   description: "Manage third-party integrations and API connections",

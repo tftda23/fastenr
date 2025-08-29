@@ -3,6 +3,12 @@ const nextConfig = {
   // Enable static optimization
   output: 'standalone',
   
+  // Configure static generation behavior
+  experimental: {
+    optimizeCss: true,
+    scrollRestoration: true,
+  },
+  
   // Optimize images
   images: {
     formats: ['image/webp', 'image/avif'],
@@ -39,11 +45,6 @@ const nextConfig = {
   // Compress responses
   compress: true,
   
-  // Enable experimental features for better performance
-  experimental: {
-    optimizeCss: true,
-    scrollRestoration: true,
-  },
 }
 
 export default nextConfig

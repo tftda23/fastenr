@@ -1,6 +1,9 @@
 import EngagementsClient from "@/components/engagements/engagements-client"
 import { getEngagements } from "@/lib/supabase/queries"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function EngagementsPage() {
   try {
     const engagements = await getEngagements()

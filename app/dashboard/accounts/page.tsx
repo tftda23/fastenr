@@ -2,6 +2,9 @@ import { checkUserPermission, getAccounts } from "@/lib/supabase/queries"
 import AccountsClient from "@/components/accounts/accounts-client"
 import { redirect } from "next/navigation"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function AccountsPage() {
   try {
     const [canCreate, initialData] = await Promise.all([checkUserPermission("read_write"), getAccounts(1, 20)])

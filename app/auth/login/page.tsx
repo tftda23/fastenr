@@ -3,6 +3,9 @@ import { redirect } from "next/navigation"
 import LoginForm from "@/components/auth/login-form"
 import { Logo } from "@/components/ui/logo"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function LoginPage() {
   // If Supabase is not configured, show setup message
   if (!isSupabaseConfigured) {

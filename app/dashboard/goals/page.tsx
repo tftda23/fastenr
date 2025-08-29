@@ -1,6 +1,9 @@
 import { getCustomerGoals, getAccounts } from "@/lib/supabase/queries"
 import { GoalsClient } from "@/components/goals/goals-client"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function GoalsPage() {
   // Always attempt both requests; don’t hide the UI if one fails
   let goals: Awaited<ReturnType<typeof getCustomerGoals>> = []

@@ -3,6 +3,9 @@ import { getCurrentUserOrganization } from "@/lib/supabase/queries"
 import { redirect } from "next/navigation"
 import AppSettingsClient from "@/components/admin/app-settings-client"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "App Settings - Admin | fastenr",
   description: "Manage application settings and configuration",

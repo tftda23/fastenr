@@ -3,6 +3,9 @@ import { getCurrentUserOrganization } from "@/lib/supabase/queries"
 import { redirect } from "next/navigation"
 import SubscriptionClient from "@/components/admin/subscription-client"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Subscription - Admin | fastenr",
   description: "Manage organization subscription and billing",
