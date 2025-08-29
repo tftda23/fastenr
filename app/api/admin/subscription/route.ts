@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
 
+export const dynamic = 'force-dynamic'
+
 // Pricing model (edit anytime)
 const PRICING = {
   TIER_A_MAX: 10,    // 1–10 seats

@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server"
 import { createApiResponse, createApiError } from "@/lib/api-middleware"
 import { createClient } from "@/lib/supabase/server"
 
+export const dynamic = 'force-dynamic'
+
 // Webhook handler for Salesforce integration
 export async function POST(request: NextRequest) {
   try {

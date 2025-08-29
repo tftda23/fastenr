@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server"
 import { withApiAuth, createApiResponse, createApiError } from "@/lib/api-middleware"
 import { createClient } from "@/lib/supabase/server"
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   return withApiAuth(request, "write", async (req, context) => {
     try {

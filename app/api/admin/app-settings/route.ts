@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { getCurrentUserOrganization } from "@/lib/supabase/queries"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
 

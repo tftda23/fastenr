@@ -3,6 +3,8 @@ import { sendInvitationEmail, EmailRecipient, InvitationEmailData } from "@/lib/
 import { createServerClient } from "@/lib/supabase/server"
 import { randomBytes } from "crypto"
 
+export const dynamic = 'force-dynamic'
+
 const ROLE_SET = new Set(["read", "write", "admin"])
 
 /** ---------- Helpers ---------- */

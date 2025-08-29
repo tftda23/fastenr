@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
 
+export const dynamic = 'force-dynamic'
+
 async function requireAdmin(supabase: ReturnType<typeof createServerClient>) {
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) }

@@ -9,8 +9,7 @@ import { updateSession } from "@/lib/supabase/middleware"
  * The session middleware runs only for actual app pages.
  */
 
-// Extra explicit prefixes (not strictly needed since we bypass /api entirely,
-// but kept for clarity and future readers).
+// Public pages that don't require authentication
 const BYPASS_PREFIXES = [
   "/api/integrations/hubspot",
   "/api/integrations/salesforce",
@@ -18,6 +17,14 @@ const BYPASS_PREFIXES = [
   "/api/webhooks",
   "/api/health",
   "/home", // Public home page - no auth required
+  "/about", // Company about page
+  "/careers", // Careers page
+  "/contact", // Contact page
+  "/blog", // Blog page
+  "/support", // Support page
+  "/documentation", // Help Center/Documentation
+  "/api-docs", // API documentation
+  "/status", // Status page
 ]
 
 export async function middleware(request: NextRequest) {

@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getEngagements, createEngagement, checkUserPermission } from "@/lib/supabase/queries"
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/engagements
 export async function GET(request: NextRequest) {
   try {
