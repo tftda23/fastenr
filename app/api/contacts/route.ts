@@ -7,13 +7,25 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url)
     const searchParams = url.searchParams
 
-    // Parse filters
+    // Parse filters with type validation
+    const seniorityLevel = searchParams.get('seniority_level')
+    const validSeniorityLevels = ['C-Level', 'VP', 'Director', 'Manager', 'Individual Contributor', 'Other']
+    
+    const decisionMakerLevel = searchParams.get('decision_maker_level')
+    const validDecisionMakerLevels = ['Unknown', 'Primary', 'Influencer', 'User', 'Gatekeeper']
+    
+    const contactStatus = searchParams.get('contact_status')
+    const validContactStatuses = ['active', 'inactive', 'left_company', 'unresponsive']
+    
+    const relationshipStrength = searchParams.get('relationship_strength')
+    const validRelationshipStrengths = ['strong', 'moderate', 'weak', 'unknown'] // Add valid values based on your enum
+    
     const filters = {
       account_id: searchParams.get('account_id') || undefined,
-      seniority_level: searchParams.get('seniority_level') || undefined,
-      decision_maker_level: searchParams.get('decision_maker_level') || undefined,
-      contact_status: searchParams.get('contact_status') || undefined,
-      relationship_strength: searchParams.get('relationship_strength') || undefined,
+      seniority_level: seniorityLevel && validSeniorityLevels.includes(seniorityLevel) ? seniorityLevel as any : undefined,
+      decision_maker_level: decisionMakerLevel && validDecisionMakerLevels.includes(decisionMakerLevel) ? decisionMakerLevel as any : undefined,
+      contact_status: contactStatus && validContactStatuses.includes(contactStatus) ? contactStatus as any : undefined,
+      relationship_strength: relationshipStrength && validRelationshipStrengths.includes(relationshipStrength) ? relationshipStrength as any : undefined,
       search: searchParams.get('search') || undefined,
       tags: searchParams.get('tags')?.split(',') || undefined
     }

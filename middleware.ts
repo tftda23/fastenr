@@ -44,3 +44,6 @@ export const config = {
     "/((?!api|_next/static|_next/image|favicon.ico|home|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|txt)$).*)",
   ],
 }
+
+// Use Node.js runtime to avoid Edge Runtime compatibility issues with Supabase
+export const runtime = 'nodejs'

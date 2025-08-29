@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response)
   } catch (error) {
-    logger.apiError('POST', '/api/ai/insights', error instanceof Error ? error : new Error(String(error)), { pageType, component: 'AI' })
+    logger.apiError('POST', '/api/ai/insights', error instanceof Error ? error : new Error(String(error)), { component: 'AI' })
     
     // Determine appropriate error status and message
     let status = 500
@@ -230,7 +230,7 @@ async function generateMockInsights(pageType: string, data: any, pageContext: an
           {
             type: accountEngagements.length === 0 ? 'risk' : 'action',
             title: `Engagement Activity: ${accountEngagements.length} interactions (90 days)`,
-            description: accountEngagements.length === 0 ? 'No recent engagements detected - relationship at risk' : `Recent activity includes: ${[...new Set(accountEngagements.map((e: any) => e.type))].join(', ')}`,
+            description: accountEngagements.length === 0 ? 'No recent engagements detected - relationship at risk' : `Recent activity includes: ${Array.from(new Set(accountEngagements.map((e: any) => e.type))).join(', ')}`,
             priority: accountEngagements.length === 0 ? 'high' : 'low',
             category: 'Engagement',
             actionable: true,
@@ -281,7 +281,7 @@ async function generateMockInsights(pageType: string, data: any, pageContext: an
           {
             type: 'trend' as const,
             title: 'Engagement Distribution Analysis',
-            description: `Current engagement types: ${[...new Set(data.engagements.map((e: any) => e.type))].join(', ')}. Balance of meeting types supports comprehensive relationship management.`,
+            description: `Current engagement types: ${Array.from(new Set(data.engagements.map((e: any) => e.type))).join(', ')}. Balance of meeting types supports comprehensive relationship management.`,
             priority: 'low' as const,
             category: 'Cadence',
             actionable: false

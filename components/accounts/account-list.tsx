@@ -30,7 +30,7 @@ export default function AccountList({ accounts, onSearch, canCreate }: AccountLi
   }
 
   // Helper functions (moved above filtering logic)
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | undefined) => {
     const staticFix = "cursor-default transition-none focus-visible:ring-0 select-none"
     switch (status) {
       case "active":
@@ -46,7 +46,7 @@ export default function AccountList({ accounts, onSearch, canCreate }: AccountLi
     }
   }
 
-  const formatStatus = (status: string) => {
+  const formatStatus = (status: string | undefined) => {
     if (!status) return ""
     return status
       .split("_")
@@ -54,12 +54,12 @@ export default function AccountList({ accounts, onSearch, canCreate }: AccountLi
       .join(" ")
   }
 
-  const getSizeLabel = (size: string | null) => {
+  const getSizeLabel = (size: string | null | undefined) => {
     if (!size) return "Unknown"
     return size.charAt(0).toUpperCase() + size.slice(1)
   }
 
-  const formatCurrency = (amount: number | null) => {
+  const formatCurrency = (amount: number | null | undefined) => {
     if (!amount) return "N/A"
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -85,7 +85,7 @@ export default function AccountList({ accounts, onSearch, canCreate }: AccountLi
   const filteredAccounts = accounts.filter(account => {
     // Churn risk filter
     if (churnRiskFilter && churnRiskFilter !== 'all') {
-      const risk = getRiskLevel(account.churn_risk_score)
+      const risk = getRiskLevel(account.churn_risk_score ?? 0)
       if (risk.label.toLowerCase() !== churnRiskFilter.toLowerCase()) {
         return false
       }
@@ -225,7 +225,7 @@ export default function AccountList({ accounts, onSearch, canCreate }: AccountLi
       {viewMode === 'card' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAccounts.map((account) => {
-            const risk = getRiskLevel(account.churn_risk_score)
+            const risk = getRiskLevel(account.churn_risk_score ?? 0)
             return (
               <Card key={account.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
@@ -248,8 +248,8 @@ export default function AccountList({ accounts, onSearch, canCreate }: AccountLi
                         <TrendingUp className="h-3 w-3 text-muted-foreground" />
                         <span className="text-xs text-muted-foreground">Health Score</span>
                       </div>
-                      <p className={`text-lg font-semibold ${getHealthScoreColor(account.health_score)}`}>
-                        {account.health_score}%
+                      <p className={`text-lg font-semibold ${getHealthScoreColor(account.health_score ?? 0)}`}>
+                        {account.health_score ?? 0}%
                       </p>
                     </div>
                     <div className="space-y-1">
@@ -316,7 +316,7 @@ export default function AccountList({ accounts, onSearch, canCreate }: AccountLi
           
           {/* List Items */}
           {filteredAccounts.map((account) => {
-            const risk = getRiskLevel(account.churn_risk_score)
+            const risk = getRiskLevel(account.churn_risk_score ?? 0)
             return (
               <Card key={account.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-4">
@@ -353,8 +353,8 @@ export default function AccountList({ accounts, onSearch, canCreate }: AccountLi
                     </div>
                     <div className="col-span-1">
                       <div className="flex items-center space-x-2">
-                        <span className={`text-sm font-semibold ${getHealthScoreColor(account.health_score)}`}>
-                          {account.health_score}%
+                        <span className={`text-sm font-semibold ${getHealthScoreColor(account.health_score ?? 0)}`}>
+                          {account.health_score ?? 0}%
                         </span>
                         <Badge className={getStatusColor(account.status)} variant="outline">
                           {formatStatus(account.status)}

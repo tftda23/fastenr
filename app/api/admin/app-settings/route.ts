@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { getCurrentUserOrganization } from "@/lib/supabase/queries"
 
 export async function GET() {
   try {
+
     const { user, organization } = await getCurrentUserOrganization()
     
     if (!user || !organization) {
@@ -58,6 +59,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+
     const { user, organization } = await getCurrentUserOrganization()
     
     if (!user || !organization) {

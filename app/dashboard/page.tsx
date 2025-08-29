@@ -89,7 +89,7 @@ export default async function DashboardPage() {
       <DashboardClient
         initialStats={stats}
         initialChurnRiskAccounts={churnRiskAccounts || []}
-        initialAccounts={accounts || []}
+        initialAccounts={(accounts || []) as any}
         initialActivities={recentActivities}
         currentUserId={profile.id}
         userFullName={profile.full_name}

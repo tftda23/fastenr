@@ -31,7 +31,7 @@ type HealthBlock = {
 }
 
 /* ---------- helpers ---------- */
-const fmtCurrency = (amount: number | null) =>
+const fmtCurrency = (amount: number | null | undefined) =>
   amount == null
     ? "N/A"
     : new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(amount)
@@ -127,14 +127,15 @@ function EngagementList({ items }: { items: Engagement[] }) {
 function goalBadge(status: CustomerGoal["status"]) {
   switch (status) {
     case "achieved": return "bg-green-100 text-green-800"
-    case "on_track": return "bg-blue-100 text-blue-800"
+    case "in_progress": return "bg-blue-100 text-blue-800"
     case "at_risk": return "bg-yellow-100 text-yellow-800"
-    case "missed": return "bg-red-100 text-red-800"
+    case "completed": return "bg-green-100 text-green-800"
+    case "not_started": return "bg-gray-100 text-gray-800"
     default: return "bg-gray-100 text-gray-800"
   }
 }
 function goalProgress(g: CustomerGoal) {
-  if (g.target_value == null || g.target_value === 0) return 0
+  if (g.target_value == null || g.target_value === 0 || g.current_value == null) return 0
   return Math.max(0, Math.min(100, Math.round((g.current_value / g.target_value) * 100)))
 }
 function GoalsList({ items }: { items: CustomerGoal[] }) {
@@ -151,8 +152,8 @@ function GoalsList({ items }: { items: CustomerGoal[] }) {
               <Badge className={`capitalize ${goalBadge(g.status)}`}>{g.status.replaceAll("_", " ")}</Badge>
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              {g.unit ? <span>{g.current_value}{g.unit ? ` ${g.unit}` : ""}{g.target_value ? ` / ${g.target_value}${g.unit ? ` ${g.unit}` : ""}` : ""}</span> : null}
-              <span>Target: {fmtDate(g.target_date)}</span>
+              <span>{g.current_value}{g.target_value ? ` / ${g.target_value}` : ""}</span>
+              <span>Target: {fmtDate(g.due_date)}</span>
             </div>
           </div>
           <Progress value={goalProgress(g)} className="mt-3" />
@@ -299,8 +300,8 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
       setHealthLoading(true)
 
       const fromLocal = (): HealthBlock => ({
-        health_score: account.health_score,
-        churn_risk_score: account.churn_risk_score,
+        health_score: account.health_score ?? 0,
+        churn_risk_score: account.churn_risk_score ?? 0,
         nps: { latest_score: null, last_response_date: null, recent_responses: [] },
       })
 
@@ -316,8 +317,8 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
             const metrics: HealthMetric[] = Array.isArray((v1 as any)?.data) ? (v1 as any).data : (v1 as any)
             const latest = Array.isArray(metrics) ? metrics[0] : undefined
             setHealth({
-              health_score: latest?.overall_health_score ?? account.health_score,
-              churn_risk_score: account.churn_risk_score,
+              health_score: latest?.value ?? account.health_score ?? 0,
+              churn_risk_score: account.churn_risk_score ?? 0,
               nps: { latest_score: null, last_response_date: null, recent_responses: [] },
             })
           } catch {
@@ -329,7 +330,7 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
     }
   }, [activeTab, account, engagements, engagementsLoading, goals, goalsLoading, health, healthLoading])
 
-  const risk = useMemo(() => churnRiskMeta(account.churn_risk_score), [account.churn_risk_score])
+  const risk = useMemo(() => churnRiskMeta(account.churn_risk_score ?? 0), [account.churn_risk_score])
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this account? This action cannot be undone.")) return
@@ -405,11 +406,11 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Health Score</p>
-                <p className={`text-2xl font-bold ${healthColour(account.health_score)}`}>{account.health_score}%</p>
+                <p className={`text-2xl font-bold ${healthColour(account.health_score ?? 0)}`}>{account.health_score ?? 0}%</p>
               </div>
               <TrendingUp className="h-8 w-8 text-muted-foreground" />
             </div>
-            <Progress value={account.health_score} className="mt-2" />
+            <Progress value={account.health_score ?? 0} className="mt-2" />
           </CardContent>
         </Card>
         <Card>
@@ -418,7 +419,7 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Churn Risk</p>
                 <p className={`text-2xl font-bold ${risk.color}`}>{risk.label}</p>
-                <p className="text-sm text-muted-foreground">{account.churn_risk_score}%</p>
+                <p className="text-sm text-muted-foreground">{account.churn_risk_score ?? 0}%</p>
               </div>
               <AlertTriangle className="h-8 w-8 text-muted-foreground" />
             </div>

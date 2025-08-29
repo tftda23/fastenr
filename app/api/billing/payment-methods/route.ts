@@ -86,7 +86,9 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Detach from Stripe
-    await stripe.paymentMethods.detach(paymentMethod.stripe_payment_method_id)
+    if (stripe) {
+      await stripe.paymentMethods.detach(paymentMethod.stripe_payment_method_id)
+    }
 
     // Delete from database
     const { error: deleteError } = await supabase

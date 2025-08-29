@@ -93,12 +93,12 @@ export default function DashboardClientLayout({
             .from("user_preferences")
             .select("theme")
             .eq("user_id", user.id)
-            .eq("organization_id", orgData.id)
+            .eq("organization_id", (orgData as any)?.id)
             .maybeSingle()
 
-          if (preferences?.theme) {
+          if ((preferences as any)?.theme) {
             // Apply the saved theme preference immediately
-            setTheme(preferences.theme)
+            setTheme((preferences as any).theme)
           }
         }
       } catch (error) {

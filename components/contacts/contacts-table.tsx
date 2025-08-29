@@ -353,7 +353,7 @@ export function ContactsTable({
               <Select 
                 value={filters.seniority_level || 'all'} 
                 onValueChange={(value) => onFilterChange({ 
-                  seniority_level: value === 'all' ? undefined : value 
+                  seniority_level: value === 'all' ? undefined : value as any
                 })}
               >
                 <SelectTrigger>
@@ -375,7 +375,7 @@ export function ContactsTable({
               <Select 
                 value={filters.decision_maker_level || 'all'} 
                 onValueChange={(value) => onFilterChange({ 
-                  decision_maker_level: value === 'all' ? undefined : value 
+                  decision_maker_level: value === 'all' ? undefined : value as any
                 })}
               >
                 <SelectTrigger>
@@ -396,7 +396,7 @@ export function ContactsTable({
               <Select 
                 value={filters.contact_status || 'all'} 
                 onValueChange={(value) => onFilterChange({ 
-                  contact_status: value === 'all' ? undefined : value 
+                  contact_status: value === 'all' ? undefined : value as any
                 })}
               >
                 <SelectTrigger>

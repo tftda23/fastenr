@@ -9,7 +9,11 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X, TrendingUp, Target, Calendar, Trash2, Users } from "lucide-react"
-import type { CustomerGoal, Account, MetricSuggestions } from "@/lib/types"
+import type { CustomerGoal, Account } from "@/lib/types"
+
+interface MetricSuggestions {
+  labels: string[]
+}
 
 type GoalType = "customer" | "organization"
 
@@ -40,13 +44,13 @@ export function GoalForm({
 
   const [loading, setLoading] = useState(false)
   const [metricSuggestions, setMetricSuggestions] = useState<MetricSuggestions | null>(null)
-  const [goalType, setGoalType] = useState<GoalType>(goalToEdit?.goal_type ?? defaultGoalType)
+  const [goalType, setGoalType] = useState<GoalType>((goalToEdit as any)?.goal_type ?? defaultGoalType)
 
   const [formData, setFormData] = useState({
     title: goalToEdit?.title ?? "",
     description: goalToEdit?.description ?? "",
     account_id: goalToEdit?.account_id ?? "",
-    metric_type: (goalToEdit?.metric_type ??
+    metric_type: ((goalToEdit as any)?.metric_type ??
       "") as
       | "accounts"
       | "arr"
@@ -59,24 +63,24 @@ export function GoalForm({
       | "",
     current_value: goalToEdit?.current_value?.toString?.() ?? "",
     target_value: goalToEdit?.target_value?.toString?.() ?? "",
-    unit: goalToEdit?.unit ?? "",
-    measurement_period: (goalToEdit?.measurement_period ?? "") as
+    unit: (goalToEdit as any)?.unit ?? "",
+    measurement_period: ((goalToEdit as any)?.measurement_period ?? "") as
       | "daily"
       | "weekly"
       | "monthly"
       | "quarterly"
       | "yearly"
       | "",
-    target_date: goalToEdit?.target_date
-      ? new Date(goalToEdit.target_date).toISOString().slice(0, 10)
+    target_date: (goalToEdit as any)?.target_date
+      ? new Date((goalToEdit as any).target_date).toISOString().slice(0, 10)
       : "",
-    status: (goalToEdit?.status ?? "on_track") as "on_track" | "at_risk" | "achieved" | "missed",
+    status: ((goalToEdit as any)?.status ?? "on_track") as "on_track" | "at_risk" | "achieved" | "missed",
   })
 
   // Keep goal type in sync if the edit target changes or default changes
   useEffect(() => {
-    setGoalType(goalToEdit?.goal_type ?? defaultGoalType)
-  }, [goalToEdit?.goal_type, defaultGoalType])
+    setGoalType((goalToEdit as any)?.goal_type ?? defaultGoalType)
+  }, [(goalToEdit as any)?.goal_type, defaultGoalType])
 
   // If switching to organization goals, clear account_id
   useEffect(() => {
@@ -102,19 +106,19 @@ export function GoalForm({
 
       switch (formData.metric_type) {
         case "arr":
-          currentValue = metricSuggestions.currentARR.toString()
+          currentValue = (metricSuggestions as any).currentARR?.toString() || ""
           unit = unit || "dollars"
           break
         case "health_score":
-          currentValue = metricSuggestions.currentHealthScore.toString()
+          currentValue = (metricSuggestions as any).currentHealthScore?.toString() || ""
           unit = unit || "score"
           break
         case "nps":
-          currentValue = metricSuggestions.currentNPS.toString()
+          currentValue = (metricSuggestions as any).currentNPS?.toString() || ""
           unit = unit || "score"
           break
         case "adoption":
-          currentValue = metricSuggestions.currentAdoption.toString()
+          currentValue = (metricSuggestions as any).currentAdoption?.toString() || ""
           unit = unit || "percentage"
           break
       }

@@ -6,7 +6,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 // Initialize Stripe with test mode for development
 export const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-07-30.basil' as any,
   typescript: true,
 }) : null
 
@@ -51,6 +51,7 @@ export function calculatePricing(seatCount: number, includePremium: boolean = fa
 }
 
 export async function createCustomer(email: string, name: string, organizationId: string) {
+  if (!stripe) throw new Error('Stripe not initialized')
   return await stripe.customers.create({
     email,
     name,
@@ -65,6 +66,7 @@ export async function createSubscription(
   priceId: string,
   trialDays: number = PRICING_CONFIG.TRIAL_DAYS
 ) {
+  if (!stripe) throw new Error('Stripe not initialized')
   return await stripe.subscriptions.create({
     customer: customerId,
     items: [{ price: priceId }],
@@ -76,6 +78,7 @@ export async function createSubscription(
 }
 
 export async function createPaymentIntent(amount: number, customerId: string) {
+  if (!stripe) throw new Error('Stripe not initialized')
   return await stripe.paymentIntents.create({
     amount: amount * 100, // Convert to pence
     currency: PRICING_CONFIG.CURRENCY,
@@ -85,6 +88,7 @@ export async function createPaymentIntent(amount: number, customerId: string) {
 }
 
 export async function createBillingPortalSession(customerId: string, returnUrl: string) {
+  if (!stripe) throw new Error('Stripe not initialized')
   return await stripe.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,

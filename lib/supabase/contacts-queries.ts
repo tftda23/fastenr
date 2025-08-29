@@ -18,13 +18,8 @@ export async function getContacts(
   page = 1,
   limit = 50
 ) {
-  console.log('getContacts - Called with:', { filters, sort, page, limit })
   const { user, organization } = await getCurrentUserOrganization()
-  console.log('getContacts - user:', user?.id, 'organization:', organization?.id)
-  console.log('getContacts - user object:', JSON.stringify(user, null, 2))
-  console.log('getContacts - organization object:', JSON.stringify(organization, null, 2))
   if (!user || !organization) {
-    console.error('getContacts - Authentication failed: user or organization missing')
     throw new Error("User not authenticated")
   }
 
@@ -73,18 +68,10 @@ export async function getContacts(
   const to = from + limit - 1
   query = query.range(from, to)
 
-  console.log('getContacts - About to execute query for org:', organization.id)
   const { data, error, count } = await query
 
-  console.log('getContacts - Query result:', { 
-    dataLength: data?.length, 
-    count, 
-    error: error ? JSON.stringify(error, null, 2) : null,
-    sampleData: data?.slice(0, 2)
-  })
   
   if (error) {
-    console.error('getContacts - Database error:', JSON.stringify(error, null, 2))
     throw new Error(`Failed to fetch contacts: ${error.message}`)
   }
 
@@ -95,7 +82,6 @@ export async function getContacts(
     limit
   }
   
-  console.log('getContacts - Returning result:', result)
   return result
 }
 
@@ -369,7 +355,7 @@ export async function getOrgChart(organizationId: string, accountId?: string): P
     }
   })
 
-  const departments = [...new Set(contacts.map(c => c.department).filter(Boolean))]
+  const departments = Array.from(new Set(contacts.map(c => c.department).filter(Boolean)))
 
   return {
     roots,

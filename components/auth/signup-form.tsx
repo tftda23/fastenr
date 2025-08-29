@@ -32,7 +32,7 @@ function SubmitButton() {
 }
 
 export default function SignUpForm() {
-  const [state, setState] = useState(null)
+  const [state, setState] = useState<{ error?: string; success?: string } | null>(null)
 
   const handleSubmit = async (formData: FormData) => {
     const result = await signUp(null, formData)

@@ -14,13 +14,8 @@ export const isSupabaseConfigured =
 
 export function createClient() {
   if (!isSupabaseConfigured) {
-    console.warn("Supabase environment variables are not set. Using dummy client.")
-    return {
-      auth: {
-        getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-        getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-      },
-    }
+    console.warn("Supabase environment variables are not set.")
+    throw new Error("Database not configured")
   }
 
   const cookieStore = cookies()

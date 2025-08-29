@@ -249,6 +249,11 @@ async function testFileSystem() {
 async function testDatabaseConnectivity() {
   log('INFO', 'Database', 'Testing database connectivity...');
 
+  if (CONFIG.skipServerTests) {
+    log('WARN', 'Database', 'Skipping database tests - server tests disabled');
+    return;
+  }
+
   try {
     // Test basic Supabase connection
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

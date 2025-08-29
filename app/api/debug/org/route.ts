@@ -42,9 +42,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Check what columns exist in organizations table
-    const { data: columns, error: columnsError } = await supabase
-      .rpc('get_table_columns', { table_name: 'organizations' })
-      .catch(() => ({ data: null, error: { message: "RPC not available" } }))
+    let columns = null, columnsError = null
+    try {
+      const result = await supabase.rpc('get_table_columns', { table_name: 'organizations' })
+      columns = result.data
+      columnsError = result.error
+    } catch (error) {
+      columns = null
+      columnsError = { message: "RPC not available" }
+    }
 
     return NextResponse.json({
       success: true,
@@ -60,6 +66,6 @@ export async function GET(request: NextRequest) {
 
   } catch (e) {
     console.error("Debug error:", e)
-    return NextResponse.json({ error: "Internal server error", details: e.message }, { status: 500 })
+    return NextResponse.json({ error: "Internal server error", details: e instanceof Error ? e.message : String(e) }, { status: 500 })
   }
 }

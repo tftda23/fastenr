@@ -11,6 +11,7 @@ export default async function EditAccountPage({ params }: { params: { id: string
 
   try {
     const account = await getAccountById(params.id)
+    if (!account) notFound()
     return <AccountForm account={account} isEditing={true} />
   } catch {
     notFound()

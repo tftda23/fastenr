@@ -306,6 +306,7 @@ export default function SurveysClient({
         onOpenChange={setShowCreateDialog}
         accounts={accounts}
         organizationId={organizationId}
+        userId={currentUserId}
       />
 
       <SurveyDetailsDialog

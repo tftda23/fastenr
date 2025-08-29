@@ -25,8 +25,8 @@ export function GoalsClient({ initialGoals, accounts }: GoalsClientProps) {
   const [editingGoal, setEditingGoal] = useState<(CustomerGoal & { accounts?: { name: string } | null }) | null>(null);
 
   const { teamGoals, customerGoals } = useMemo(() => {
-    const team = goals.filter((goal) => goal.goal_type === "organization");
-    const customer = goals.filter((goal) => goal.goal_type === "customer");
+    const team = goals.filter((goal) => (goal as any).goal_type === "organization");
+    const customer = goals.filter((goal) => (goal as any).goal_type === "customer");
     return { teamGoals: team, customerGoals: customer };
   }, [goals]);
 
@@ -108,7 +108,7 @@ export function GoalsClient({ initialGoals, accounts }: GoalsClientProps) {
 
         <CardContent className="space-y-4">
           <div className="space-y-3">
-            {goal.goal_type === "customer" && (
+            {(goal as any).goal_type === "customer" && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <User className="h-4 w-4" />
                 <span>{goal.accounts?.name ?? "—"}</span>
@@ -117,7 +117,7 @@ export function GoalsClient({ initialGoals, accounts }: GoalsClientProps) {
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              <span>Due: {goal.target_date ? new Date(goal.target_date).toLocaleDateString() : "—"}</span>
+              <span>Due: {(goal as any).target_date ? new Date((goal as any).target_date).toLocaleDateString() : "—"}</span>
             </div>
 
             {goal.current_value !== null && goal.target_value && (
@@ -125,7 +125,7 @@ export function GoalsClient({ initialGoals, accounts }: GoalsClientProps) {
                 <div className="flex justify-between text-sm">
                   <span>Progress</span>
                   <span>
-                    {goal.current_value} {goal.unit ? goal.unit : ""} / {goal.target_value} {goal.unit ? goal.unit : ""}
+                    {goal.current_value} {(goal as any).unit ? (goal as any).unit : ""} / {goal.target_value} {(goal as any).unit ? (goal as any).unit : ""}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
@@ -139,10 +139,10 @@ export function GoalsClient({ initialGoals, accounts }: GoalsClientProps) {
               </div>
             )}
 
-            {goal.metric_type && (
+            {(goal as any).metric_type && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <TrendingUp className="h-4 w-4" />
-                <span>{goal.metric_type.replace("_", " ").toUpperCase()}</span>
+                <span>{(goal as any).metric_type.replace("_", " ").toUpperCase()}</span>
               </div>
             )}
           </div>

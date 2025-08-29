@@ -17,6 +17,26 @@ export interface Organization {
   updated_at: string
 }
 
+export interface HealthMetric {
+  label: string
+  value: number
+  trend?: 'up' | 'down' | 'stable'
+  color?: string
+}
+
+export interface ApiResponse<T = any> {
+  data?: T
+  error?: string
+  success?: boolean
+}
+
+export interface PaginatedResponse<T = any> {
+  data: T[]
+  count: number | null
+  page: number
+  limit: number
+}
+
 export interface Account {
   id: string
   name: string
@@ -26,6 +46,9 @@ export interface Account {
   arr?: number
   churn_risk_score?: number
   status?: 'active' | 'churned' | 'at_risk' | 'onboarding'
+  size?: 'startup' | 'small' | 'medium' | 'large' | 'enterprise'
+  industry?: string
+  domain?: string
   created_at: string
   updated_at: string
   
@@ -59,7 +82,7 @@ export interface CustomerGoal {
   description?: string
   target_value?: number
   current_value?: number
-  status: 'not_started' | 'in_progress' | 'completed' | 'at_risk'
+  status: 'not_started' | 'in_progress' | 'completed' | 'at_risk' | 'achieved'
   due_date?: string
   created_at: string
   updated_at: string
@@ -194,6 +217,24 @@ export interface ContactHierarchy {
   children?: ContactHierarchy[]
 }
 
+export interface AutomationWorkflow {
+  id: string
+  organization_id: string
+  name: string
+  description?: string
+  status: 'draft' | 'active' | 'paused'
+  enabled: boolean
+  scope_all_accounts: boolean
+  trigger_type: string
+  trigger_config?: Record<string, any>
+  condition_config?: Record<string, any>
+  action_type: string
+  action_config?: Record<string, any>
+  last_run_at?: string
+  created_at: string
+  updated_at: string
+}
+
 export interface AutomationRecipient {
   id: string
   automation_id: string
@@ -323,34 +364,3 @@ export interface GoalWithContacts extends CustomerGoal {
 
 // Contact analytics types
 
-// Export all types
-export type {
-  // Keep existing exports for compatibility
-  User,
-  Organization,
-  Account,
-  Engagement,
-  CustomerGoal,
-  NPSSurvey,
-  
-  // New contact system exports
-  Contact,
-  ContactGroup,
-  ContactGroupMembership,
-  ContactGoalRole,
-  EngagementParticipant,
-  ContactHierarchy,
-  AutomationRecipient,
-  DecisionMakerAnalysis,
-  ContactFormData,
-  ContactGroupFormData,
-  ContactsResponse,
-  ContactGroupsResponse,
-  ContactFilters,
-  ContactSortOptions,
-  OrgChartNode,
-  OrgChartData,
-  AutomationContactTarget,
-  EngagementWithParticipants,
-  GoalWithContacts
-}

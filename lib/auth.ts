@@ -49,5 +49,5 @@ export async function checkUserPermission(requiredRole: "read" | "read_write" | 
     admin: 4,
   }
 
-  return roleHierarchy[user.role] >= roleHierarchy[requiredRole]
+  return (roleHierarchy as any)[(user as any).role] >= (roleHierarchy as any)[requiredRole]
 }

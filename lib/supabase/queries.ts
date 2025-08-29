@@ -179,19 +179,13 @@ export async function createAccount(account: Omit<Account, "id" | "created_at" |
 }
 
 export async function updateAccount(id: string, updates: Partial<Account>) {
-  console.log('updateAccount called with:', { id, updates })
-  
   const { user, organization } = await getCurrentUserOrganization()
-  console.log('Current user and org:', { user: user?.id, org: organization?.id })
   
   if (!user || !organization) throw new Error("User not authenticated")
 
   const supabase = createClient()
-  console.log('Making supabase update call...')
   
   const { data, error } = await supabase.from("accounts").update(updates).eq("id", id).select().single()
-  
-  console.log('Supabase update result:', { data, error })
 
   if (error) {
     console.error('Supabase error details:', {
@@ -348,6 +342,24 @@ export async function getNPSSurveys(accountId?: string) {
   return data as (NPSSurvey & { accounts: { name: string } })[]
 }
 
+export async function createNPSSurvey(surveyData: Partial<NPSSurvey>) {
+  const { user, organization } = await getCurrentUserOrganization()
+  if (!user || !organization) throw new Error("User not authenticated")
+  const supabase = createClient()
+  
+  const { data, error } = await supabase
+    .from("nps_surveys")
+    .insert({
+      ...surveyData,
+      organization_id: organization.id
+    })
+    .select()
+    .single()
+  
+  if (error) throw error
+  return data
+}
+
 // Goals queries
 export async function getCustomerGoals(accountId?: string) {
   const { user, organization } = await getCurrentUserOrganization()
@@ -383,7 +395,7 @@ export async function getCustomerGoals(accountId?: string) {
     // Optional: log to help distinguish empty vs blocked
     // Customer goals count retrieved
 
-    return data as (CustomerGoal & { accounts: { id: string; name: string } })[]
+    return data as any
   } catch (e) {
     console.error("getCustomerGoals fatal error:", e)
     throw e
@@ -414,7 +426,7 @@ export async function createCustomerGoal(
     .single()
 
   if (error) throw error
-  return data as CustomerGoal & { accounts: { id: string; name: string } }
+  return data as any
 }
 
 export async function getMetricBasedGoalSuggestions(accountId: string) {

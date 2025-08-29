@@ -18,7 +18,7 @@ export function OnboardingForm() {
     setIsLoading(true)
     setError("")
 
-    const result = await completeOnboarding(formData)
+    const result = await completeOnboarding(null, formData)
 
     if (result.error) {
       setError(result.error)

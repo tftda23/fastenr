@@ -77,10 +77,10 @@ export default function UserSettingsClient({ userId, organizationId }: UserSetti
 
       if (data) {
         setPreferences({
-          theme: data.theme || "system",
-          timezone: data.timezone || "UTC",
-          display_name: data.display_name || "",
-          email_notifications: data.email_notifications ?? true,
+          theme: (data as any).theme || "system",
+          timezone: (data as any).timezone || "UTC",
+          display_name: (data as any).display_name || "",
+          email_notifications: (data as any).email_notifications ?? true,
         })
       }
     } catch (error) {
@@ -93,7 +93,7 @@ export default function UserSettingsClient({ userId, organizationId }: UserSetti
   const savePreferences = async () => {
     setSaving(true)
     try {
-      const { error } = await supabase.from("user_preferences").upsert(
+      const { error } = await (supabase as any).from("user_preferences").upsert(
         {
           user_id: userId,
           organization_id: organizationId,

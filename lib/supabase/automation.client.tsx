@@ -20,7 +20,7 @@ export async function createAutomation(input: {
 }) {
   const supabase = createSupabaseClient();
 
-  const { data: workflow, error } = await supabase
+  const { data: workflow, error } = await (supabase as any)
     .from("automation_workflows")
     .insert([
       {
@@ -47,7 +47,7 @@ export async function createAutomation(input: {
       workflow_id: workflow.id,
       account_id,
     }));
-    const { error: waErr } = await supabase.from("automation_workflow_accounts").insert(rows);
+    const { error: waErr } = await (supabase as any).from("automation_workflow_accounts").insert(rows);
     if (waErr) throw waErr;
   }
 
@@ -62,7 +62,7 @@ export async function updateAutomation(
   const { account_ids, ...wfUpdates } = updates;
 
   if (Object.keys(wfUpdates).length) {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("automation_workflows")
       .update(wfUpdates)
       .eq("id", workflowId);
@@ -78,7 +78,7 @@ export async function updateAutomation(
 
     if (account_ids.length) {
       const rows = account_ids.map((account_id) => ({ workflow_id: workflowId, account_id }));
-      const { error: insErr } = await supabase
+      const { error: insErr } = await (supabase as any)
         .from("automation_workflow_accounts")
         .insert(rows);
       if (insErr) throw insErr;
@@ -88,7 +88,7 @@ export async function updateAutomation(
 
 export async function toggleAutomation(workflowId: string, enabled: boolean) {
   const supabase = createSupabaseClient();
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from("automation_workflows")
     .update({ enabled, status: enabled ? "active" : "paused" })
     .eq("id", workflowId);

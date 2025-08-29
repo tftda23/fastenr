@@ -14,9 +14,12 @@ export async function POST(request: NextRequest) {
     let event: Stripe.Event
 
     try {
+      if (!stripe) {
+        return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 })
+      }
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
     } catch (err) {
-      logger.security('Webhook signature verification failed', { component: 'Stripe' }, err)
+      logger.security('Webhook signature verification failed', { component: 'Stripe', error: err instanceof Error ? err.message : String(err) })
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
     }
 
@@ -74,6 +77,7 @@ async function handleSetupIntentSucceeded(
 ) {
   if (!setupIntent.payment_method || !setupIntent.customer) return
 
+  if (!stripe) return
   const paymentMethod = await stripe.paymentMethods.retrieve(
     setupIntent.payment_method as string
   )
@@ -171,7 +175,7 @@ async function handleInvoicePaymentSucceeded(
   if (dbInvoice) {
     await supabase.from('invoice_payments').insert({
       invoice_id: dbInvoice.id,
-      stripe_payment_intent_id: invoice.payment_intent as string,
+      stripe_payment_intent_id: (invoice as any).payment_intent as string,
       amount: invoice.amount_paid,
       status: 'succeeded',
       processed_at: new Date().toISOString()
@@ -213,7 +217,7 @@ async function handleInvoicePaymentFailed(
   if (dbInvoice) {
     await supabase.from('invoice_payments').insert({
       invoice_id: dbInvoice.id,
-      stripe_payment_intent_id: invoice.payment_intent as string,
+      stripe_payment_intent_id: (invoice as any).payment_intent as string,
       amount: 0,
       status: 'failed',
       failure_reason: 'Payment failed',

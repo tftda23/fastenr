@@ -1,15 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { isAdmin } from '@/lib/auth'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { pathname } = req.url!
+  const pathname = req.url!
 
   if (pathname === '/api/v1/routes') {
     res.status(200).json([
       // ... other routes
       {
         path: '/dashboard/admin/billing',
-        component: () => import('../pages/dashboard/admin/Billing'),
+        component: 'BillingPage',
         isPrivate: true,
         isAdmin: true,
       },

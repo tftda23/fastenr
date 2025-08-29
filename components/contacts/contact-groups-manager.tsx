@@ -274,7 +274,7 @@ export function ContactGroupsManager({
           onRefresh()
           setShowAddContactsDialog(false)
         }}
-        group={selectedGroupData}
+        group={selectedGroupData || null}
         allContacts={contacts}
       />
     </div>

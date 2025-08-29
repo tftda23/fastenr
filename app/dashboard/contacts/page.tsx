@@ -9,13 +9,18 @@ export default async function ContactsPage({
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
   try {
-    // Parse search params for filters
+    // Parse search params for filters with type validation
+    const validSeniorityLevels = ['C-Level', 'VP', 'Director', 'Manager', 'Individual Contributor', 'Other']
+    const validDecisionMakerLevels = ['Unknown', 'Primary', 'Influencer', 'User', 'Gatekeeper']
+    const validContactStatuses = ['active', 'inactive', 'left_company', 'unresponsive']
+    const validRelationshipStrengths = ['strong', 'moderate', 'weak', 'unknown']
+
     const filters = {
       account_id: typeof searchParams.account_id === 'string' ? searchParams.account_id : undefined,
-      seniority_level: typeof searchParams.seniority_level === 'string' ? searchParams.seniority_level : undefined,
-      decision_maker_level: typeof searchParams.decision_maker_level === 'string' ? searchParams.decision_maker_level : undefined,
-      contact_status: typeof searchParams.contact_status === 'string' ? searchParams.contact_status : undefined,
-      relationship_strength: typeof searchParams.relationship_strength === 'string' ? searchParams.relationship_strength : undefined,
+      seniority_level: typeof searchParams.seniority_level === 'string' && validSeniorityLevels.includes(searchParams.seniority_level) ? searchParams.seniority_level as any : undefined,
+      decision_maker_level: typeof searchParams.decision_maker_level === 'string' && validDecisionMakerLevels.includes(searchParams.decision_maker_level) ? searchParams.decision_maker_level as any : undefined,
+      contact_status: typeof searchParams.contact_status === 'string' && validContactStatuses.includes(searchParams.contact_status) ? searchParams.contact_status as any : undefined,
+      relationship_strength: typeof searchParams.relationship_strength === 'string' && validRelationshipStrengths.includes(searchParams.relationship_strength) ? searchParams.relationship_strength as any : undefined,
       search: typeof searchParams.search === 'string' ? searchParams.search : undefined,
     }
 
@@ -47,7 +52,7 @@ export default async function ContactsPage({
         <div className="flex-1">
           <Suspense fallback={<div>Loading contacts...</div>}>
             <ContactsPageWrapper 
-              initialContacts={contactsResult}
+              initialContacts={contactsResult as any}
               contactGroups={contactGroups}
               accounts={accountsResult.data}
               initialFilters={filters}

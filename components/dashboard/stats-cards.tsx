@@ -1,6 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, TrendingUp, AlertTriangle, DollarSign, Star, Loader2 } from "lucide-react"
-import type { DashboardStats } from "@/lib/types"
+interface DashboardStats {
+  totalAccounts: number
+  activeAccounts: number
+  totalRevenue: number
+  averageHealthScore: number
+  criticalAccounts: number
+  atRiskAccounts: number
+  totalARR: number
+  npsScore: number
+}
 
 interface StatsCardsProps {
   stats: DashboardStats

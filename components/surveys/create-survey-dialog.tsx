@@ -152,7 +152,7 @@ export default function CreateSurveyDialog({
       router.refresh()
 
       // Reset form
-      setFormData({ title: "", subject: "", content: "", logoUrl: "", accountId: "", template: "custom" })
+      setFormData({ title: "", subject: "", content: "", logoUrl: "", accountId: "", template: "custom", sendOption: "immediate", scheduledDate: "", scheduledTime: "" })
       setLinks([])
       setSelectedTemplate("custom")
     } catch (error) {

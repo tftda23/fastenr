@@ -90,7 +90,7 @@ export function AddContactsToGroupDialog({
       setSelectedContacts(prev => prev.filter(id => !currentPageContactIds.includes(id)))
     } else {
       // Add current page contacts to selection
-      setSelectedContacts(prev => [...new Set([...prev, ...currentPageContactIds])])
+      setSelectedContacts(prev => Array.from(new Set([...prev, ...currentPageContactIds])))
     }
   }
 

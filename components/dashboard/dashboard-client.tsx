@@ -135,7 +135,7 @@ export function DashboardClient({
 
         <TabsContent value="all" className="space-y-6">
           {/* Stats Cards */}
-          <StatsCards stats={stats} loading={loading} />
+          <StatsCards stats={stats as any} loading={loading} />
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -151,7 +151,7 @@ export function DashboardClient({
                 accounts={churnRiskAccounts.map((account) => ({
                   ...account,
                   href: `/dashboard/accounts/${account.id}`,
-                }))}
+                })) as any}
                 loading={loading}
               />
             </div>
@@ -160,7 +160,7 @@ export function DashboardClient({
 
         <TabsContent value="my" className="space-y-6">
           {/* Stats Cards */}
-          <StatsCards stats={stats} loading={loading} />
+          <StatsCards stats={stats as any} loading={loading} />
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -176,7 +176,7 @@ export function DashboardClient({
                 accounts={churnRiskAccounts.map((account) => ({
                   ...account,
                   href: `/dashboard/accounts/${account.id}`,
-                }))}
+                })) as any}
                 loading={loading}
               />
             </div>

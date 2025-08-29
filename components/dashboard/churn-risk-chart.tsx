@@ -3,7 +3,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, TrendingDown, TrendingUp, Loader2 } from "lucide-react"
-import type { ChurnRiskAccount } from "@/lib/types"
+import type { Account } from "@/lib/types"
+
+interface ChurnRiskAccount extends Account {
+  churn_risk_score?: number
+  contract_end_date?: string
+  last_engagement?: string
+}
 
 interface ChurnRiskChartProps {
   accounts: ChurnRiskAccount[]
@@ -52,7 +58,7 @@ export default function ChurnRiskChart({ accounts, loading = false }: ChurnRiskC
         ) : (
           <div className="space-y-4">
             {accounts.map((account) => {
-            const risk = getRiskLevel(account.churn_risk_score)
+            const risk = getRiskLevel(account.churn_risk_score || 0)
             const RiskIcon = risk.icon
 
             return (
@@ -63,7 +69,7 @@ export default function ChurnRiskChart({ accounts, loading = false }: ChurnRiskC
                     <div>
                       <h4 className="font-medium text-foreground">{account.name}</h4>
                       <p className="text-sm text-muted-foreground">
-                        ARR: {formatCurrency(account.arr)} • Contract ends: {formatDate(account.contract_end_date)}
+                        ARR: {formatCurrency(account.arr || 0)} • Contract ends: {formatDate(account.contract_end_date || null)}
                       </p>
                     </div>
                   </div>
@@ -72,7 +78,7 @@ export default function ChurnRiskChart({ accounts, loading = false }: ChurnRiskC
                   <div className="text-right">
                     <div className="text-sm font-medium">Health: {account.health_score}%</div>
                     <div className="text-sm text-muted-foreground">
-                      Last engagement: {formatDate(account.last_engagement)}
+                      Last engagement: {formatDate(account.last_engagement || null)}
                     </div>
                   </div>
                   <Badge className={risk.color}>{risk.label}</Badge>

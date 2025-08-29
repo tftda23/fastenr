@@ -202,12 +202,26 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
 
   async function resetSyncState(provider: Provider) {
     try {
-      const { error } = await supabase
-        .from("integration_sync_state")
-        .update({ phase: "initial", cursor: null, since: null, last_error: null })
-        .eq("organization_id", organizationId)
-        .eq("provider", provider)
-      if (error) throw error
+      // Reset all object types for this provider
+      const objectTypes = provider === "hubspot" ? ["company", "contact", "deal"] : ["company", "contact", "deal"]
+      
+      for (const objectType of objectTypes) {
+        const resetPayload = {
+          phase: "initial",
+          cursor: null,
+          since: null,
+          last_error: null,
+        }
+        
+        const { error } = await (supabase as any)
+          .from("integration_sync_state")
+          .update(resetPayload)
+          .eq("organization_id", organizationId)
+          .eq("provider", provider)
+          .eq("object_type", objectType)
+        if (error) throw error
+      }
+      
       toast({ title: `${titleFor(provider)} sync state reset`, description: "Initial backfill will resume on next sync." })
       await load()
     } catch (e: any) {

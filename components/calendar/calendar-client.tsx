@@ -453,17 +453,19 @@ export default function CalendarClient() {
           </div>
           
           <CreateEngagementDialog
-            selectedDate={createEngagementDate}
-            selectedTime={createEngagementTime}
+            selectedDate={createEngagementDate || undefined}
+            selectedTime={createEngagementTime || undefined}
             onEngagementCreated={handleEngagementCreated}
           />
 
           <AIInsightsButton 
-            pageType="calendar" 
+            pageType="dashboard" 
             pageContext={{ 
-              viewMode,
-              currentDate: currentDate.toISOString(),
-              selectedDate: selectedDate?.toISOString()
+              filters: {
+                viewMode,
+                currentDate: currentDate.toISOString(),
+                selectedDate: selectedDate?.toISOString()
+              }
             }}
           />
         </div>
@@ -487,7 +489,7 @@ export default function CalendarClient() {
 
       {/* Engagement Details Modal */}
       <EngagementDetailsModal
-        engagement={selectedEngagement}
+        engagement={selectedEngagement as any}
         open={!!selectedEngagement}
         onOpenChange={(open) => !open && setSelectedEngagement(null)}
         onEngagementUpdated={handleEngagementUpdated}

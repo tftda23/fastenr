@@ -33,7 +33,7 @@ function SubmitButton() {
 }
 
 export default function LoginForm() {
-  const [state, setState] = useState(null)
+  const [state, setState] = useState<{ error?: string; success?: boolean } | null>(null)
   const router = useRouter()
 
   // Check for OAuth errors in URL params
@@ -41,7 +41,7 @@ export default function LoginForm() {
     const urlParams = new URLSearchParams(window.location.search)
     const error = urlParams.get('error')
     if (error) {
-      const errorMessages = {
+      const errorMessages: Record<string, string> = {
         oauth_error: 'Social login failed. Please try again.',
         profile_error: 'Unable to load your profile. Please contact support.',
         callback_error: 'Authentication callback failed. Please try again.'
@@ -73,7 +73,7 @@ export default function LoginForm() {
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            handleSubmit(new FormData(e.target))
+            handleSubmit(new FormData(e.target as HTMLFormElement))
           }}
           className="space-y-4"
         >

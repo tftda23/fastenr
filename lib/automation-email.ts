@@ -71,12 +71,12 @@ async function getAutomationRecipients(organizationId: string, accountId?: strin
     // Filter users who have email notifications enabled
     const recipients: EmailRecipient[] = users
       .filter(user => {
-        const preferences = user.user_preferences as any
+        const preferences = (user as any).user_preferences as any
         return !preferences || preferences.email_notifications !== false
       })
       .map(user => ({
-        email: user.email,
-        name: user.full_name || undefined
+        email: (user as any).email,
+        name: (user as any).full_name || undefined
       }))
 
     return recipients

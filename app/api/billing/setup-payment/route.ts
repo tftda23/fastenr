@@ -53,6 +53,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Create setup intent for saving payment method
+    if (!stripe) {
+      return NextResponse.json({ error: "Payment processing not configured" }, { status: 503 })
+    }
+    
     const setupIntent = await stripe.setupIntents.create({
       customer: stripeCustomerId,
       payment_method_types: ['card'],

@@ -63,7 +63,19 @@ class Logger {
 
   private formatMessage(level: string, message: string, context?: LogContext): string {
     const timestamp = new Date().toISOString();
-    const contextStr = context ? ` | ${JSON.stringify(context)}` : '';
+    let contextStr = '';
+    if (context) {
+      try {
+        const contextJson = JSON.stringify(context);
+        if (contextJson.length > 1000) { // 1KB limit for context
+          contextStr = ' | [Context too large]';
+        } else {
+          contextStr = ` | ${contextJson}`;
+        }
+      } catch {
+        contextStr = ' | [Context serialization failed]';
+      }
+    }
     return `[${timestamp}] ${level}: ${message}${contextStr}`;
   }
 
@@ -76,26 +88,45 @@ class Logger {
 
     // In production, use structured logging
     if (this.isProduction) {
+      // Limit data size to prevent JSON.stringify errors
+      let limitedData = data;
+      if (data && typeof data === 'object') {
+        try {
+          const dataStr = JSON.stringify(data);
+          if (dataStr.length > 10000) { // 10KB limit
+            limitedData = '[Large object truncated]';
+          }
+        } catch {
+          limitedData = '[Object too large to serialize]';
+        }
+      }
+
       const logEntry = {
         timestamp: new Date().toISOString(),
         level: levelName,
         message,
         context,
-        data,
+        data: limitedData,
         environment: 'production'
       };
 
-      // Use appropriate console method based on level
-      switch (level) {
-        case LogLevel.ERROR:
-          console.error(JSON.stringify(logEntry));
-          break;
-        case LogLevel.WARN:
-          console.warn(JSON.stringify(logEntry));
-          break;
-        default:
-          console.log(JSON.stringify(logEntry));
-          break;
+      try {
+        const logStr = JSON.stringify(logEntry);
+        // Use appropriate console method based on level
+        switch (level) {
+          case LogLevel.ERROR:
+            console.error(logStr);
+            break;
+          case LogLevel.WARN:
+            console.warn(logStr);
+            break;
+          default:
+            console.log(logStr);
+            break;
+        }
+      } catch (error) {
+        // Fallback if JSON.stringify still fails
+        console.error(`[${new Date().toISOString()}] ${levelName}: ${message} [Serialization failed]`);
       }
     } else {
       // In development, use readable format

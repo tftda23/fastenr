@@ -303,7 +303,7 @@ function getEngagementTypes(engagements: any[]) {
 }
 
 function getDepartmentCoverage(contacts: any[]) {
-  const departments = [...new Set(contacts.map(c => c.department).filter(Boolean))]
+  const departments = Array.from(new Set(contacts.map(c => c.department).filter(Boolean)))
   return departments.join(', ') || 'None'
 }
 

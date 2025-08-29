@@ -213,7 +213,7 @@ async function processAutomationJob(supabase: any, jobId: string) {
       .from("automation_jobs")
       .update({ 
         status: "failed",
-        error_message: error.message,
+        error_message: error instanceof Error ? error.message : String(error),
         updated_at: new Date().toISOString()
       })
       .eq("id", jobId)

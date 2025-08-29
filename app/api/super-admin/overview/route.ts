@@ -38,8 +38,8 @@ export async function GET(request: NextRequest) {
       'super_admin_overview_access',
       undefined,
       { action: 'viewed_overview' },
-      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
-      request.headers.get('user-agent')
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
+      request.headers.get('user-agent') || undefined
     )
 
     // Get all organizations with billing data
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
       recentInvoices: recentInvoices?.map(inv => ({
         ...inv,
         total_amount: inv.total_amount / 100,
-        organization_name: inv.organizations?.name
+        organization_name: (inv.organizations as any)?.name
       }))
     })
 
