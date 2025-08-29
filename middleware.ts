@@ -25,6 +25,8 @@ const BYPASS_PREFIXES = [
   "/documentation", // Help Center/Documentation
   "/api-docs", // API documentation
   "/status", // Status page
+  "/demo", // Demo booking page
+  "/watch-demo", // Watch demo page
 ]
 
 export async function middleware(request: NextRequest) {
