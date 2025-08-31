@@ -17,6 +17,7 @@ import {
   Mail,
   Calendar,
   MessageSquare,
+  Play,
   Building2,
   Sparkles,
   Clock,
@@ -40,6 +41,7 @@ import {
   AlertTriangle
 } from "lucide-react"
 import { Logo } from "@/components/ui/logo"
+import PublicLayout from "@/components/layout/public-layout"
 
 export const metadata: Metadata = {
   title: "Fastenr - AI-Powered Customer Success Platform | Reduce Churn & Drive Growth",
@@ -119,7 +121,7 @@ export default function HomePage() {
   };
 
   return (
-    <>
+    <PublicLayout>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -817,10 +819,10 @@ export default function HomePage() {
                 <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
               </Button>
             </Link>
-            <Link href="/demo" aria-label="Schedule a personalized product demo">
+            <Link href="/demo" aria-label="See our product demo">
               <Button variant="outline" className="bg-white text-blue-600 border-white hover:bg-blue-600 hover:text-white px-6 py-3 hover:border-blue-600 group font-semibold">
-                <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
-                <span>Book Demo</span>
+                <Play className="mr-2 h-4 w-4" aria-hidden="true" />
+                <span>See Demo</span>
               </Button>
             </Link>
           </div>
@@ -868,7 +870,6 @@ export default function HomePage() {
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/support" className="hover:text-white">Help Center</Link></li>
                 <li><Link href="/documentation" className="hover:text-white">Documentation</Link></li>
-                <li><Link href="/api-docs" className="hover:text-white">API</Link></li>
                 <li><Link href="/status" className="hover:text-white">Status</Link></li>
               </ul>
             </div>
@@ -880,6 +881,6 @@ export default function HomePage() {
         </div>
       </footer>
       </div>
-    </>
+    </PublicLayout>
   )
 }

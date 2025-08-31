@@ -17,20 +17,22 @@ import {
   TrendingUp
 } from "lucide-react"
 import { Logo } from "@/components/ui/logo"
+import PublicLayout from "@/components/layout/public-layout"
+import Footer from "@/components/layout/footer"
 
 export const metadata: Metadata = {
   title: "Status - Fastenr",
-  description: "Real-time status and uptime monitoring for Fastenr services and API.",
+  description: "Real-time status and uptime monitoring for Fastenr services and platform.",
 }
 
 export default function StatusPage() {
   const services = [
     {
-      name: "API Gateway",
+      name: "Core Services",
       status: "operational",
       uptime: "99.98%",
       responseTime: "145ms",
-      description: "Core API endpoints and authentication"
+      description: "Core platform services and authentication"
     },
     {
       name: "Dashboard",
@@ -79,12 +81,12 @@ export default function StatusPage() {
       description: "Routine database optimization and index rebuilding to improve query performance."
     },
     {
-      title: "API Rate Limiting Adjustment",
+      title: "Performance Optimization",
       status: "completed", 
       date: "March 10, 2024",
       duration: "15 minutes",
       impact: "Minimal impact",
-      description: "Temporary rate limit adjustments during peak traffic. All requests processed successfully."
+      description: "Performance improvements and optimization during peak traffic. All requests processed successfully."
     },
     {
       title: "Email Delivery Delay",
@@ -112,7 +114,7 @@ export default function StatusPage() {
       color: "text-blue-600"
     },
     {
-      label: "API Requests",
+      label: "Platform Requests",
       value: "2.4M",
       period: "Last 24 hours",
       icon: Activity,
@@ -154,7 +156,8 @@ export default function StatusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <PublicLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation */}
       <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -335,6 +338,9 @@ export default function StatusPage() {
           </p>
         </div>
       </section>
-    </div>
+
+      <Footer />
+      </div>
+    </PublicLayout>
   )
 }

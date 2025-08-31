@@ -23,14 +23,58 @@ import {
   ExternalLink
 } from "lucide-react"
 import { Logo } from "@/components/ui/logo"
+import PublicLayout from "@/components/layout/public-layout"
+import Footer from "@/components/layout/footer"
+import { getAllDocs, getAllCategories } from '@/lib/docs'
 
 export const metadata: Metadata = {
   title: "Documentation - Fastenr",
-  description: "Complete documentation for Fastenr. API references, guides, and tutorials for developers and users.",
+  description: "Complete documentation for Fastenr. Product guides, tutorials, and best practices for users.",
 }
 
 export default function DocumentationPage() {
-  const docSections = [
+  const allDocs = getAllDocs()
+  const categories = getAllCategories()
+  
+  // Group docs by category
+  const docsByCategory = categories.reduce((acc, category) => {
+    acc[category] = allDocs.filter(doc => doc.category === category)
+    return acc
+  }, {} as Record<string, typeof allDocs>)
+  
+  // Get category colors and icons
+  const getCategoryIcon = (category: string) => {
+    const iconMap: Record<string, any> = {
+      'Getting Started': Book,
+      'Analytics': BarChart3,
+      'Automation': Zap,
+      'Dashboard': Settings,
+      'Administration': Shield,
+    }
+    return iconMap[category] || FileText
+  }
+  
+  const getCategoryColor = (category: string) => {
+    const colorMap: Record<string, string> = {
+      'Getting Started': 'from-blue-500 to-indigo-500',
+      'Analytics': 'from-purple-500 to-pink-500',
+      'Automation': 'from-teal-500 to-cyan-500',
+      'Dashboard': 'from-green-500 to-emerald-500',
+      'Administration': 'from-orange-500 to-red-500',
+    }
+    return colorMap[category] || 'from-gray-500 to-slate-500'
+  }
+
+  // Create doc sections from actual categories
+  const docSections = categories.map(category => ({
+    title: category,
+    description: `${category} guides and documentation`,
+    icon: getCategoryIcon(category),
+    color: getCategoryColor(category),
+    articles: docsByCategory[category]?.slice(0, 4).map(doc => doc.title) || []
+  }))
+
+  const oldDocSections = [
     {
       title: "Getting Started",
       description: "Quick start guides and basic setup",
@@ -44,15 +88,15 @@ export default function DocumentationPage() {
       ]
     },
     {
-      title: "API Reference",
-      description: "Complete API documentation and examples",
+      title: "Advanced Features",
+      description: "Advanced functionality and customization options",
       icon: Code,
       color: "from-green-500 to-emerald-500",
       articles: [
-        "Authentication",
-        "REST API Endpoints",
-        "Webhooks",
-        "Rate Limiting"
+        "Custom Fields",
+        "Advanced Filtering",
+        "Bulk Operations",
+        "Data Export"
       ]
     },
     {
@@ -107,72 +151,43 @@ export default function DocumentationPage() {
 
   const quickLinks = [
     {
-      title: "API Quick Start",
-      description: "Get up and running with our API in 5 minutes",
-      link: "/api-docs/quickstart",
+      title: "Getting Started",
+      description: "Complete setup guide for new users",
+      link: "/documentation/getting-started",
       badge: "Popular"
     },
     {
-      title: "SDK Downloads",
-      description: "Official SDKs for popular programming languages",
-      link: "/api-docs/sdks",
-      badge: "New"
+      title: "Dashboard Overview", 
+      description: "Learn the main interface and navigation",
+      link: "/documentation/dashboard-overview",
+      badge: "Essential"
     },
     {
-      title: "Postman Collection",
-      description: "Import our complete API collection",
-      link: "/api-docs/postman",
-      badge: "Updated"
+      title: "Health Scoring",
+      description: "Set up customer health scoring system",
+      link: "/documentation/customer-health-scoring", 
+      badge: "Advanced"
     },
     {
-      title: "Changelog",
-      description: "Latest updates and feature releases",
-      link: "/changelog",
-      badge: "Latest"
+      title: "Admin Panel",
+      description: "Administrative features and management",
+      link: "/documentation/admin-panel",
+      badge: "Admin"
     }
   ]
 
-  const popularGuides = [
-    {
-      title: "Setting Up Customer Health Scoring",
-      category: "Analytics",
-      difficulty: "Intermediate",
-      time: "15 min"
-    },
-    {
-      title: "Creating Your First Automation Workflow",
-      category: "Automation",
-      difficulty: "Beginner",
-      time: "10 min"
-    },
-    {
-      title: "Integrating with Salesforce",
-      category: "Integrations",
-      difficulty: "Advanced",
-      time: "20 min"
-    },
-    {
-      title: "Building Custom Dashboards",
-      category: "Analytics",
-      difficulty: "Intermediate",
-      time: "12 min"
-    },
-    {
-      title: "API Authentication Guide",
-      category: "API",
-      difficulty: "Beginner",
-      time: "8 min"
-    },
-    {
-      title: "Advanced Survey Targeting",
-      category: "Surveys",
-      difficulty: "Advanced",
-      time: "18 min"
-    }
-  ]
+  // Use actual docs for popular guides
+  const popularGuides = allDocs.map(doc => ({
+    title: doc.title,
+    category: doc.category,
+    difficulty: doc.difficulty,
+    time: doc.readTime,
+    slug: doc.slug
+  }))
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <PublicLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation */}
       <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -213,8 +228,8 @@ export default function DocumentationPage() {
               <span className="text-gray-900">to Build & Integrate</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-              Comprehensive guides, API references, and tutorials to help you get the most out of Fastenr. 
-              From basic setup to advanced integrations, we've got you covered.
+              Comprehensive guides, tutorials, and best practices to help you get the most out of Fastenr. 
+              From basic setup to advanced features, we've got you covered.
             </p>
 
             {/* Search Bar */}
@@ -259,10 +274,12 @@ export default function DocumentationPage() {
                     <Badge variant="secondary" className="text-xs">{link.badge}</Badge>
                   </div>
                   <p className="text-gray-600 text-sm mb-4">{link.description}</p>
-                  <Button variant="outline" size="sm" className="w-full">
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View
-                  </Button>
+                  <Link href={link.link}>
+                    <Button variant="outline" size="sm" className="w-full">
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      View
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
@@ -294,17 +311,21 @@ export default function DocumentationPage() {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 mb-6">
-                    {section.articles.map((article, articleIndex) => (
+                    {docsByCategory[section.title]?.slice(0, 4).map((doc, articleIndex) => (
                       <li key={articleIndex} className="flex items-center text-sm text-gray-600">
                         <ArrowRight className="h-3 w-3 mr-2 text-gray-400" />
-                        {article}
+                        <Link href={`/documentation/${doc.slug}`} className="hover:text-blue-600 hover:underline">
+                          {doc.title}
+                        </Link>
                       </li>
                     ))}
                   </ul>
-                  <Button variant="outline" className="w-full">
-                    Explore Section
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  {docsByCategory[section.title]?.length > 4 && (
+                    <Button variant="outline" className="w-full">
+                      View All ({docsByCategory[section.title]?.length})
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -342,10 +363,12 @@ export default function DocumentationPage() {
                       {guide.difficulty}
                     </span>
                   </div>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Read Guide
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  <Link href={`/documentation/${guide.slug}`}>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Read Guide
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
@@ -357,26 +380,33 @@ export default function DocumentationPage() {
       <section className="py-24 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
-            Ready to Start Building?
+            Ready to Get Started?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Get your API keys and start integrating Fastenr into your applications today.
+            Start using Fastenr today and transform your customer success operations.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-6">
-              <Code className="mr-2 h-5 w-5" />
-              Get API Keys
-            </Button>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600 text-lg px-8 py-6">
-              <Download className="mr-2 h-5 w-5" />
-              Download SDKs
-            </Button>
+            <Link href="/auth/signup">
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-6">
+                <Sparkles className="mr-2 h-5 w-5" />
+                Start Free Trial
+              </Button>
+            </Link>
+            <Link href="/demo">
+              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600 text-lg px-8 py-6">
+                <MessageSquare className="mr-2 h-5 w-5" />
+                Speak with Team
+              </Button>
+            </Link>
           </div>
           <p className="text-blue-200 text-sm mt-6">
-            Free tier available • No credit card required • Full API access
+            Free trial available • No credit card required • Full feature access
           </p>
         </div>
       </section>
-    </div>
+
+      <Footer />
+      </div>
+    </PublicLayout>
   )
 }

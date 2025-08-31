@@ -18,6 +18,9 @@ import {
   Heart
 } from "lucide-react"
 import { Logo } from "@/components/ui/logo"
+import PublicLayout from "@/components/layout/public-layout"
+import Footer from "@/components/layout/footer"
+import { getAllBlogPosts, getFeaturedBlogPosts, getAllCategories } from '@/lib/blog'
 
 export const metadata: Metadata = {
   title: "Blog - Fastenr",
@@ -25,85 +28,53 @@ export const metadata: Metadata = {
 }
 
 export default function BlogPage() {
-  const featuredPost = {
-    title: "The Ultimate Guide to Customer Health Scoring in 2024",
-    excerpt: "Learn how to build a comprehensive customer health scoring system that predicts churn and identifies expansion opportunities with 95% accuracy.",
-    author: "Sarah Chen",
-    date: "March 15, 2024",
-    readTime: "12 min read",
-    category: "Best Practices",
-    image: "bg-gradient-to-r from-blue-500 to-purple-500"
+  const allPosts = getAllBlogPosts()
+  const featuredPosts = getFeaturedBlogPosts()
+  const allCategories = getAllCategories()
+  
+  const featuredPost = featuredPosts[0] || allPosts[0]
+  const blogPosts = allPosts.slice(0, 6) // Show first 6 posts
+  
+  // Create categories with counts
+  const categories = [
+    { name: "All Posts", count: allPosts.length, active: true },
+    ...allCategories.map(category => ({
+      name: category,
+      count: allPosts.filter(post => post.category === category).length,
+      active: false
+    }))
+  ]
+
+  // Helper function to get gradient colors based on category
+  const getCategoryColor = (category: string) => {
+    const colorMap: { [key: string]: string } = {
+      'AI & Machine Learning': 'from-green-500 to-emerald-500',
+      'Team Building': 'from-blue-500 to-indigo-500',
+      'Analytics': 'from-purple-500 to-pink-500',
+      'Automation': 'from-orange-500 to-red-500',
+      'Customer Success': 'from-teal-500 to-cyan-500',
+      'Best Practices': 'from-pink-500 to-rose-500'
+    }
+    return colorMap[category] || 'from-gray-500 to-slate-500'
   }
 
-  const blogPosts = [
-    {
-      title: "5 AI-Powered Strategies to Reduce Customer Churn",
-      excerpt: "Discover how leading companies are using artificial intelligence to predict and prevent customer churn before it happens.",
-      author: "Mike Rodriguez",
-      date: "March 12, 2024",
-      readTime: "8 min read",
-      category: "AI & Machine Learning",
-      color: "from-green-500 to-emerald-500"
-    },
-    {
-      title: "Building a Customer Success Team That Scales",
-      excerpt: "Essential frameworks and processes for scaling your customer success operations from startup to enterprise.",
-      author: "Emily Johnson",
-      date: "March 10, 2024",
-      readTime: "10 min read",
-      category: "Team Building",
-      color: "from-blue-500 to-indigo-500"
-    },
-    {
-      title: "The ROI of Customer Success: Measuring What Matters",
-      excerpt: "Key metrics and KPIs that prove the business impact of your customer success initiatives to leadership.",
-      author: "David Park",
-      date: "March 8, 2024",
-      readTime: "6 min read",
-      category: "Analytics",
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      title: "Automation vs. Human Touch: Finding the Right Balance",
-      excerpt: "When to automate customer interactions and when personal touch is essential for building lasting relationships.",
-      author: "Lisa Thompson",
-      date: "March 5, 2024",
-      readTime: "9 min read",
-      category: "Automation",
-      color: "from-orange-500 to-red-500"
-    },
-    {
-      title: "Customer Onboarding: The First 90 Days That Make or Break",
-      excerpt: "A comprehensive playbook for creating onboarding experiences that drive adoption and reduce time-to-value.",
-      author: "Alex Kumar",
-      date: "March 3, 2024",
-      readTime: "11 min read",
-      category: "Onboarding",
-      color: "from-teal-500 to-cyan-500"
-    },
-    {
-      title: "NPS Surveys: Beyond the Score to Actionable Insights",
-      excerpt: "How to design NPS surveys that provide meaningful feedback and drive real improvements in customer experience.",
-      author: "Rachel Green",
-      date: "March 1, 2024",
-      readTime: "7 min read",
-      category: "Surveys & Feedback",
-      color: "from-pink-500 to-rose-500"
+  // Helper function to get category icon
+  const getCategoryIcon = (category: string) => {
+    const iconMap: { [key: string]: any } = {
+      'AI & Machine Learning': Brain,
+      'Team Building': Users,
+      'Analytics': BarChart3,
+      'Automation': Zap,
+      'Customer Success': Target,
+      'Best Practices': Heart
     }
-  ]
-
-  const categories = [
-    { name: "All Posts", count: 24, active: true },
-    { name: "Best Practices", count: 8 },
-    { name: "AI & Machine Learning", count: 5 },
-    { name: "Team Building", count: 4 },
-    { name: "Analytics", count: 3 },
-    { name: "Automation", count: 2 },
-    { name: "Case Studies", count: 2 }
-  ]
+    const IconComponent = iconMap[category] || Target
+    return <IconComponent className="h-12 w-12 text-white" />
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <PublicLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation */}
       <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -162,10 +133,10 @@ export default function BlogPage() {
           <Card className="border-0 shadow-2xl overflow-hidden">
             <div className="md:flex">
               <div className="md:w-1/2">
-                <div className={`h-64 md:h-full ${featuredPost.image} flex items-center justify-center`}>
+                <div className={`h-64 md:h-full bg-gradient-to-r ${getCategoryColor(featuredPost.category)} flex items-center justify-center`}>
                   <div className="text-center text-white p-8">
-                    <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-80" />
-                    <p className="text-lg font-medium opacity-90">Featured Article</p>
+                    {getCategoryIcon(featuredPost.category)}
+                    <p className="text-lg font-medium opacity-90 mt-4">Featured Article</p>
                   </div>
                 </div>
               </div>
@@ -181,7 +152,11 @@ export default function BlogPage() {
                     </span>
                     <span className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
-                      {featuredPost.date}
+                      {new Date(featuredPost.date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
                     </span>
                     <span className="flex items-center">
                       <Clock className="h-4 w-4 mr-1" />
@@ -189,10 +164,12 @@ export default function BlogPage() {
                     </span>
                   </div>
                 </div>
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                  Read Article
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link href={`/blog/${featuredPost.slug}`}>
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                    Read Article
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </Card>
@@ -223,13 +200,8 @@ export default function BlogPage() {
             {blogPosts.map((post, index) => (
               <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
                 <CardHeader>
-                  <div className={`h-32 bg-gradient-to-r ${post.color} rounded-lg flex items-center justify-center mb-4`}>
-                    {post.category === "AI & Machine Learning" && <Brain className="h-12 w-12 text-white" />}
-                    {post.category === "Team Building" && <Users className="h-12 w-12 text-white" />}
-                    {post.category === "Analytics" && <BarChart3 className="h-12 w-12 text-white" />}
-                    {post.category === "Automation" && <Zap className="h-12 w-12 text-white" />}
-                    {post.category === "Onboarding" && <Target className="h-12 w-12 text-white" />}
-                    {post.category === "Surveys & Feedback" && <Heart className="h-12 w-12 text-white" />}
+                  <div className={`h-32 bg-gradient-to-r ${getCategoryColor(post.category)} rounded-lg flex items-center justify-center mb-4`}>
+                    {getCategoryIcon(post.category)}
                   </div>
                   <Badge className="mb-2 w-fit">{post.category}</Badge>
                   <CardTitle className="text-xl text-gray-900 line-clamp-2">{post.title}</CardTitle>
@@ -247,11 +219,19 @@ export default function BlogPage() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{post.date}</span>
-                    <Button variant="outline" size="sm">
-                      Read More
-                      <ArrowRight className="ml-2 h-3 w-3" />
-                    </Button>
+                    <span className="text-sm text-gray-500">
+                      {new Date(post.date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
+                    </span>
+                    <Link href={`/blog/${post.slug}`}>
+                      <Button variant="outline" size="sm">
+                        Read More
+                        <ArrowRight className="ml-2 h-3 w-3" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -285,6 +265,9 @@ export default function BlogPage() {
           </p>
         </div>
       </section>
-    </div>
+
+      <Footer />
+      </div>
+    </PublicLayout>
   )
 }

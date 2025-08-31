@@ -20,6 +20,8 @@ import {
   CheckCircle
 } from "lucide-react"
 import { Logo } from "@/components/ui/logo"
+import PublicLayout from "@/components/layout/public-layout"
+import Footer from "@/components/layout/footer"
 
 export const metadata: Metadata = {
   title: "Support - Fastenr",
@@ -41,13 +43,6 @@ export default function SupportPage() {
       icon: Video,
       color: "from-green-500 to-emerald-500",
       link: "/support/tutorials"
-    },
-    {
-      title: "API Documentation",
-      description: "Complete API reference and examples",
-      icon: FileText,
-      color: "from-purple-500 to-pink-500",
-      link: "/api-docs"
     },
     {
       title: "Contact Support",
@@ -125,7 +120,8 @@ export default function SupportPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <PublicLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation */}
       <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -325,6 +321,9 @@ export default function SupportPage() {
           </p>
         </div>
       </section>
-    </div>
+
+      <Footer />
+      </div>
+    </PublicLayout>
   )
 }
