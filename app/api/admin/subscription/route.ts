@@ -5,19 +5,18 @@ export const dynamic = 'force-dynamic'
 
 // Pricing model (edit anytime)
 const PRICING = {
-  TIER_A_MAX: 10,    // 1–10 seats
-  TIER_B_MAX: 100,   // 11–100 seats
-  PRICE_A: 3,        // £3 for 1–10
-  PRICE_B: 5,        // £5 for 11–100
-  PRICE_C: 4,        // £4 for 101+
+  TIER_B_MAX: 99,    // Up to 99 seats get base pricing
+  BASE_PRICE: 25,    // £25 base price per user (all tiers)
+  ENTERPRISE_PRICE: 35, // £35 for 100+ (premium included)
+  PREMIUM_ADDON: 15, // £15 premium add-on per user (makes total £40)
   CURRENCY: "£",
-  TRIAL_MONTHS: 3,   // 3-month free trial
+  TRIAL_MONTHS: 1,   // 1-month free trial
+  MIN_SEATS: 5,      // Minimum 5 seats for all plans
 }
 
 function perSeatFor(seatCap: number) {
-  if (seatCap <= PRICING.TIER_A_MAX) return PRICING.PRICE_A
-  if (seatCap <= PRICING.TIER_B_MAX) return PRICING.PRICE_B
-  return PRICING.PRICE_C
+  if (seatCap <= PRICING.TIER_B_MAX) return PRICING.BASE_PRICE
+  return PRICING.ENTERPRISE_PRICE // 101+ gets enterprise pricing with premium included
 }
 
 function planFrom(seatCap: number) {
@@ -70,7 +69,7 @@ export async function GET(request: NextRequest) {
       .eq("organization_id", organizationId)
 
     const activeUsers = users?.length ?? 0
-    const seatCap = org?.seat_cap ?? PRICING.TIER_A_MAX
+    const seatCap = org?.seat_cap ?? PRICING.MIN_SEATS
     const trialEndsAt = org?.trial_ends_at ?? null
     const now = new Date()
     const trialActive = trialEndsAt ? new Date(trialEndsAt) > now : false
@@ -92,9 +91,8 @@ export async function GET(request: NextRequest) {
         perSeat,                 // per-seat for current seatCap
         monthlyAfterTrial,       // what you'll pay after trial
         tiers: {
-          a: { range: `1–${PRICING.TIER_A_MAX}`, perSeat: PRICING.PRICE_A },
-          b: { range: `${PRICING.TIER_A_MAX + 1}–${PRICING.TIER_B_MAX}`, perSeat: PRICING.PRICE_B },
-          c: { range: `${PRICING.TIER_B_MAX + 1}+`, perSeat: PRICING.PRICE_C },
+          a: { range: `${PRICING.MIN_SEATS}–${PRICING.TIER_B_MAX}`, perSeat: PRICING.BASE_PRICE },
+          b: { range: `${PRICING.TIER_B_MAX + 1}+`, perSeat: PRICING.ENTERPRISE_PRICE },
         },
         trialMonths: PRICING.TRIAL_MONTHS,
       },
@@ -114,7 +112,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}))
     const { seatCap, organizationId, premiumAddon } = body as { seatCap?: number; organizationId?: string; premiumAddon?: boolean }
-    if (!seatCap || seatCap < 1) return NextResponse.json({ error: "seatCap must be >= 1" }, { status: 400 })
+    if (!seatCap || seatCap < PRICING.MIN_SEATS) return NextResponse.json({ error: `seatCap must be >= ${PRICING.MIN_SEATS}` }, { status: 400 })
 
     const orgId = organizationId || admin.organizationId
     const newPlan = planFrom(seatCap)
@@ -152,6 +150,81 @@ export async function POST(request: NextRequest) {
 
     // Determine final premium addon state (auto-included for 100+ seats)
     const finalPremiumAddon = seatCap > PRICING.TIER_B_MAX ? true : (premiumAddon ?? false)
+
+    // Check if this is a license change and if it's allowed
+    if (currentOrg.seat_cap !== seatCap) {
+      try {
+        // Try to use the database function first
+        const { data: canChange, error: canChangeError } = await supabase.rpc('can_change_license', { org_id: orgId })
+        
+        if (canChangeError) {
+          // Fallback to manual check if function doesn't exist
+          console.log('Using fallback license change validation:', canChangeError.message)
+          
+          // Get current billing period manually
+          const currentMonth = new Date()
+          const periodStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
+          const periodEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
+          
+          // Check for existing license changes this period
+          const { data: existingChanges } = await supabase
+            .from('billing_events')
+            .select('id')
+            .eq('organization_id', orgId)
+            .eq('is_license_change', true)
+            .gte('effective_date', periodStart.toISOString())
+            .lte('effective_date', periodEnd.toISOString())
+          
+          if (existingChanges && existingChanges.length >= 1) {
+            return NextResponse.json({ 
+              error: "License change not allowed: Maximum one change per billing period" 
+            }, { status: 400 })
+          }
+        } else if (!canChange) {
+          return NextResponse.json({ 
+            error: "License change not allowed: Maximum one change per billing period" 
+          }, { status: 400 })
+        }
+
+        // Record the license change
+        try {
+          await supabase.rpc('record_license_change', {
+            org_id: orgId,
+            old_seat_count: currentOrg.seat_cap,
+            new_seat_count: seatCap,
+            user_id: admin.user.id
+          })
+        } catch (recordError) {
+          // Fallback to manual recording
+          console.log('Using fallback license change recording:', recordError.message)
+          
+          // Create billing event manually
+          await supabase.from('billing_events').insert({
+            organization_id: orgId,
+            event_type: 'license_change',
+            seat_count: seatCap,
+            previous_seat_count: currentOrg.seat_cap,
+            is_license_change: true,
+            change_effective_date: new Date().toISOString().split('T')[0],
+            plan: newPlan,
+            base_cost_per_seat: seatCap <= PRICING.TIER_B_MAX ? PRICING.BASE_PRICE : PRICING.ENTERPRISE_PRICE,
+            total_monthly_cost: seatCap * (seatCap <= PRICING.TIER_B_MAX ? PRICING.BASE_PRICE : PRICING.ENTERPRISE_PRICE),
+            effective_date: new Date().toISOString(),
+            metadata: {
+              changed_by: admin.user.id,
+              old_seat_count: currentOrg.seat_cap,
+              new_seat_count: seatCap,
+              change_reason: 'admin_update'
+            }
+          })
+        }
+      } catch (licenseError) {
+        console.error("License change validation error:", licenseError)
+        return NextResponse.json({ 
+          error: "Failed to validate license change" 
+        }, { status: 500 })
+      }
+    }
 
     // Update organization
     const { error } = await supabase
@@ -193,7 +266,7 @@ export async function POST(request: NextRequest) {
 
     // Create billing event
     const trialActive = currentOrg.trial_ends_at ? new Date(currentOrg.trial_ends_at) > new Date() : false
-    const premiumAddonCostPerSeat = finalPremiumAddon ? (seatCap > PRICING.TIER_B_MAX ? 0 : 2) : 0
+    const premiumAddonCostPerSeat = finalPremiumAddon ? (seatCap > PRICING.TIER_B_MAX ? 0 : PRICING.PREMIUM_ADDON) : 0
     const baseMonthlyCost = monthlyCostAfterTrial(seatCap)
     const totalMonthlyCost = baseMonthlyCost + (seatCap * premiumAddonCostPerSeat)
     

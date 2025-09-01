@@ -34,7 +34,7 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
     type: engagement?.type || "meeting",
     title: engagement?.title || "",
     description: engagement?.description || "",
-    outcome: engagement?.outcome || "no_outcome_set",
+    outcome: engagement?.outcome || "",
     scheduled_at: engagement?.scheduled_at ? engagement.scheduled_at.slice(0, 16) : "",
     completed_at: engagement?.completed_at ? engagement.completed_at.slice(0, 16) : "",
   })
@@ -104,7 +104,7 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
         ...formData,
         scheduled_at: formData.scheduled_at || null,
         completed_at: formData.completed_at || null,
-        outcome: formData.outcome || null,
+        outcome: formData.outcome && formData.outcome.trim() ? formData.outcome : null,
         description: formData.description || null,
         participants: selectedContacts, // Send selected contact IDs
       }
@@ -260,7 +260,6 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
                     <SelectValue placeholder="Select outcome" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="no_outcome_set">No outcome set</SelectItem>
                     <SelectItem value="positive">Positive</SelectItem>
                     <SelectItem value="neutral">Neutral</SelectItem>
                     <SelectItem value="negative">Negative</SelectItem>

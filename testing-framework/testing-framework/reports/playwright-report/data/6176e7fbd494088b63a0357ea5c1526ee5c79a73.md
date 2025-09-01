@@ -1,0 +1,341 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - img "Fastenr" [ref=e5]
+      - navigation [ref=e6]:
+        - link "Dashboard" [ref=e7] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e8] [cursor=pointer]
+          - text: Dashboard
+        - link "Accounts" [ref=e11] [cursor=pointer]:
+          - /url: /dashboard/accounts
+          - img [ref=e12] [cursor=pointer]
+          - text: Accounts
+        - link "Contacts" [ref=e15] [cursor=pointer]:
+          - /url: /dashboard/contacts
+          - img [ref=e16] [cursor=pointer]
+          - text: Contacts
+        - link "Engagements" [ref=e21] [cursor=pointer]:
+          - /url: /dashboard/engagements
+          - img [ref=e22] [cursor=pointer]
+          - text: Engagements
+        - link "Calendar" [ref=e24] [cursor=pointer]:
+          - /url: /dashboard/calendar
+          - img [ref=e25] [cursor=pointer]
+          - text: Calendar
+        - link "Goals" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard/goals
+          - img [ref=e28] [cursor=pointer]
+          - text: Goals
+        - link "Surveys" [ref=e32] [cursor=pointer]:
+          - /url: /dashboard/surveys
+          - img [ref=e33] [cursor=pointer]
+          - text: Surveys
+        - link "Analytics" [ref=e36] [cursor=pointer]:
+          - /url: /dashboard/analytics
+          - img [ref=e37] [cursor=pointer]
+          - text: Analytics
+        - link "Health Scores" [ref=e39] [cursor=pointer]:
+          - /url: /dashboard/health
+          - img [ref=e40] [cursor=pointer]
+          - text: Health Scores
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e46]: A
+          - generic [ref=e47]:
+            - paragraph [ref=e48]: Adam Wood
+            - paragraph [ref=e49]: acwood90@gmail.com
+        - generic [ref=e50]:
+          - button "Admin" [ref=e51] [cursor=pointer]:
+            - img
+            - text: Admin
+          - link [ref=e52] [cursor=pointer]:
+            - /url: /dashboard/settings
+            - button [ref=e53] [cursor=pointer]:
+              - img
+          - button [ref=e55] [cursor=pointer]:
+            - img
+    - main [ref=e56]:
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - generic [ref=e60]:
+            - heading "Dashboard" [level=1] [ref=e61]
+            - paragraph [ref=e62]: Welcome back, Adam Wood • admin
+          - button "AI Insights" [ref=e63] [cursor=pointer]:
+            - img
+            - text: AI Insights
+        - generic [ref=e64]:
+          - tablist [ref=e65]:
+            - tab "All Accounts" [selected] [ref=e66] [cursor=pointer]:
+              - img [ref=e67] [cursor=pointer]
+              - text: All Accounts
+            - tab "My Accounts" [ref=e71] [cursor=pointer]:
+              - img [ref=e72] [cursor=pointer]
+              - text: My Accounts
+          - tabpanel "All Accounts" [ref=e75]:
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - generic [ref=e78]:
+                  - generic [ref=e79]: Total Accounts
+                  - img [ref=e81]
+                - generic [ref=e86]:
+                  - generic [ref=e87]: "36"
+                  - paragraph [ref=e88]: 32 active
+                  - paragraph [ref=e89]: +12% from last month
+              - generic [ref=e90]:
+                - generic [ref=e91]:
+                  - generic [ref=e92]: Average Health Score
+                  - img [ref=e94]
+                - generic [ref=e97]:
+                  - generic [ref=e98]: 78%
+                  - paragraph [ref=e99]: Across all accounts
+                  - paragraph [ref=e100]: +5% from last month
+              - generic [ref=e101]:
+                - generic [ref=e102]:
+                  - generic [ref=e103]: At Risk Accounts
+                  - img [ref=e105]
+                - generic [ref=e107]:
+                  - generic [ref=e108]: "3"
+                  - paragraph [ref=e109]: 8% of total
+                  - paragraph [ref=e110]: "-3% from last month"
+              - generic [ref=e111]:
+                - generic [ref=e112]:
+                  - generic [ref=e113]: Total ARR
+                  - img [ref=e115]
+                - generic [ref=e117]:
+                  - generic [ref=e118]: $7096K
+                  - paragraph [ref=e119]: Annual recurring revenue
+                  - paragraph [ref=e120]: +18% from last month
+              - generic [ref=e121]:
+                - generic [ref=e122]:
+                  - generic [ref=e123]: NPS Score
+                  - img [ref=e125]
+                - generic [ref=e127]:
+                  - generic [ref=e128]: "7.7"
+                  - paragraph [ref=e129]: Last 90 days
+                  - paragraph [ref=e130]: +0.5 from last month
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - generic [ref=e133]:
+                  - generic [ref=e134]:
+                    - img [ref=e135]
+                    - text: Health Score Distribution
+                  - generic [ref=e138]: Account health across your customer base
+                - generic [ref=e139]:
+                  - generic [ref=e140]:
+                    - generic [ref=e141]:
+                      - generic [ref=e142]:
+                        - generic [ref=e143]: Excellent (80-100%)
+                        - generic [ref=e144]: 20 accounts (55.6%)
+                      - progressbar [ref=e145]
+                    - generic [ref=e147]:
+                      - generic [ref=e148]:
+                        - generic [ref=e149]: Good (60-79%)
+                        - generic [ref=e150]: 11 accounts (30.6%)
+                      - progressbar [ref=e151]
+                    - generic [ref=e153]:
+                      - generic [ref=e154]:
+                        - generic [ref=e155]: Fair (40-59%)
+                        - generic [ref=e156]: 5 accounts (13.9%)
+                      - progressbar [ref=e157]
+                    - generic [ref=e159]:
+                      - generic [ref=e160]:
+                        - generic [ref=e161]: Poor (0-39%)
+                        - generic [ref=e162]: 0 accounts (0.0%)
+                      - progressbar [ref=e163]
+                  - generic [ref=e166]:
+                    - generic [ref=e167]:
+                      - paragraph [ref=e168]: Average Health Score
+                      - paragraph [ref=e169]: 77.9%
+                    - generic [ref=e170]:
+                      - paragraph [ref=e171]: Total Accounts
+                      - paragraph [ref=e172]: "36"
+              - generic [ref=e173]:
+                - generic [ref=e174]:
+                  - generic [ref=e175]: Recent Activity
+                  - generic [ref=e176]: Latest updates across your accounts
+                - generic [ref=e178]:
+                  - generic [ref=e179]:
+                    - img [ref=e181]
+                    - generic [ref=e183]:
+                      - generic [ref=e184]:
+                        - heading "Quarterly Business Review" [level=4] [ref=e185]
+                        - generic [ref=e186]: engagement
+                      - paragraph [ref=e187]: Completed QBR with TechCorp Inc
+                      - generic [ref=e188]:
+                        - generic [ref=e189]: TechCorp Inc • by John Smith
+                        - generic [ref=e190]: 2h ago
+                  - generic [ref=e191]:
+                    - img [ref=e193]
+                    - generic [ref=e197]:
+                      - generic [ref=e198]:
+                        - heading "Goal Updated" [level=4] [ref=e199]
+                        - generic [ref=e200]: goal
+                      - paragraph [ref=e201]: User adoption goal marked as at risk
+                      - generic [ref=e202]:
+                        - generic [ref=e203]: StartupXYZ • by Sarah Johnson
+                        - generic [ref=e204]: 4h ago
+                  - generic [ref=e205]:
+                    - img [ref=e207]
+                    - generic [ref=e212]:
+                      - generic [ref=e213]:
+                        - heading "NPS Survey Completed" [level=4] [ref=e214]
+                        - generic [ref=e215]: nps
+                      - paragraph [ref=e216]: New NPS score of 8 received
+                      - generic [ref=e217]:
+                        - generic [ref=e218]: Enterprise Solutions • by Mike Davis
+                        - generic [ref=e219]: 6h ago
+              - generic [ref=e221]:
+                - generic [ref=e222]:
+                  - generic [ref=e223]:
+                    - img [ref=e224]
+                    - text: Churn Risk Analysis
+                  - generic [ref=e226]: Accounts ranked by churn risk score
+                - generic [ref=e228]:
+                  - generic [ref=e229]:
+                    - generic [ref=e231]:
+                      - img [ref=e232]
+                      - generic [ref=e235]:
+                        - heading "Credit Solutions" [level=4] [ref=e236]
+                        - paragraph [ref=e237]: "ARR: $55,000 • Contract ends: N/A"
+                    - generic [ref=e238]:
+                      - generic [ref=e239]:
+                        - generic [ref=e240]: "Health: 45%"
+                        - generic [ref=e241]: "Last engagement: N/A"
+                      - generic [ref=e242]: Medium
+                      - generic [ref=e243]:
+                        - generic [ref=e244]: 55%
+                        - generic [ref=e245]: Risk Score
+                  - generic [ref=e246]:
+                    - generic [ref=e248]:
+                      - img [ref=e249]
+                      - generic [ref=e252]:
+                        - heading "test" [level=4] [ref=e253]
+                        - paragraph [ref=e254]: "ARR: $3,224 • Contract ends: N/A"
+                    - generic [ref=e255]:
+                      - generic [ref=e256]:
+                        - generic [ref=e257]: "Health: 50%"
+                        - generic [ref=e258]: "Last engagement: N/A"
+                      - generic [ref=e259]: Medium
+                      - generic [ref=e260]:
+                        - generic [ref=e261]: 50%
+                        - generic [ref=e262]: Risk Score
+                  - generic [ref=e263]:
+                    - generic [ref=e265]:
+                      - img [ref=e266]
+                      - generic [ref=e269]:
+                        - heading "HubSpot" [level=4] [ref=e270]
+                        - paragraph [ref=e271]: "ARR: N/A • Contract ends: N/A"
+                    - generic [ref=e272]:
+                      - generic [ref=e273]:
+                        - generic [ref=e274]: "Health: 50%"
+                        - generic [ref=e275]: "Last engagement: N/A"
+                      - generic [ref=e276]: Medium
+                      - generic [ref=e277]:
+                        - generic [ref=e278]: 50%
+                        - generic [ref=e279]: Risk Score
+                  - generic [ref=e280]:
+                    - generic [ref=e282]:
+                      - img [ref=e283]
+                      - generic [ref=e286]:
+                        - heading "Audio Solutions Ltd" [level=4] [ref=e287]
+                        - paragraph [ref=e288]: "ARR: $40,000 • Contract ends: N/A"
+                    - generic [ref=e289]:
+                      - generic [ref=e290]:
+                        - generic [ref=e291]: "Health: 50%"
+                        - generic [ref=e292]: "Last engagement: N/A"
+                      - generic [ref=e293]: Medium
+                      - generic [ref=e294]:
+                        - generic [ref=e295]: 50%
+                        - generic [ref=e296]: Risk Score
+                  - generic [ref=e297]:
+                    - generic [ref=e299]:
+                      - img [ref=e300]
+                      - generic [ref=e303]:
+                        - heading "Patient Care Plus" [level=4] [ref=e304]
+                        - paragraph [ref=e305]: "ARR: $38,000 • Contract ends: N/A"
+                    - generic [ref=e306]:
+                      - generic [ref=e307]:
+                        - generic [ref=e308]: "Health: 58%"
+                        - generic [ref=e309]: "Last engagement: 4/11/2025"
+                      - generic [ref=e310]: Medium
+                      - generic [ref=e311]:
+                        - generic [ref=e312]: 42%
+                        - generic [ref=e313]: Risk Score
+                  - generic [ref=e314]:
+                    - generic [ref=e316]:
+                      - img [ref=e317]
+                      - generic [ref=e320]:
+                        - heading "LogiFlow Transport" [level=4] [ref=e321]
+                        - paragraph [ref=e322]: "ARR: $80,000 • Contract ends: N/A"
+                    - generic [ref=e323]:
+                      - generic [ref=e324]:
+                        - generic [ref=e325]: "Health: 65%"
+                        - generic [ref=e326]: "Last engagement: N/A"
+                      - generic [ref=e327]: Low
+                      - generic [ref=e328]:
+                        - generic [ref=e329]: 35%
+                        - generic [ref=e330]: Risk Score
+                  - generic [ref=e331]:
+                    - generic [ref=e333]:
+                      - img [ref=e334]
+                      - generic [ref=e337]:
+                        - heading "DevTools Pro" [level=4] [ref=e338]
+                        - paragraph [ref=e339]: "ARR: $45,000 • Contract ends: N/A"
+                    - generic [ref=e340]:
+                      - generic [ref=e341]:
+                        - generic [ref=e342]: "Health: 65%"
+                        - generic [ref=e343]: "Last engagement: 6/20/2025"
+                      - generic [ref=e344]: Low
+                      - generic [ref=e345]:
+                        - generic [ref=e346]: 35%
+                        - generic [ref=e347]: Risk Score
+                  - generic [ref=e348]:
+                    - generic [ref=e350]:
+                      - img [ref=e351]
+                      - generic [ref=e354]:
+                        - heading "AutoDrive Technologies" [level=4] [ref=e355]
+                        - paragraph [ref=e356]: "ARR: $280,000 • Contract ends: N/A"
+                    - generic [ref=e357]:
+                      - generic [ref=e358]:
+                        - generic [ref=e359]: "Health: 68%"
+                        - generic [ref=e360]: "Last engagement: N/A"
+                      - generic [ref=e361]: Low
+                      - generic [ref=e362]:
+                        - generic [ref=e363]: 32%
+                        - generic [ref=e364]: Risk Score
+                  - generic [ref=e365]:
+                    - generic [ref=e367]:
+                      - img [ref=e368]
+                      - generic [ref=e371]:
+                        - heading "Fashion Forward" [level=4] [ref=e372]
+                        - paragraph [ref=e373]: "ARR: $85,000 • Contract ends: N/A"
+                    - generic [ref=e374]:
+                      - generic [ref=e375]:
+                        - generic [ref=e376]: "Health: 72%"
+                        - generic [ref=e377]: "Last engagement: N/A"
+                      - generic [ref=e378]: Low
+                      - generic [ref=e379]:
+                        - generic [ref=e380]: 28%
+                        - generic [ref=e381]: Risk Score
+                  - generic [ref=e382]:
+                    - generic [ref=e384]:
+                      - img [ref=e385]
+                      - generic [ref=e388]:
+                        - heading "RetailMax Systems" [level=4] [ref=e389]
+                        - paragraph [ref=e390]: "ARR: $300,000 • Contract ends: N/A"
+                    - generic [ref=e391]:
+                      - generic [ref=e392]:
+                        - generic [ref=e393]: "Health: 75%"
+                        - generic [ref=e394]: "Last engagement: N/A"
+                      - generic [ref=e395]: Low
+                      - generic [ref=e396]:
+                        - generic [ref=e397]: 25%
+                        - generic [ref=e398]: Risk Score
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e399]
+```

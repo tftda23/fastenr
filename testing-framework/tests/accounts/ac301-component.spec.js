@@ -1,0 +1,49 @@
+const { test, expect } = require('@playwright/test');
+const config = require('../config/test-config');
+
+test.describe('Component Tests - Accounts - Edit Form', () => {
+  test('AC301: Test account editing form', async ({ page }) => {
+    // Test Configuration
+    const testConfig = config.testCategories[Critical] || config.testCategories.medium;
+    test.setTimeout(testConfig.timeout);
+
+    try {
+      // Navigate to the component page
+      await page.goto(config.environments.local.baseUrl);
+      
+      // TODO: Implement component test for Test account editing form
+      // Expected Result: Account details can be updated
+      // Element Type: Form
+      
+      // Placeholder implementation - replace with actual component interactions
+      console.log('Component Test AC301 - Manual implementation required');
+      console.log('Description: Test account editing form');
+      console.log('Expected: Account details can be updated');
+      
+      // Add component-specific test logic here
+      // Example: await page.click('selector-for-Form');
+      
+    } catch (error) {
+      console.error('Component Test AC301 failed:', error);
+      throw error;
+    }
+  });
+});
+
+/*
+Component Test Case Details:
+- ID: AC301
+- Area: Accounts
+- Page: Edit Account (/dashboard/accounts/[id]/edit)
+- Feature: Edit Form
+- Element Type: Form
+- Priority: Critical
+- Notes: Account management
+
+Implementation Status: REQUIRES_MANUAL_IMPLEMENTATION
+Next Steps:
+1. Add proper component selectors
+2. Implement interaction logic for Form
+3. Add assertions for expected behavior
+4. Handle component state changes
+*/

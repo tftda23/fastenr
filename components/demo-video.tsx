@@ -56,16 +56,14 @@ export default function DemoVideo({ wantsToSpeak, trackingId }: DemoVideoProps) 
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="aspect-video bg-gray-900 overflow-hidden rounded-lg">
-            <video 
-              className="w-full h-full object-cover" 
-              controls
-              preload="metadata"
-              poster="/images/demo-thumbnail.jpg"
-            >
-              <source src="/videos/demo.mp4" type="video/mp4" />
-              <source src="/videos/demo.webm" type="video/webm" />
-              Your browser does not support the video tag.
-            </video>
+            <iframe
+              className="w-full h-full"
+              src={`https://www.youtube.com/embed/${process.env.NEXT_PUBLIC_DEMO_VIDEO_ID || 'dQw4w9WgXcQ'}`}
+              title="Fastenr Product Demo"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
           </div>
         </CardContent>
       </Card>

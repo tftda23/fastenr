@@ -1,0 +1,93 @@
+Test ID,Area,Feature,Type,Priority,Status,Automation Level,Last Executed,Result,Notes
+HP001,Public Pages,Hero Section,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+HP005,Public Pages,Features Section,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+HP006,Public Pages,Testimonials,Manual,Low,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AB001,Public Pages,Page Content,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AB002,Public Pages,Team Section,Manual,Low,Pending,Manual Only,Never,Not Executed,Requires manual execution
+BL001,Public Pages,Blog List,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+BL002,Public Pages,Individual Post,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+CR001,Public Pages,Jobs List,Manual,Low,Pending,Manual Only,Never,Not Executed,Requires manual execution
+CR002,Public Pages,Job Details,Manual,Low,Pending,Manual Only,Never,Not Executed,Requires manual execution
+DC002,Public Pages,Doc Content,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+SP001,Public Pages,Support Options,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+ST001,Public Pages,System Status,Manual,Low,Pending,Manual Only,Never,Not Executed,Requires manual execution
+DB001,Dashboard,Dashboard Stats,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+DB002,Dashboard,Stats Cards,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+DB003,Dashboard,Churn Risk Chart,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+SB003,Dashboard,User Profile Display,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AC008,Accounts,Health Score Display,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AC201,Accounts,Account Overview,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AC204,Accounts,Health Score Details,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AC302,Accounts,Form Pre-population,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+CN003,Contacts,Contact Groups,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+CN008,Contacts,Org Chart View,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+EN201,Engagements,Engagement Overview,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+EN302,Engagements,Form Pre-population,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+CA001,Calendar,Calendar Display,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+CA003,Calendar,Engagement Display,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+GO002,Goals,Goal Progress,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+GO003,Goals,Goal Status,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+GO006,Goals,Goal Metrics,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+SV002,Surveys,Survey Status,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+SV003,Surveys,Response Count,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+SV101,Surveys,Survey Preview,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+SV102,Surveys,Question Display,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AN001,Analytics,Analytics Overview,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+HS001,Health Scores,Health Overview,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+HS005,Health Scores,Health Alerts,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+ST004,Settings,Theme Settings,Manual,Low,Pending,Manual Only,Never,Not Executed,Requires manual execution
+BI001,Billing,Billing Overview,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+BI003,Billing,Payment Methods,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+BI004,Billing,Subscription Details,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AD101,Admin,Subscription Overview,Manual,Critical,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AD103,Admin,Usage Metrics,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AD201,Admin,Integrations List,Manual,High,Pending,Manual Only,Never,Not Executed,Requires manual execution
+AD402,Admin,Email Templates,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+SA007,Super Admin,Revenue Projections,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+SA008,Super Admin,System Statistics,Manual,Medium,Pending,Manual Only,Never,Not Executed,Requires manual execution
+BD002,Public Pages,Calendar Integration,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+WD001,Public Pages,Video Player,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+SU002,Authentication,Email Validation,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+SU003,Authentication,Password Requirements,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+SU006,Authentication,Demo Tracking,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+IV002,Authentication,Invite Validation,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+DB004,Dashboard,Health Score Distribution,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+DB005,Dashboard,Recent Activities,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+DB007,Dashboard,Data Refresh,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AC001,Accounts,Accounts Table,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AC002,Accounts,Search Function,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AC003,Accounts,Filter Options,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AC004,Accounts,Sort Function,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AC202,Accounts,Contact List,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AC203,Accounts,Engagement History,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AC207,Accounts,Account Notes,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+CN001,Contacts,Contacts Table,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+CN002,Contacts,Contact Search,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+CN007,Contacts,Contact Groups Manager,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+EN001,Engagements,Engagements Table,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+EN002,Engagements,Filter by Type,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+EN003,Engagements,Filter by Account,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+EN004,Engagements,Date Range Filter,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+EN105,Engagements,Date/Time Picker,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+EN106,Engagements,Notes Field,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+EN202,Engagements,Participants List,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+CA004,Calendar,Create from Calendar,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+CA005,Calendar,Engagement Details Modal,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+GO001,Goals,Goals Display,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+SV001,Surveys,Surveys Table,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+SV006,Surveys,Send Survey,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AN002,Analytics,Data Tables,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AN003,Analytics,Chart Interactions,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AN004,Analytics,Date Range Selector,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AN006,Analytics,Real-time Updates,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+HS002,Health Scores,Health Distribution,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+HS003,Health Scores,Health Trends,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+HS004,Health Scores,Account Health List,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+BI002,Billing,Invoice List,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AD001,Admin,Users List,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AD301,Admin,Automation Rules,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+AD502,Admin,Feature Toggles,Mixed,Medium,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+SA001,Super Admin,Access Control,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+SA002,Super Admin,Organizations Overview,Mixed,Critical,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+SA004,Super Admin,Organization Details,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion
+SA006,Super Admin,Invoice Display,Mixed,High,Pending,Partial Automation,Never,Not Implemented,Requires implementation completion

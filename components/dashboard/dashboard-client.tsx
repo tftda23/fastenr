@@ -38,6 +38,7 @@ interface Activity {
   timestamp: string
   account: string
   user: string
+  account_id?: string
 }
 
 interface DashboardClientProps {
@@ -63,7 +64,13 @@ export function DashboardClient({
   const [stats, setStats] = useState(initialStats)
   const [churnRiskAccounts, setChurnRiskAccounts] = useState(initialChurnRiskAccounts)
   const [accounts, setAccounts] = useState(initialAccounts)
+  const [activities, setActivities] = useState(initialActivities)
   const [loading, setLoading] = useState(false)
+
+  // Debug initial data
+  console.log('DashboardClient received initial data:')
+  console.log('- Initial activities:', initialActivities?.length || 0)
+  console.log('- Current activities state:', activities?.length || 0)
 
   const refreshDashboardData = useCallback(async (ownerId?: string) => {
     setLoading(true)
@@ -87,6 +94,16 @@ export function DashboardClient({
       if (accountsResponse.ok) {
         const accountsData = await accountsResponse.json()
         setAccounts(accountsData.data || [])
+      }
+
+      // Fetch recent activities
+      const activitiesResponse = await fetch(`/api/dashboard/activities${ownerId ? `?owner_id=${ownerId}` : ''}`)
+      if (activitiesResponse.ok) {
+        const activitiesData = await activitiesResponse.json()
+        console.log('Client: Received activities:', activitiesData.length, 'activities')
+        setActivities(activitiesData)
+      } else {
+        console.error('Client: Failed to fetch activities:', activitiesResponse.status)
       }
     } catch (error) {
       console.error('Failed to refresh dashboard data:', error)
@@ -143,7 +160,7 @@ export function DashboardClient({
             <HealthScoreDistribution accounts={accounts} loading={loading} />
 
             {/* Recent Activity */}
-            <RecentActivity activities={initialActivities} />
+            <RecentActivity activities={activities} />
 
             {/* Churn Risk Analysis */}
             <div className="lg:col-span-2">
@@ -168,7 +185,7 @@ export function DashboardClient({
             <HealthScoreDistribution accounts={accounts} loading={loading} />
 
             {/* Recent Activity */}
-            <RecentActivity activities={initialActivities} />
+            <RecentActivity activities={activities} />
 
             {/* Churn Risk Analysis */}
             <div className="lg:col-span-2">

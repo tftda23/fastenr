@@ -119,7 +119,7 @@ Any future expiry date and any 3-digit CVC work with test cards.
 ### Testing Workflow
 
 1. **Add Payment Method**
-   - Go to `/dashboard/billing`
+   - Go to `/dashboard/admin/billing`
    - Click "Add Payment Method"
    - Use test card: `4242424242424242`
    - Expiry: Any future date (e.g., 12/25)

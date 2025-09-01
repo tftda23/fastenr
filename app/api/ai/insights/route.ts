@@ -3,9 +3,42 @@ import { aggregateDataForAI, sanitizeDataForAI } from '@/lib/ai/data-aggregator'
 import { getDashboardPrompt, getAccountsPrompt, getAccountDetailPrompt, getContactsPrompt, getCalendarPrompt } from '@/lib/ai/prompts'
 import { aiService } from '@/lib/ai/service'
 import { logger } from '@/lib/logger'
+import { createServerClient } from '@/lib/supabase/server'
+import { hasFeatureAccess } from '@/lib/features'
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication and premium access
+    const supabase = createServerClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    }
+
+    // Get user's organization
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('organization_id')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
+
+    // Check if user has access to AI insights premium feature
+    const hasAccess = await hasFeatureAccess(profile.organization_id, 'ai_insights')
+    if (!hasAccess) {
+      return NextResponse.json(
+        { 
+          error: 'AI Insights requires a Premium subscription',
+          premium_required: true,
+          feature: 'ai_insights'
+        },
+        { status: 402 } // Payment Required
+      )
+    }
+
     const body = await request.json()
     const { pageType, pageContext } = body
 

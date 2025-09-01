@@ -1,0 +1,77 @@
+area,page,testId,feature,elementType,description,expectedResult,priority,notes,status,automationLevel
+Public Pages,Home Page (/home),HP002,Navigation Menu,Navigation,Test all navigation links in header,All links navigate to correct pages,High,Primary navigation,pending,automated
+Public Pages,Home Page (/home),HP003,CTA Buttons,Button,"Test "Start Free Trial" button,Redirects to signup page,High,Primary conversion action,",,,,pending,automated
+Public Pages,Home Page (/home),HP004,Demo Video Link,Link,"Test "Watch Demo" link,Navigates to /watch-demo page,Medium,Secondary CTA,",,,,pending,automated
+Public Pages,Home Page (/home),HP007,Footer Links,Navigation,Test all footer links,All footer links work correctly,Medium,Secondary navigation,pending,automated
+Public Pages,Contact Page (/contact),CT001,Contact Form,Form,Test contact form submission,Form submits successfully with validation,High,Lead generation,pending,automated
+Public Pages,Contact Page (/contact),CT002,Form Validation,Validation,Test required field validation,Error messages show for empty required fields,High,Data quality,pending,automated
+Public Pages,Contact Page (/contact),CT003,Email Validation,Validation,Test email format validation,Invalid emails show error message,Medium,Data quality,pending,automated
+Public Pages,Book Demo (/book-demo),BD001,Demo Form,Form,Test demo booking form,Form submits and creates demo request,High,Lead conversion,pending,automated
+Public Pages,Watch Demo (/watch-demo),WD002,CTA After Video,Button,Test signup CTA after video,Signup button works with tracking,High,Conversion tracking,pending,automated
+Public Pages,Watch Demo (/watch-demo),WD003,Speak with Team,Button,"Test "Speak with Team" button,Button tracks interest and redirects to contact,Medium,Lead qualification,",,,,pending,automated
+Public Pages,Demo Access (/demo),DM001,Demo Access Form,Form,Test demo access request form,Form submission works correctly,High,Demo access control,pending,automated
+Public Pages,Documentation (/documentation),DC001,Docs Navigation,Navigation,Test documentation navigation,Docs menu and links work correctly,Medium,User guidance,pending,automated
+Authentication,Login Page (/auth/login),LG001,Login Form,Form,Test email/password login,User can login with valid credentials,Critical,Core authentication,pending,automated
+Authentication,Login Page (/auth/login),LG002,Login Validation,Validation,Test login with invalid credentials,Error message shows for invalid login,Critical,Security validation,pending,automated
+Authentication,Login Page (/auth/login),LG003,Social Login,Button,Test social login buttons if available,Social authentication works correctly,High,Alternative auth method,pending,automated
+Authentication,Login Page (/auth/login),LG004,Forgot Password,Link,Test forgot password functionality,Password reset process works,High,Account recovery,pending,automated
+Authentication,Login Page (/auth/login),LG005,Redirect After Login,Navigation,Test redirect to dashboard after login,Successfully redirects to dashboard,Critical,User flow,pending,automated
+Authentication,Login Page (/auth/login),LG006,Already Logged In,Navigation,Test access when already authenticated,Redirects to dashboard if already logged in,Medium,Session handling,pending,automated
+Authentication,Signup Page (/auth/signup),SU001,Signup Form,Form,Test new user registration,User can create account successfully,Critical,User onboarding,pending,automated
+Authentication,Signup Page (/auth/signup),SU004,Terms Acceptance,Checkbox,Test terms and conditions checkbox,Terms must be accepted to proceed,Medium,Legal compliance,pending,automated
+Authentication,Signup Page (/auth/signup),SU005,Organization Setup,Form,Test organization creation during signup,Organization created with user account,High,Multi-tenancy,pending,automated
+Authentication,Invite Page (/invite),IV001,Invite Acceptance,Form,Test team member invite acceptance,Invited user can join organization,High,Team collaboration,pending,automated
+Authentication,Onboarding (/onboarding),OB001,Onboarding Flow,Form,Test new user onboarding process,User completes initial setup successfully,High,User experience,pending,automated
+Authentication,Onboarding (/onboarding),OB002,Profile Setup,Form,Test user profile completion,User profile created with required information,High,User setup,pending,automated
+Dashboard,Main Dashboard (/dashboard),DB006,Quick Actions,Button,Test quick action buttons,Quick actions navigate to correct pages,Medium,User efficiency,pending,automated
+Dashboard,Sidebar Navigation,SB001,Navigation Menu,Navigation,Test all sidebar navigation links,All navigation items work correctly,Critical,Core navigation,pending,automated
+Dashboard,Sidebar Navigation,SB002,Admin Toggle,Button,Test admin panel access for admin users,Admin users can access admin panel,High,Role-based access,pending,automated
+Dashboard,Sidebar Navigation,SB004,Logout Function,Button,Test logout functionality,User successfully logs out and redirects to login,Critical,Session management,pending,automated
+Dashboard,Sidebar Navigation,SB005,Settings Access,Link,Test settings page access,Settings link navigates correctly,Medium,User preferences,pending,automated
+Accounts,Accounts List (/dashboard/accounts),AC005,Pagination,Navigation,Test table pagination,Pagination works for large datasets,Medium,Performance,pending,automated
+Accounts,Accounts List (/dashboard/accounts),AC006,Add Account Button,Button,Test new account creation button,Button navigates to new account form,High,Account creation,pending,automated
+Accounts,Accounts List (/dashboard/accounts),AC007,Account Actions,Button,Test account action buttons (view edit delete),Action buttons work correctly,High,Account management,pending,automated
+Accounts,New Account (/dashboard/accounts/new),AC101,Account Form,Form,Test new account creation form,Form creates account successfully,Critical,Account creation,pending,automated
+Accounts,New Account (/dashboard/accounts/new),AC102,Form Validation,Validation,Test required field validation,Required fields show validation errors,High,Data integrity,pending,automated
+Accounts,New Account (/dashboard/accounts/new),AC103,Cancel Button,Button,Test form cancellation,Cancel returns to accounts list,Medium,User flow,pending,automated
+Accounts,New Account (/dashboard/accounts/new),AC104,Save and Continue,Button,Test save and continue workflow,Account saved and user redirected appropriately,High,User experience,pending,automated
+Accounts,Account Details (/dashboard/accounts/[id]),AC205,Edit Account Button,Button,Test edit account functionality,Edit button navigates to edit form,High,Account management,pending,automated
+Accounts,Account Details (/dashboard/accounts/[id]),AC206,Add Engagement,Button,Test new engagement creation from account,Can create engagement for account,High,Activity creation,pending,automated
+Accounts,Edit Account (/dashboard/accounts/[id]/edit),AC301,Edit Form,Form,Test account editing form,Account details can be updated,Critical,Account management,pending,automated
+Accounts,Edit Account (/dashboard/accounts/[id]/edit),AC303,Update Validation,Validation,Test update validation rules,Validation works for updated fields,High,Data integrity,pending,automated
+Accounts,Edit Account (/dashboard/accounts/[id]/edit),AC304,Save Changes,Button,Test save changes functionality,Changes save successfully,Critical,Data persistence,pending,automated
+Contacts,Contacts List (/dashboard/contacts),CN004,Add Contact Button,Button,Test new contact creation,Add contact button works,High,Contact creation,pending,automated
+Contacts,Contacts List (/dashboard/contacts),CN005,Contact Actions,Button,Test contact action buttons,Edit/delete actions work correctly,High,Contact management,pending,automated
+Contacts,Contacts List (/dashboard/contacts),CN006,Bulk Actions,Checkbox,Test bulk contact operations,Multiple contacts can be selected and acted upon,Medium,Efficiency,pending,automated
+Engagements,Engagements List (/dashboard/engagements),EN005,Add Engagement,Button,Test new engagement creation,Add engagement button works,Critical,Activity creation,pending,automated
+Engagements,Engagements List (/dashboard/engagements),EN006,Engagement Actions,Button,Test engagement actions (view edit delete),Action buttons work correctly,High,Engagement management,pending,automated
+Engagements,New Engagement (/dashboard/engagements/new),EN101,Engagement Form,Form,Test new engagement creation form,Form creates engagement successfully,Critical,Activity creation,pending,automated
+Engagements,New Engagement (/dashboard/engagements/new),EN102,Account Selection,Dropdown,Test account selection dropdown,Can select account for engagement,Critical,Account association,pending,automated
+Engagements,New Engagement (/dashboard/engagements/new),EN103,Contact Selection,Dropdown,Test contact selection,Can select contacts for engagement,High,Contact association,pending,automated
+Engagements,New Engagement (/dashboard/engagements/new),EN104,Type Selection,Dropdown,Test engagement type selection,Can select engagement type,High,Categorization,pending,automated
+Engagements,Engagement Details (/dashboard/engagements/[id]),EN203,Edit Engagement,Button,Test edit engagement button,Edit button navigates to edit form,High,Engagement management,pending,automated
+Engagements,Engagement Details (/dashboard/engagements/[id]),EN204,Delete Engagement,Button,Test delete engagement functionality,Delete works with confirmation,Medium,Data management,pending,automated
+Engagements,Edit Engagement (/dashboard/engagements/[id]/edit),EN301,Edit Form,Form,Test engagement editing,Engagement can be updated,Critical,Engagement management,pending,automated
+Calendar,Calendar View (/dashboard/calendar),CA002,Month Navigation,Navigation,Test month navigation controls,Can navigate between months,High,Time navigation,pending,automated
+Calendar,Calendar View (/dashboard/calendar),CA006,View Switching,Button,Test calendar view options (month week day),Different view modes work,Medium,Flexibility,pending,automated
+Goals,Goals List (/dashboard/goals),GO004,Add Goal,Button,Test new goal creation,Add goal button works,High,Goal creation,pending,automated
+Goals,Goals List (/dashboard/goals),GO005,Goal Actions,Button,Test goal actions (edit delete),Action buttons work correctly,High,Goal management,pending,automated
+Surveys,Surveys List (/dashboard/surveys),SV004,Create Survey,Button,Test new survey creation,Create survey button works,Critical,Survey creation,pending,automated
+Surveys,Surveys List (/dashboard/surveys),SV005,Survey Actions,Button,Test survey actions (edit send delete),Action buttons work correctly,High,Survey management,pending,automated
+Analytics,Analytics Dashboard (/dashboard/analytics),AN005,Export Function,Button,Test data export functionality,Can export analytics data,Medium,Data portability,pending,automated
+Settings,User Settings (/dashboard/settings),ST001,Profile Settings,Form,Test user profile settings,User can update profile information,High,User management,pending,automated
+Settings,User Settings (/dashboard/settings),ST002,Password Change,Form,Test password change functionality,User can change password securely,High,Security,pending,automated
+Settings,User Settings (/dashboard/settings),ST003,Notification Preferences,Checkbox,Test notification settings,User can configure notifications,Medium,User preferences,pending,automated
+Billing,Billing Dashboard (/dashboard/billing),BI005,Download Invoice,Button,Test invoice download functionality,Invoices can be downloaded as PDF,Medium,Document access,pending,automated
+Admin,Users Management (/dashboard/admin/users),AD002,Invite User,Button,Test user invitation functionality,Can invite new users to organization,Critical,Team management,pending,automated
+Admin,Users Management (/dashboard/admin/users),AD003,User Roles,Dropdown,Test user role management,Can assign/change user roles,High,Access control,pending,automated
+Admin,Users Management (/dashboard/admin/users),AD004,User Actions,Button,Test user actions (edit deactivate),User management actions work,High,User administration,pending,automated
+Admin,Subscription (/dashboard/admin/subscription),AD102,Plan Changes,Button,Test subscription plan changes,Can upgrade/downgrade plans,High,Plan management,pending,automated
+Admin,Integrations (/dashboard/admin/integrations),AD202,Connect Integration,Button,Test integration connection process,Can connect to external services,High,System integration,pending,automated
+Admin,Integrations (/dashboard/admin/integrations),AD203,Integration Settings,Form,Test integration configuration,Can configure integration settings,Medium,Integration customization,pending,automated
+Admin,Automation (/dashboard/admin/automation),AD302,Create Automation,Button,Test automation creation,Can create new automation rules,High,Automation setup,pending,automated
+Admin,Automation (/dashboard/admin/automation),AD303,Edit Automation,Form,Test automation editing,Can modify existing automations,High,Automation management,pending,automated
+Admin,Email Settings (/dashboard/admin/email),AD401,Email Configuration,Form,Test email settings management,Can configure email settings,Medium,Email management,pending,automated
+Admin,App Settings (/dashboard/admin/settings),AD501,App Configuration,Form,Test application settings,Can configure app-wide settings,Medium,System configuration,pending,automated
+Super Admin,Super Admin Portal (/super-admin),SA003,Billing Operations,Button,Test bulk billing operations,Can generate invoices for multiple orgs,Critical,Billing management,pending,automated
+Super Admin,Super Admin Portal (/super-admin),SA005,Invoice Generation,Button,Test individual invoice generation,Can generate invoices for specific orgs,Critical,Invoice management,pending,automated

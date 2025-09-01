@@ -44,7 +44,7 @@ const navigation = [
 const adminNavigation = [
   { name: "Users", href: "/dashboard/admin/users", icon: UserCog },
   { name: "Subscription", href: "/dashboard/admin/subscription", icon: CreditCard },
-  { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
+  { name: "Billing", href: "/dashboard/admin/billing", icon: CreditCard },
   { name: "Integrations", href: "/dashboard/admin/integrations", icon: Plug },
   { name: "Automation", href: "/dashboard/admin/automation", icon: Zap },
   { name: "Email Settings", href: "/dashboard/admin/email", icon: Mail },

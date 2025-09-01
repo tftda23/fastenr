@@ -3,6 +3,7 @@ import { getCurrentUserOrganization } from "@/lib/supabase/queries"
 import { redirect } from "next/navigation"
 import AutomationClient from "@/components/admin/automation-client"
 import { getAutomations } from "@/lib/supabase/automation.server"
+import FeatureGate from "@/components/feature-gate"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -23,8 +24,6 @@ export default async function AdminAutomationPage() {
     redirect("/dashboard")
   }
 
-  const automations = await getAutomations(organization.id)
-
   return (
     <div className="space-y-6">
       <div>
@@ -33,10 +32,21 @@ export default async function AdminAutomationPage() {
           Manage automated workflows and customer success triggers
         </p>
       </div>
-      <AutomationClient
-        organizationId={organization.id}
-        initialAutomations={automations}
-      />
+      
+      <FeatureGate organizationId={organization.id} feature="automation">
+        <AutomationContent organizationId={organization.id} />
+      </FeatureGate>
     </div>
+  )
+}
+
+async function AutomationContent({ organizationId }: { organizationId: string }) {
+  const automations = await getAutomations(organizationId)
+  
+  return (
+    <AutomationClient
+      organizationId={organizationId}
+      initialAutomations={automations}
+    />
   )
 }

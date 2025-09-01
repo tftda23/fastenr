@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Sparkles, AlertTriangle, TrendingUp, Calendar, ExternalLink, CheckCircle } from 'lucide-react'
+import { Loader2, Sparkles, AlertTriangle, TrendingUp, Calendar, ExternalLink, CheckCircle, Lock, Crown } from 'lucide-react'
 import Link from 'next/link'
 
 interface AIInsight {
@@ -48,6 +48,37 @@ export function AIInsightsModal({ open, onOpenChange, pageType, pageContext }: A
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<AIInsightsData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [hasPremiumAccess, setHasPremiumAccess] = useState<boolean | null>(null)
+  const [checkingAccess, setCheckingAccess] = useState(false)
+
+  // Check premium access when modal opens
+  useEffect(() => {
+    if (open && hasPremiumAccess === null) {
+      checkPremiumAccess()
+    }
+  }, [open, hasPremiumAccess])
+
+  const checkPremiumAccess = async () => {
+    setCheckingAccess(true)
+    try {
+      const response = await fetch('/api/features/ai_insights')
+      const result = await response.json()
+      
+      console.log('Premium access check response:', result)
+      
+      if (response.ok) {
+        setHasPremiumAccess(result.hasAccess === true)
+      } else {
+        console.error('Premium access check failed:', result)
+        setHasPremiumAccess(false)
+      }
+    } catch (err) {
+      console.error('Error checking premium access:', err)
+      setHasPremiumAccess(false)
+    } finally {
+      setCheckingAccess(false)
+    }
+  }
 
   const handleAnalyze = async () => {
     setLoading(true)
@@ -121,6 +152,55 @@ export function AIInsightsModal({ open, onOpenChange, pageType, pageContext }: A
     }
   }
 
+  const renderPremiumGate = () => (
+    <Card className="border-dashed border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
+      <CardHeader className="text-center">
+        <div className="mx-auto w-12 h-12 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mb-4">
+          <Crown className="w-6 h-6 text-white" />
+        </div>
+        <CardTitle className="flex items-center justify-center gap-2">
+          <Sparkles className="w-5 h-5" />
+          AI Insights
+          <Badge className="bg-gradient-to-r from-amber-500 to-orange-600">Premium</Badge>
+        </CardTitle>
+        <CardDescription className="text-center">
+          Get AI-powered recommendations and predictions for your accounts
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="text-center space-y-4">
+        <div className="p-4 bg-white/60 rounded-lg border">
+          <Lock className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+          <p className="text-sm text-amber-800 font-medium">
+            AI Insights requires a Premium subscription
+          </p>
+          <p className="text-xs text-amber-700 mt-1">
+            Unlock intelligent analysis and actionable recommendations
+          </p>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-2 justify-center">
+          <Link href="/dashboard/admin/subscription">
+            <Button className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700">
+              <Crown className="w-4 h-4 mr-2" />
+              Upgrade to Premium
+            </Button>
+          </Link>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Maybe Later
+          </Button>
+        </div>
+        
+        <div className="text-xs text-amber-700 bg-amber-50 p-3 rounded-lg">
+          <p className="font-medium mb-1">Premium includes:</p>
+          <p>• AI-powered insights and recommendations</p>
+          <p>• Advanced analytics and custom dashboards</p>
+          <p>• Automation workflows and smart triggers</p>
+          <p>• Customer surveys and satisfaction tracking</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -132,7 +212,19 @@ export function AIInsightsModal({ open, onOpenChange, pageType, pageContext }: A
         </DialogHeader>
 
         <div className="space-y-6">
-          {!data && !loading && (
+          {checkingAccess && (
+            <div className="text-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-purple-500 mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Checking Access</h3>
+              <p className="text-muted-foreground">
+                Verifying your subscription status...
+              </p>
+            </div>
+          )}
+
+          {!checkingAccess && hasPremiumAccess === false && renderPremiumGate()}
+
+          {!checkingAccess && hasPremiumAccess === true && !data && !loading && (
             <div className="text-center py-8">
               <Sparkles className="h-12 w-12 text-purple-500 mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Generate AI Insights</h3>

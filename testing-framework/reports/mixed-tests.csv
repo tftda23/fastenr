@@ -1,0 +1,47 @@
+area,page,testId,feature,elementType,description,expectedResult,priority,notes,status,automationLevel
+Public Pages,Book Demo (/book-demo),BD002,Calendar Integration,Integration,Test calendar scheduling if available,Calendar booking works correctly,Medium,Scheduling system,pending,mixed
+Public Pages,Watch Demo (/watch-demo),WD001,Video Player,Media,Test YouTube video embed,Video loads and plays correctly,High,Product demonstration,pending,mixed
+Authentication,Signup Page (/auth/signup),SU002,Email Validation,Validation,Test email format and uniqueness,Proper validation for email field,Critical,Data integrity,pending,mixed
+Authentication,Signup Page (/auth/signup),SU003,Password Requirements,Validation,Test password strength requirements,Password meets security requirements,High,Security compliance,pending,mixed
+Authentication,Signup Page (/auth/signup),SU006,Demo Tracking,Integration,Test demo tracking parameter handling,Demo tracking ID preserved through signup,Medium,Conversion tracking,pending,mixed
+Authentication,Invite Page (/invite),IV002,Invite Validation,Validation,Test invalid invite token handling,Invalid invites show appropriate error,High,Security validation,pending,mixed
+Dashboard,Main Dashboard (/dashboard),DB004,Health Score Distribution,Chart,Test health score distribution chart,Health scores visualized properly,High,Health monitoring,pending,mixed
+Dashboard,Main Dashboard (/dashboard),DB005,Recent Activities,List,Test recent activities feed,Recent activities display chronologically,Medium,Activity tracking,pending,mixed
+Dashboard,Main Dashboard (/dashboard),DB007,Data Refresh,Function,Test dashboard data refresh,Data updates when refreshed,Medium,Real-time data,pending,mixed
+Accounts,Accounts List (/dashboard/accounts),AC001,Accounts Table,Table,Test accounts data table display,All accounts show with correct data,Critical,Core functionality,pending,mixed
+Accounts,Accounts List (/dashboard/accounts),AC002,Search Function,Search,Test account search functionality,Search filters accounts correctly,High,Data discovery,pending,mixed
+Accounts,Accounts List (/dashboard/accounts),AC003,Filter Options,Filter,Test account filtering options,Filters work correctly (health score status etc),High,Data organization,pending,mixed
+Accounts,Accounts List (/dashboard/accounts),AC004,Sort Function,Sort,Test column sorting,Columns sort correctly (name health score etc),Medium,Data organization,pending,mixed
+Accounts,Account Details (/dashboard/accounts/[id]),AC202,Contact List,List,Test associated contacts display,Account contacts show correctly,High,Relationship management,pending,mixed
+Accounts,Account Details (/dashboard/accounts/[id]),AC203,Engagement History,List,Test engagement history display,Past engagements show chronologically,High,Activity tracking,pending,mixed
+Accounts,Account Details (/dashboard/accounts/[id]),AC207,Account Notes,Text,Test account notes section,Notes display and can be edited,Medium,Information management,pending,mixed
+Contacts,Contacts List (/dashboard/contacts),CN001,Contacts Table,Table,Test contacts data display,All contacts show with correct information,Critical,Contact management,pending,mixed
+Contacts,Contacts List (/dashboard/contacts),CN002,Contact Search,Search,Test contact search functionality,Search finds contacts correctly,High,Data discovery,pending,mixed
+Contacts,Contacts List (/dashboard/contacts),CN007,Contact Groups Manager,Modal,Test contact groups management,Groups can be created/edited/deleted,High,Organization,pending,mixed
+Engagements,Engagements List (/dashboard/engagements),EN001,Engagements Table,Table,Test engagements data display,All engagements show with correct data,Critical,Engagement tracking,pending,mixed
+Engagements,Engagements List (/dashboard/engagements),EN002,Filter by Type,Filter,Test engagement type filtering,Filter by meeting call email etc works,High,Data organization,pending,mixed
+Engagements,Engagements List (/dashboard/engagements),EN003,Filter by Account,Filter,Test account-based filtering,Can filter engagements by specific account,High,Account focus,pending,mixed
+Engagements,Engagements List (/dashboard/engagements),EN004,Date Range Filter,Filter,Test date range filtering,Can filter by date ranges,Medium,Time-based analysis,pending,mixed
+Engagements,New Engagement (/dashboard/engagements/new),EN105,Date/Time Picker,Input,Test date and time selection,Date/time picker works correctly,High,Scheduling,pending,mixed
+Engagements,New Engagement (/dashboard/engagements/new),EN106,Notes Field,Textarea,Test notes/description field,Can add detailed notes,Medium,Documentation,pending,mixed
+Engagements,Engagement Details (/dashboard/engagements/[id]),EN202,Participants List,List,Test participants display,All participants show correctly,High,Participant tracking,pending,mixed
+Calendar,Calendar View (/dashboard/calendar),CA004,Create from Calendar,Modal,Test creating engagement from calendar,Can create engagement by clicking date,High,Quick creation,pending,mixed
+Calendar,Calendar View (/dashboard/calendar),CA005,Engagement Details Modal,Modal,Test clicking engagement opens details,Engagement details modal opens,High,Quick access,pending,mixed
+Goals,Goals List (/dashboard/goals),GO001,Goals Display,Table,Test goals data display,All goals show with progress,Critical,Goal tracking,pending,mixed
+Surveys,Surveys List (/dashboard/surveys),SV001,Surveys Table,Table,Test surveys data display,All surveys show with status,Critical,Survey management,pending,mixed
+Surveys,Surveys List (/dashboard/surveys),SV006,Send Survey,Modal,Test survey sending functionality,Can send surveys to contacts/accounts,Critical,Survey distribution,pending,mixed
+Analytics,Analytics Dashboard (/dashboard/analytics),AN002,Data Tables,Table,Test analytics data tables,Data tables display with correct information,High,Data presentation,pending,mixed
+Analytics,Analytics Dashboard (/dashboard/analytics),AN003,Chart Interactions,Interactive,Test chart interactions (hover click filter),Chart interactions work correctly,Medium,User engagement,pending,mixed
+Analytics,Analytics Dashboard (/dashboard/analytics),AN004,Date Range Selector,Input,Test date range filtering,Can filter analytics by date range,High,Time-based analysis,pending,mixed
+Analytics,Analytics Dashboard (/dashboard/analytics),AN006,Real-time Updates,Function,Test data refresh/updates,Analytics data updates correctly,Medium,Data accuracy,pending,mixed
+Health Scores,Health Dashboard (/dashboard/health),HS002,Health Distribution,Chart,Test health score distribution chart,Distribution chart shows correctly,High,Health analysis,pending,mixed
+Health Scores,Health Dashboard (/dashboard/health),HS003,Health Trends,Chart,Test health trend analysis,Trend charts show historical data,High,Trend analysis,pending,mixed
+Health Scores,Health Dashboard (/dashboard/health),HS004,Account Health List,Table,Test account health scores list,All accounts show with health scores,High,Account monitoring,pending,mixed
+Billing,Billing Dashboard (/dashboard/billing),BI002,Invoice List,Table,Test invoice history,All invoices display with correct data,High,Financial tracking,pending,mixed
+Admin,Users Management (/dashboard/admin/users),AD001,Users List,Table,Test users management interface,All organization users display correctly,Critical,User administration,pending,mixed
+Admin,Automation (/dashboard/admin/automation),AD301,Automation Rules,Table,Test automation rules display,All automation rules show correctly,High,Process automation,pending,mixed
+Admin,App Settings (/dashboard/admin/settings),AD502,Feature Toggles,Toggle,Test feature flag management,Can enable/disable features,Medium,Feature management,pending,mixed
+Super Admin,Super Admin Portal (/super-admin),SA001,Access Control,Security,Test super admin access restriction,Only authorized users can access,Critical,Security control,pending,mixed
+Super Admin,Super Admin Portal (/super-admin),SA002,Organizations Overview,Table,Test organizations list display,All organizations show with billing status,Critical,System oversight,pending,mixed
+Super Admin,Super Admin Portal (/super-admin),SA004,Organization Details,Modal,Test organization drill-down functionality,Can view detailed org information,High,Detailed oversight,pending,mixed
+Super Admin,Super Admin Portal (/super-admin),SA006,Invoice Display,Table,Test invoice list in org details,Invoices show correctly in org modal,High,Invoice tracking,pending,mixed

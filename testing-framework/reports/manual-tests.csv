@@ -1,0 +1,47 @@
+area,page,testId,feature,elementType,description,expectedResult,priority,notes,status,automationLevel
+Public Pages,Home Page (/home),HP001,Hero Section,Visual,Verify hero section displays with correct branding,Hero section visible with Fastenr branding and tagline,High,Main landing experience,pending,manual
+Public Pages,Home Page (/home),HP005,Features Section,Visual,Verify features section displays correctly,All feature cards visible with icons and descriptions,Medium,Product showcase,pending,manual
+Public Pages,Home Page (/home),HP006,Testimonials,Visual,Check testimonials section,Customer testimonials display properly,Low,Social proof,pending,manual
+Public Pages,About Page (/about),AB001,Page Content,Visual,Verify about page content loads,About content displays correctly,Medium,Company information,pending,manual
+Public Pages,About Page (/about),AB002,Team Section,Visual,Check team member display,Team members show with photos and roles,Low,Team showcase,pending,manual
+Public Pages,Blog (/blog),BL001,Blog List,Visual,Verify blog posts list,Blog posts display with titles and excerpts,Medium,Content marketing,pending,manual
+Public Pages,Blog (/blog/[slug]),BL002,Individual Post,Visual,Test individual blog post display,Blog post content renders correctly,Medium,Content delivery,pending,manual
+Public Pages,Careers (/careers),CR001,Jobs List,Visual,Verify job listings display,Available positions show correctly,Low,Recruitment,pending,manual
+Public Pages,Careers (/careers/[slug]),CR002,Job Details,Visual,Test individual job posting,Job details display correctly,Low,Job information,pending,manual
+Public Pages,Documentation (/documentation/[slug]),DC002,Doc Content,Visual,Test individual documentation pages,Documentation content renders properly,Medium,User support,pending,manual
+Public Pages,Support (/support),SP001,Support Options,Visual,Verify support options display,Support channels and resources visible,Medium,Customer support,pending,manual
+Public Pages,Status (/status),ST001,System Status,Visual,Check system status page,Status indicators show correctly,Low,System monitoring,pending,manual
+Dashboard,Main Dashboard (/dashboard),DB001,Dashboard Stats,Visual,Verify dashboard statistics display,Key metrics and stats show correctly,Critical,Core functionality,pending,manual
+Dashboard,Main Dashboard (/dashboard),DB002,Stats Cards,Visual,Test stats cards (accounts total health etc),All stat cards display with correct data,Critical,Data visualization,pending,manual
+Dashboard,Main Dashboard (/dashboard),DB003,Churn Risk Chart,Chart,Test churn risk visualization,Chart displays churn risk data correctly,High,Risk management,pending,manual
+Dashboard,Sidebar Navigation,SB003,User Profile Display,Visual,Test user profile section in sidebar,User name and email display correctly,Medium,User identification,pending,manual
+Accounts,Accounts List (/dashboard/accounts),AC008,Health Score Display,Visual,Test health score visualization,Health scores display with correct colors/indicators,High,Health monitoring,pending,manual
+Accounts,Account Details (/dashboard/accounts/[id]),AC201,Account Overview,Visual,Test account detail page display,Account information displays correctly,Critical,Account management,pending,manual
+Accounts,Account Details (/dashboard/accounts/[id]),AC204,Health Score Details,Visual,Test health score breakdown,Health score components display correctly,High,Health analysis,pending,manual
+Accounts,Edit Account (/dashboard/accounts/[id]/edit),AC302,Form Pre-population,Visual,Test form pre-fills with existing data,Form shows current account data,High,User experience,pending,manual
+Contacts,Contacts List (/dashboard/contacts),CN003,Contact Groups,Visual,Test contact groups display,Contact groups show correctly,High,Organization,pending,manual
+Contacts,Contacts List (/dashboard/contacts),CN008,Org Chart View,Visual,Test organizational chart view,Org chart displays contact hierarchy,Medium,Visualization,pending,manual
+Engagements,Engagement Details (/dashboard/engagements/[id]),EN201,Engagement Overview,Visual,Test engagement detail display,Engagement details show correctly,Critical,Information display,pending,manual
+Engagements,Edit Engagement (/dashboard/engagements/[id]/edit),EN302,Form Pre-population,Visual,Test form shows existing data,Form pre-fills with current data,High,User experience,pending,manual
+Calendar,Calendar View (/dashboard/calendar),CA001,Calendar Display,Visual,Test calendar view renders,Calendar shows correctly with engagements,Critical,Schedule visualization,pending,manual
+Calendar,Calendar View (/dashboard/calendar),CA003,Engagement Display,Visual,Test engagements show on calendar,Engagements appear on correct dates,Critical,Schedule accuracy,pending,manual
+Goals,Goals List (/dashboard/goals),GO002,Goal Progress,Visual,Test progress visualization,Progress bars/indicators show correctly,High,Progress monitoring,pending,manual
+Goals,Goals List (/dashboard/goals),GO003,Goal Status,Visual,Test goal status indicators,Status shows correctly (on track at risk etc),High,Status monitoring,pending,manual
+Goals,Goals List (/dashboard/goals),GO006,Goal Metrics,Visual,Test goal metrics display,Metrics and KPIs show correctly,Medium,Performance tracking,pending,manual
+Surveys,Surveys List (/dashboard/surveys),SV002,Survey Status,Visual,Test survey status indicators,Status shows correctly (draft sent completed),High,Status tracking,pending,manual
+Surveys,Surveys List (/dashboard/surveys),SV003,Response Count,Visual,Test response count display,Response counts show correctly,High,Response tracking,pending,manual
+Surveys,Survey Preview (/survey/[id]/preview),SV101,Survey Preview,Visual,Test survey preview display,Survey shows as recipients will see it,High,Quality assurance,pending,manual
+Surveys,Survey Preview (/survey/[id]/preview),SV102,Question Display,Visual,Test all question types display,All question types render correctly,High,Survey functionality,pending,manual
+Analytics,Analytics Dashboard (/dashboard/analytics),AN001,Analytics Overview,Visual,Test analytics dashboard display,Analytics charts and metrics show correctly,Critical,Data analysis,pending,manual
+Health Scores,Health Dashboard (/dashboard/health),HS001,Health Overview,Visual,Test health scores dashboard,Health metrics display correctly,Critical,Health monitoring,pending,manual
+Health Scores,Health Dashboard (/dashboard/health),HS005,Health Alerts,Visual,Test health score alerts/warnings,Alerts show for at-risk accounts,High,Risk management,pending,manual
+Settings,User Settings (/dashboard/settings),ST004,Theme Settings,Toggle,Test theme/appearance settings,User can change theme preferences,Low,User experience,pending,manual
+Billing,Billing Dashboard (/dashboard/billing),BI001,Billing Overview,Visual,Test billing information display,Billing details show correctly,Critical,Financial management,pending,manual
+Billing,Billing Dashboard (/dashboard/billing),BI003,Payment Methods,Visual,Test payment methods display,Payment methods show correctly,High,Payment management,pending,manual
+Billing,Billing Dashboard (/dashboard/billing),BI004,Subscription Details,Visual,Test subscription information,Subscription details display correctly,High,Subscription management,pending,manual
+Admin,Subscription (/dashboard/admin/subscription),AD101,Subscription Overview,Visual,Test subscription management interface,Subscription details show correctly,Critical,Subscription management,pending,manual
+Admin,Subscription (/dashboard/admin/subscription),AD103,Usage Metrics,Visual,Test usage tracking display,Usage metrics show correctly,High,Usage monitoring,pending,manual
+Admin,Integrations (/dashboard/admin/integrations),AD201,Integrations List,Visual,Test available integrations display,All integrations show with status,High,Integration management,pending,manual
+Admin,Email Settings (/dashboard/admin/email),AD402,Email Templates,Visual,Test email template management,Email templates display and can be edited,Medium,Template management,pending,manual
+Super Admin,Super Admin Portal (/super-admin),SA007,Revenue Projections,Visual,Test revenue projection display,Revenue forecasts show correctly,Medium,Financial planning,pending,manual
+Super Admin,Super Admin Portal (/super-admin),SA008,System Statistics,Visual,Test system-wide statistics,Overall system metrics display correctly,Medium,System monitoring,pending,manual

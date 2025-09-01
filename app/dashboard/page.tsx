@@ -1,4 +1,4 @@
-import { getDashboardStats, getChurnRiskAccounts } from "@/lib/supabase/queries"
+import { getDashboardStats, getChurnRiskAccounts, getRecentActivities } from "@/lib/supabase/queries"
 import { createClient } from "@/lib/supabase/server"
 import { DashboardClient } from "@/components/dashboard/dashboard-client"
 import { redirect } from "next/navigation"
@@ -44,41 +44,20 @@ export default async function DashboardPage() {
   }
 
   try {
-    const [stats, churnRiskAccounts] = await Promise.all([getDashboardStats(), getChurnRiskAccounts(10)])
+    const [stats, churnRiskAccounts, recentActivities] = await Promise.all([
+      getDashboardStats(), 
+      getChurnRiskAccounts(10),
+      getRecentActivities(10) // Get latest 10 activities
+    ])
 
     // Get accounts for health distribution
     const { data: accounts } = await supabase.from("accounts").select("id, health_score, name, owner_id").eq("organization_id", profile.organization_id)
 
-    // Mock recent activities (in real app, this would come from a proper query)
-    const recentActivities = [
-      {
-        id: "1",
-        type: "engagement" as const,
-        title: "Quarterly Business Review",
-        description: "Completed QBR with TechCorp Inc",
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        account: "TechCorp Inc",
-        user: "John Smith",
-      },
-      {
-        id: "2",
-        type: "goal" as const,
-        title: "Goal Updated",
-        description: "User adoption goal marked as at risk",
-        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-        account: "StartupXYZ",
-        user: "Sarah Johnson",
-      },
-      {
-        id: "3",
-        type: "nps" as const,
-        title: "NPS Survey Completed",
-        description: "New NPS score of 8 received",
-        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-        account: "Enterprise Solutions",
-        user: "Mike Davis",
-      },
-    ]
+    console.log('Dashboard server-side data:')
+    console.log('- Stats:', !!stats)
+    console.log('- Churn risk accounts:', churnRiskAccounts?.length || 0)
+    console.log('- Recent activities:', recentActivities?.length || 0)
+    console.log('- Accounts:', accounts?.length || 0)
 
     if (!stats) {
       return (

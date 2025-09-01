@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, Mail, Lock } from "lucide-react"
+import { Loader2, Mail, Lock, User, Building } from "lucide-react"
 import Link from "next/link"
 import { signUp } from "@/lib/actions"
 import SocialLoginButtons from "./social-login-buttons"
@@ -67,12 +67,32 @@ export default function SignUpForm() {
           )}
 
           <div className="space-y-2">
+            <label htmlFor="fullName" className="text-sm font-medium text-foreground">
+              Full Name
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input id="fullName" name="fullName" type="text" placeholder="John Doe" required className="pl-10" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium text-foreground">
               Email
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input id="email" name="email" type="email" placeholder="you@company.com" required className="pl-10" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="organizationName" className="text-sm font-medium text-foreground">
+              Organization Name
+            </label>
+            <div className="relative">
+              <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input id="organizationName" name="organizationName" type="text" placeholder="Your Company" required className="pl-10" />
             </div>
           </div>
 

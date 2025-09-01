@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -34,18 +34,47 @@ interface Snapshot {
   }
 }
 
-const PREMIUM_ADDON_PER_SEAT = 2 // £2/user add-on when <100 seats; included (free) at 100+
+const PREMIUM_ADDON_PER_SEAT = 15 // £15/user add-on when <100 seats; included (free) at 100+
 
 export default function SubscriptionClient({ organizationId }: SubscriptionClientProps) {
   const [snap, setSnap] = useState<Snapshot | null>(null)
   const [loading, setLoading] = useState(true)
   const [newSeats, setNewSeats] = useState<number | null>(null)
+  const [inputValue, setInputValue] = useState<string>("")
+  const [validationMessage, setValidationMessage] = useState<string>("")
   const [saving, setSaving] = useState(false)
   const [premiumAddon, setPremiumAddon] = useState<boolean>(false)
 
   useEffect(() => {
     void load()
   }, [organizationId])
+
+  // Debounced validation for input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const numValue = parseInt(inputValue) || 0
+      if (inputValue && numValue < 5) {
+        setValidationMessage("5 minimum seat license")
+        setNewSeats(null)
+      } else if (inputValue && numValue >= 5) {
+        setValidationMessage("")
+        setNewSeats(numValue)
+      } else {
+        setValidationMessage("")
+        setNewSeats(null)
+      }
+    }, 800) // 800ms debounce
+
+    return () => clearTimeout(timer)
+  }, [inputValue])
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    // Allow empty input or valid numbers
+    if (value === "" || /^\d+$/.test(value)) {
+      setInputValue(value)
+    }
+  }, [])
 
   async function load() {
     setLoading(true)
@@ -55,8 +84,9 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
       if (res.ok) {
         setSnap(data)
         setNewSeats(data.seatCap)
+        setInputValue(data.seatCap.toString())
         // Use the premium addon state from the database, or default based on seat count
-        setPremiumAddon(data.premiumAddon ?? ((data.seatCap ?? 0) > parseInt((data.pricing.tiers.b.range.split("–")[1] || "100"))))
+        setPremiumAddon(data.premiumAddon ?? ((data.seatCap ?? 0) >= 100))
       } else {
         console.error(data.error || "Failed to load subscription")
       }
@@ -66,7 +96,7 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
   }
 
   async function saveSeatCap() {
-    if (!newSeats || newSeats < 1) return
+    if (!newSeats || newSeats < 5) return
     setSaving(true)
     try {
       const res = await fetch(`/api/admin/subscription`, {
@@ -92,16 +122,16 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
   // Local preview for edited seat cap and add-on toggle
   const preview = useMemo(() => {
     if (!snap) return null
-    const seats = Math.max(1, newSeats ?? snap.seatCap)
+    const seats = Math.max(5, newSeats ?? snap.seatCap)
     const { a, b, c } = snap.pricing.tiers
 
-    const aMax = parseInt(a.range.split("–")[1] || "10")
-    const bMax = parseInt(b.range.split("–")[1] || "100")
+    const aMax = parseInt(a.range.split("–")[1] || "100")
+    const bMax = 100 // Premium included at 100+ seats
 
     let basePerSeat = a.perSeat
-    if (seats > aMax) basePerSeat = seats <= bMax ? b.perSeat : c.perSeat
+    if (seats >= bMax) basePerSeat = b?.perSeat || a.perSeat
 
-    const inDiscountBand = seats > bMax
+    const inDiscountBand = seats >= bMax
     const addonIncluded = inDiscountBand // premium included at 100+
     const addonEnabled = addonIncluded ? true : premiumAddon
 
@@ -130,7 +160,11 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
 
   const seatBarPct = Math.min(100, (snap.activeUsers / Math.max(1, snap.seatCap)) * 100)
   const willBeOverage = preview.seats < snap.activeUsers
-  const planLabel = (p: PlanType) => (p === "premium_discount" ? "Premium (Discounted 101+)" : "Premium")
+  const planLabel = (p: PlanType) => {
+    if (p === "premium_discount") return "Enterprise (100+ seats)"
+    if (p === "premium") return "Standard (5-99 seats)"
+    return "Standard"
+  }
 
   return (
     <div className="space-y-6">
@@ -150,7 +184,7 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
             </div>
           </CardTitle>
           <CardDescription>
-            Seat‑based pricing with a {snap.pricing.trialMonths}-month free trial{snap.trialActive && snap.trialEndsAt ? ` until ${new Date(snap.trialEndsAt).toLocaleDateString()}` : ""}.
+            Seat‑based pricing with a {snap.pricing.trialMonths}-month free trial (minimum 5 seats){snap.trialActive && snap.trialEndsAt ? ` until ${new Date(snap.trialEndsAt).toLocaleDateString()}` : ""}.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-3">
@@ -187,18 +221,21 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
               <Users className="h-5 w-5" />
               Seat cap
             </CardTitle>
-            <CardDescription>Type the number of seats you need. Premium is included automatically at 100+ seats.</CardDescription>
+            <CardDescription>Type the number of seats you need (minimum 5). Premium features are included automatically at 100+ seats.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm text-muted-foreground">Seats</label>
               <Input
-                value={newSeats ?? snap.seatCap}
-                onChange={(e) => setNewSeats(Math.max(1, Number(e.target.value) || 1))}
+                value={inputValue}
+                onChange={handleInputChange}
                 className="w-40"
-                type="number"
-                min={1}
+                type="text"
+                placeholder="Enter seats"
               />
+              {validationMessage && (
+                <div className="text-sm text-amber-600 mt-1">{validationMessage}</div>
+              )}
             </div>
 
             {/* Premium add-on toggle */}
@@ -206,7 +243,7 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
               <div className="text-sm">
                 <div className="font-medium">Premium add‑on</div>
                 <div className="text-muted-foreground">
-                  Extra features & support. <span className="font-medium">Included at 100+ seats.</span>
+                  AI insights, automation, surveys & advanced analytics. <span className="font-medium">Included at 100+ seats.</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -227,7 +264,7 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
             {willBeOverage && (
               <div className="rounded-md border border-rose-300 bg-rose-50 p-3 text-rose-900 text-sm flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 mt-0.5" />
-                <div>Active users: {snap.activeUsers}. Seat cap must be at least {snap.activeUsers}.</div>
+                <div>Active users: {snap.activeUsers}. Seat cap must be at least {Math.max(5, snap.activeUsers)}.</div>
               </div>
             )}
           </CardContent>
@@ -241,7 +278,7 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
           </CardHeader>
           <CardContent className="space-y-3">
             <Row label="Seat cap (after saving)" value={`${preview.seats} seats`} />
-            <Row label="Plan" value={preview.plan === "premium_discount" ? "Premium (Discounted 101+)" : "Premium"} />
+            <Row label="Plan" value={planLabel(preview.plan)} />
             <Row label="Per‑user (base)" value={`${preview.currency}${preview.basePerSeat}`} />
             <Row label="Base after‑trial monthly" value={`${preview.currency}${preview.baseMonthly}`} />
 
@@ -254,8 +291,8 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
       </div>
 
       <div className="flex items-center justify-end">
-        <Button onClick={saveSeatCap} disabled={saving || willBeOverage}>
-          {willBeOverage ? "Increase seats to save" : (saving ? "Saving…" : "Save changes")}
+        <Button onClick={saveSeatCap} disabled={saving || willBeOverage || (newSeats ?? 0) < 5}>
+          {willBeOverage ? "Increase seats to save" : (newSeats ?? 0) < 5 ? "Minimum 5 seats required" : (saving ? "Saving…" : "Save changes")}
         </Button>
       </div>
 
@@ -273,7 +310,7 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
           <div className="rounded-md border p-3 mt-2 text-muted-foreground flex items-start gap-2">
             <Info className="h-4 w-4 mt-0.5" />
             <div>
-              Premium is **included** for teams with 100+ seats. Below 100 seats, you can toggle it on or off anytime.
+              Premium features are **included** for teams with 100+ seats. Below 100 seats, you can toggle it on or off anytime.
             </div>
           </div>
         </CardContent>

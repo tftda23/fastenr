@@ -110,11 +110,18 @@ export async function signUp(prevState: any, formData: FormData) {
       return { error: "Failed to create user account" }
     }
 
-    // Create organization
+    // Create organization with default subscription settings
+    const trialEndDate = new Date()
+    trialEndDate.setMonth(trialEndDate.getMonth() + 1) // 1 month trial
+    
     const { data: orgData, error: orgError } = await supabase
       .from("organizations")
       .insert({
         name: organizationName.toString(),
+        seat_cap: 5, // Minimum 5 seats for all new organizations
+        plan: "premium",
+        trial_ends_at: trialEndDate.toISOString(),
+        premium_addon: false
       })
       .select()
       .single()
@@ -193,11 +200,18 @@ export async function completeOnboarding(prevState: any, formData: FormData) {
       }
     }
 
-    // Create organization
+    // Create organization with default subscription settings
+    const trialEndDate = new Date()
+    trialEndDate.setMonth(trialEndDate.getMonth() + 1) // 1 month trial
+    
     const { data: orgData, error: orgError } = await supabase
       .from("organizations")
       .insert({
         name: organizationName.toString(),
+        seat_cap: 5, // Minimum 5 seats for all new organizations
+        plan: "premium",
+        trial_ends_at: trialEndDate.toISOString(),
+        premium_addon: false
       })
       .select()
       .single()

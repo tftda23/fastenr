@@ -1,0 +1,44 @@
+{
+  "name": "fastenr-testing-framework",
+  "version": "1.0.0",
+  "description": "Comprehensive testing framework for Fastenr application",
+  "main": "test-runner.js",
+  "scripts": {
+    "test": "node test-runner.js --action=all",
+    "test:parse": "node test-runner.js --action=parse",
+    "test:generate": "node test-runner.js --action=generate",
+    "test:run": "node test-runner.js --action=run",
+    "test:run:critical": "node test-runner.js --action=run --priority=critical",
+    "test:run:auth": "node test-runner.js --action=run --category=authentication",
+    "test:report": "node test-runner.js --action=report",
+    "test:help": "node test-runner.js --action=help",
+    "playwright:install": "npx playwright install",
+    "playwright:test": "npx playwright test",
+    "playwright:report": "npx playwright show-report"
+  },
+  "keywords": [
+    "testing",
+    "automation",
+    "playwright",
+    "fastenr",
+    "e2e",
+    "quality-assurance"
+  ],
+  "author": "Fastenr Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "csv-parser": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fastenr/fastenr"
+  },
+  "bugs": {
+    "url": "https://github.com/fastenr/fastenr/issues"
+  },
+  "homepage": "https://fastenr.com"
+}

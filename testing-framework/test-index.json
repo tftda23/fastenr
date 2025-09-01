@@ -1,0 +1,82 @@
+{
+  "testSuite": {
+    "name": "Fastenr Comprehensive Test Suite",
+    "version": "1.0.0",
+    "created": "2024-12-31",
+    "lastUpdated": "2024-12-31",
+    "totalTestCases": 168,
+    "automationCoverage": {
+      "fullyAutomated": 85,
+      "partiallyAutomated": 45,
+      "manualOnly": 38
+    }
+  },
+  "testAreas": {
+    "publicPages": {
+      "testCases": 25,
+      "automationLevel": "high",
+      "priority": "medium"
+    },
+    "authentication": {
+      "testCases": 12,
+      "automationLevel": "high",
+      "priority": "critical"
+    },
+    "dashboard": {
+      "testCases": 7,
+      "automationLevel": "high",
+      "priority": "critical"
+    },
+    "accounts": {
+      "testCases": 16,
+      "automationLevel": "high",
+      "priority": "critical"
+    },
+    "contacts": {
+      "testCases": 8,
+      "automationLevel": "medium",
+      "priority": "high"
+    },
+    "engagements": {
+      "testCases": 14,
+      "automationLevel": "medium",
+      "priority": "high"
+    },
+    "calendar": {
+      "testCases": 6,
+      "automationLevel": "medium",
+      "priority": "medium"
+    },
+    "goals": {
+      "testCases": 6,
+      "automationLevel": "medium",
+      "priority": "medium"
+    },
+    "surveys": {
+      "testCases": 8,
+      "automationLevel": "medium",
+      "priority": "high"
+    },
+    "analytics": {
+      "testCases": 11,
+      "automationLevel": "low",
+      "priority": "medium"
+    },
+    "admin": {
+      "testCases": 18,
+      "automationLevel": "high",
+      "priority": "high"
+    },
+    "superAdmin": {
+      "testCases": 8,
+      "automationLevel": "high",
+      "priority": "critical"
+    }
+  },
+  "testTypes": {
+    "functional": 120,
+    "ui": 25,
+    "integration": 15,
+    "security": 8
+  }
+}

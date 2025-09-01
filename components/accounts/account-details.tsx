@@ -19,6 +19,7 @@ import type {
 } from "@/lib/types"
 import { OrgChartView } from "@/components/contacts/org-chart-view"
 import { AIInsightsButton } from "@/components/ai/ai-insights-button"
+import { CreateContactDialog } from "@/components/contacts/create-contact-dialog"
 
 type HealthBlock = {
   health_score: number
@@ -253,6 +254,11 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
 
   const [activeTab, setActiveTab] = useState<"overview" | "engagements" | "goals" | "health" | "contacts">("overview")
 
+  // Contact creation modal state
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false)
+  const [contactGroups, setContactGroups] = useState([])
+  const [accounts, setAccounts] = useState([account])
+
   const [engagements, setEngagements] = useState<Engagement[] | null>(null)
   const [engagementsError, setEngagementsError] = useState<string | null>(null)
   const [engagementsLoading, setEngagementsLoading] = useState(false)
@@ -264,6 +270,22 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
   const [health, setHealth] = useState<HealthBlock | null>(null)
   const [healthError, setHealthError] = useState<string | null>(null)
   const [healthLoading, setHealthLoading] = useState(false)
+
+  // Load contact groups when component mounts
+  useEffect(() => {
+    const loadContactGroups = async () => {
+      try {
+        const response = await fetch('/api/contact-groups')
+        if (response.ok) {
+          const groups = await response.json()
+          setContactGroups(groups)
+        }
+      } catch (error) {
+        console.error('Failed to load contact groups:', error)
+      }
+    }
+    loadContactGroups()
+  }, [])
 
   useEffect(() => {
     const id = account.id
@@ -560,11 +582,9 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
                   <Users className="h-5 w-5" />
                   Account Contacts ({accountContacts.length})
                 </div>
-                <Button size="sm" asChild>
-                  <Link href={`/dashboard/contacts?account_id=${account.id}`}>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Add Contact
-                  </Link>
+                <Button size="sm" onClick={() => setIsContactDialogOpen(true)}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Add Contact
                 </Button>
               </CardTitle>
             </CardHeader>
@@ -619,11 +639,9 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
                   <p className="text-muted-foreground mb-4">
                     Add contacts to track stakeholders and decision makers for this account.
                   </p>
-                  <Button asChild>
-                    <Link href={`/dashboard/contacts?account_id=${account.id}`}>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Add First Contact
-                    </Link>
+                  <Button onClick={() => setIsContactDialogOpen(true)}>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Add First Contact
                   </Button>
                 </div>
               )}
@@ -649,6 +667,20 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Contact Creation Modal */}
+      <CreateContactDialog
+        open={isContactDialogOpen}
+        onOpenChange={setIsContactDialogOpen}
+        contactGroups={contactGroups}
+        onSuccess={() => {
+          setIsContactDialogOpen(false)
+          // Refresh the page to show the new contact
+          router.refresh()
+        }}
+        accounts={accounts}
+        defaultAccountId={account.id}
+      />
     </div>
   )
 }

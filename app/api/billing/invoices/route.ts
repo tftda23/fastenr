@@ -23,7 +23,29 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    const invoices = await getOrganizationInvoices(profile.organization_id)
+    // Get invoices directly from database with fallback
+    let invoices = []
+    try {
+      const invoicesResult = await getOrganizationInvoices(profile.organization_id)
+      invoices = invoicesResult
+    } catch (libError) {
+      console.log('Using fallback invoice query:', libError.message)
+      
+      // Fallback to direct database query
+      const { data, error } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('organization_id', profile.organization_id)
+        .order('created_at', { ascending: false })
+      
+      if (error) {
+        console.error('Invoice query error:', error)
+        return NextResponse.json({ error: 'Failed to fetch invoices' }, { status: 500 })
+      }
+      
+      invoices = data || []
+    }
+    
     return NextResponse.json({ invoices })
 
   } catch (error) {

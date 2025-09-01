@@ -296,23 +296,50 @@ export async function getEngagements(
 }
 
 export async function createEngagement(
-  engagement: Omit<Engagement, "id" | "created_at" | "updated_at" | "organization_id" | "created_by">,
+  engagement: Omit<Engagement, "id" | "created_at" | "updated_at" | "organization_id" | "created_by"> & {
+    participants?: string[] // Contact IDs
+  },
 ) {
   const { user, organization } = await getCurrentUserOrganization()
   if (!user || !organization) throw new Error("User not authenticated")
 
   const supabase = createClient()
+  
+  // Extract participants from engagement data
+  const { participants, ...engagementData } = engagement
+  
   const { data, error } = await supabase
     .from("engagements")
     .insert({
-      ...engagement,
+      ...engagementData,
       organization_id: organization.id,
-      created_by: user.id, // Fixed field name from user_id to created_by
+      created_by: user.id,
     })
     .select()
     .single()
 
   if (error) throw error
+  
+  // If participants were provided, create participant records
+  if (participants && participants.length > 0) {
+    const participantRecords = participants.map(contactId => ({
+      engagement_id: data.id,
+      contact_id: contactId,
+      participation_type: 'attendee' as const,
+      response_status: 'no_response' as const,
+      added_at: new Date().toISOString()
+    }))
+    
+    const { error: participantsError } = await supabase
+      .from("engagement_participants")
+      .insert(participantRecords)
+    
+    if (participantsError) {
+      console.error("Failed to create participants:", participantsError)
+      // Don't throw error here as the engagement was already created successfully
+    }
+  }
+  
   return data as Engagement
 }
 
@@ -731,4 +758,202 @@ export async function toggleAutomation(workflowId: string, enabled: boolean) {
     .update({ enabled, status: enabled ? 'active' : 'paused' })
     .eq('id', workflowId);
   if (error) throw error;
+}
+
+// Recent Activity queries
+export interface RecentActivity {
+  id: string
+  type: "engagement" | "goal" | "nps"
+  title: string
+  description: string
+  timestamp: string
+  account: string
+  user: string
+  account_id?: string
+}
+
+export async function getRecentActivities(limit: number = 10, filterByUserId?: string): Promise<RecentActivity[]> {
+  const { user, organization } = await getCurrentUserOrganization()
+  if (!user || !organization) {
+    console.log('No user or organization found in getRecentActivities')
+    return []
+  }
+
+  console.log('Fetching activities for organization:', organization.id, 'filterByUserId:', filterByUserId)
+
+  const supabase = createClient()
+  const activities: RecentActivity[] = []
+
+  try {
+    // Get recent engagements (both completed and recent ones)
+    let engagementQuery = supabase
+      .from('engagements')
+      .select(`
+        id,
+        title,
+        type,
+        completed_at,
+        created_at,
+        updated_at,
+        account_id,
+        created_by
+      `)
+      .eq('organization_id', organization.id)
+      .order('updated_at', { ascending: false })
+      .limit(10)
+
+    // Filter by user if specified
+    if (filterByUserId) {
+      engagementQuery = engagementQuery.eq('created_by', filterByUserId)
+    }
+
+    const { data: engagements, error: engError } = await engagementQuery
+
+    console.log('Engagements query result:', { engagements: engagements?.length, error: engError })
+    if (engagements && engagements.length > 0) {
+      console.log('Sample engagement:', engagements[0])
+    }
+
+    if (!engError && engagements && engagements.length > 0) {
+      // Get account names for all engagements in one query
+      const accountIds = engagements.map(e => e.account_id).filter(Boolean)
+      let accountNames: { [key: string]: string } = {}
+      
+      if (accountIds.length > 0) {
+        const { data: accounts } = await supabase
+          .from('accounts')
+          .select('id, name')
+          .in('id', accountIds)
+        
+        if (accounts) {
+          accountNames = Object.fromEntries(accounts.map(a => [a.id, a.name]))
+        }
+      }
+
+      // Get user names for all creators in one query
+      const creatorIds = engagements.map(e => e.created_by).filter(Boolean)
+      let creatorNames: { [key: string]: string } = {}
+      
+      if (creatorIds.length > 0) {
+        const { data: creators } = await supabase
+          .from('user_profiles')
+          .select('id, full_name')
+          .in('id', creatorIds)
+        
+        if (creators) {
+          creatorNames = Object.fromEntries(creators.map(u => [u.id, u.full_name || 'Unknown User']))
+        }
+      }
+
+      for (const engagement of engagements) {
+        const isCompleted = engagement.completed_at
+        const actionType = engagement.type || 'engagement'
+        const accountName = accountNames[engagement.account_id] || 'Unknown Account'
+        const creatorName = creatorNames[engagement.created_by] || 'Unknown User'
+        
+        activities.push({
+          id: `engagement-${engagement.id}`,
+          type: 'engagement',
+          title: engagement.title || `${actionType} ${isCompleted ? 'Completed' : 'Created'}`,
+          description: `${isCompleted ? 'Completed' : 'Created'} ${actionType} with ${accountName}`,
+          timestamp: engagement.completed_at || engagement.updated_at || engagement.created_at,
+          account: accountName,
+          user: creatorName,
+          account_id: engagement.account_id
+        })
+      }
+    }
+
+    // Get recent goal updates
+    let goalQuery = supabase
+      .from('customer_goals')
+      .select(`
+        id,
+        title,
+        status,
+        updated_at,
+        created_at,
+        account:accounts(id, name),
+        creator:user_profiles!customer_goals_created_by_fkey(full_name)
+      `)
+      .eq('organization_id', organization.id)
+      .order('updated_at', { ascending: false })
+      .limit(5)
+
+    // Filter by user if specified
+    if (filterByUserId) {
+      goalQuery = goalQuery.eq('created_by', filterByUserId)
+    }
+
+    const { data: goals, error: goalError } = await goalQuery
+
+    if (!goalError && goals) {
+      for (const goal of goals) {
+        // Only include if updated recently (within last 30 days)
+        const updatedAt = new Date(goal.updated_at)
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        
+        if (updatedAt > thirtyDaysAgo) {
+          activities.push({
+            id: `goal-${goal.id}`,
+            type: 'goal',
+            title: 'Goal Updated',
+            description: `${goal.title} ${goal.status ? `marked as ${goal.status}` : 'updated'}`,
+            timestamp: goal.updated_at,
+            account: goal.account?.name || 'Unknown Account',
+            user: goal.creator?.full_name || 'Unknown User',
+            account_id: goal.account?.id
+          })
+        }
+      }
+    }
+
+    // Get recent NPS surveys
+    let npsQuery = supabase
+      .from('nps_surveys')
+      .select(`
+        id,
+        score,
+        feedback,
+        survey_date,
+        respondent_name,
+        account:accounts(id, name)
+      `)
+      .eq('organization_id', organization.id)
+      .not('score', 'is', null)
+      .order('survey_date', { ascending: false })
+      .limit(5)
+
+    const { data: npsResponses, error: npsError } = await npsQuery
+
+    if (!npsError && npsResponses) {
+      for (const nps of npsResponses) {
+        activities.push({
+          id: `nps-${nps.id}`,
+          type: 'nps',
+          title: 'NPS Survey Completed',
+          description: `New NPS score of ${nps.score} received${nps.feedback ? ' with feedback' : ''}`,
+          timestamp: nps.survey_date,
+          account: nps.account?.name || 'Unknown Account',
+          user: nps.respondent_name || 'Anonymous',
+          account_id: nps.account?.id
+        })
+      }
+    }
+
+  } catch (error) {
+    console.error('Error fetching recent activities:', error)
+  }
+
+  // Sort all activities by timestamp and limit
+  const sortedActivities = activities
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, limit)
+
+  console.log('Final activities count:', sortedActivities.length)
+  if (sortedActivities.length > 0) {
+    console.log('Sample final activity:', sortedActivities[0])
+  }
+
+  return sortedActivities
 }

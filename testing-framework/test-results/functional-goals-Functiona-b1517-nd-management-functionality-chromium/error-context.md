@@ -1,0 +1,44 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - img [ref=e8]
+      - heading "Welcome back" [level=2] [ref=e10]
+      - paragraph [ref=e11]: Continue managing your customer relationships with ease
+    - generic [ref=e13]:
+      - img "Fastenr" [ref=e15]
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Welcome back
+          - generic [ref=e19]: Sign in to your fastenr account
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - generic [ref=e23]: Email
+            - generic [ref=e24]:
+              - img [ref=e25]
+              - textbox "Email" [ref=e28]
+          - generic [ref=e29]:
+            - generic [ref=e30]: Password
+            - generic [ref=e31]:
+              - img [ref=e32]
+              - textbox "Password" [ref=e35]
+          - button "Sign In" [ref=e36] [cursor=pointer]
+          - generic [ref=e37]:
+            - generic [ref=e42]: Or continue with
+            - generic [ref=e43]:
+              - button "Google" [ref=e44] [cursor=pointer]:
+                - img
+                - text: Google
+              - button "GitHub" [ref=e45] [cursor=pointer]:
+                - img
+                - text: GitHub
+          - generic [ref=e46]:
+            - text: Don't have an account?
+            - link "Sign up" [ref=e47] [cursor=pointer]:
+              - /url: /auth/signup
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e48]
+```

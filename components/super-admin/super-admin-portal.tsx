@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
   Building2, 
@@ -12,8 +13,12 @@ import {
   TrendingUp,
   Calendar,
   FileText,
-  Shield
+  Shield,
+  CreditCard,
+  Eye
 } from 'lucide-react'
+import { BillingDashboard } from './billing-dashboard'
+import { OrganizationDetailModal } from './organization-detail-modal'
 
 interface SuperAdminData {
   overview: {
@@ -51,6 +56,8 @@ export function SuperAdminPortal() {
   const [data, setData] = useState<SuperAdminData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null)
+  const [selectedOrgName, setSelectedOrgName] = useState<string>('')
 
   useEffect(() => {
     loadSuperAdminData()
@@ -90,6 +97,11 @@ export function SuperAdminPortal() {
       month: 'short',
       year: 'numeric'
     })
+  }
+
+  const openOrganizationDetails = (orgId: string, orgName: string) => {
+    setSelectedOrgId(orgId)
+    setSelectedOrgName(orgName)
   }
 
   const getStatusColor = (status: string) => {
@@ -187,12 +199,17 @@ export function SuperAdminPortal() {
         </Card>
       </div>
 
-      <Tabs defaultValue="organizations" className="space-y-4">
+      <Tabs defaultValue="billing" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="billing">Billing Operations</TabsTrigger>
           <TabsTrigger value="organizations">Organizations</TabsTrigger>
           <TabsTrigger value="invoices">Recent Invoices</TabsTrigger>
           <TabsTrigger value="projections">Revenue Projections</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="billing" className="space-y-4">
+          <BillingDashboard />
+        </TabsContent>
 
         <TabsContent value="organizations" className="space-y-4">
           <Card>
@@ -238,6 +255,16 @@ export function SuperAdminPortal() {
                         )}
                       </div>
                     </div>
+                    <div className="ml-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openOrganizationDetails(org.id, org.name)}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -255,25 +282,35 @@ export function SuperAdminPortal() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentInvoices.map((invoice) => (
-                  <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h4 className="font-medium">{invoice.invoice_number}</h4>
-                        <Badge className={getStatusColor(invoice.status)} variant="secondary">
-                          {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm text-muted-foreground">
-                        <div>{invoice.organization_name}</div>
-                        <div>{formatCurrency(invoice.total_amount)}</div>
-                        <div>Due: {formatDate(invoice.due_date)}</div>
-                        <div>Created: {formatDate(invoice.created_at)}</div>
+                {recentInvoices && recentInvoices.length > 0 ? (
+                  recentInvoices.map((invoice) => (
+                    <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h4 className="font-medium">{invoice.invoice_number}</h4>
+                          <Badge className={getStatusColor(invoice.status)} variant="secondary">
+                            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                          </Badge>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm text-muted-foreground">
+                          <div>{invoice.organization_name}</div>
+                          <div>{formatCurrency(invoice.total_amount)}</div>
+                          <div>Due: {formatDate(invoice.due_date)}</div>
+                          <div>Created: {formatDate(invoice.created_at)}</div>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No recent invoices found</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Invoices will appear here once organizations are billed
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
@@ -327,6 +364,14 @@ export function SuperAdminPortal() {
         </TabsContent>
       </Tabs>
       </div>
+
+      {/* Organization Detail Modal */}
+      <OrganizationDetailModal
+        organizationId={selectedOrgId}
+        organizationName={selectedOrgName}
+        isOpen={!!selectedOrgId}
+        onClose={() => setSelectedOrgId(null)}
+      />
     </div>
   )
 }

@@ -1,0 +1,866 @@
+{
+  "timestamp": "2025-08-31T22:07:55.622Z",
+  "totalGenerated": 122,
+  "automatedFiles": [
+    {
+      "testId": "HP002",
+      "fileName": "public-pages/hp002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/hp002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "HP003",
+      "fileName": "public-pages/hp003-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/hp003-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "HP004",
+      "fileName": "public-pages/hp004-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/hp004-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "HP007",
+      "fileName": "public-pages/hp007-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/hp007-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "CT001",
+      "fileName": "public-pages/ct001-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/ct001-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "CT002",
+      "fileName": "public-pages/ct002-api.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/ct002-api.spec.js",
+      "testType": "api",
+      "status": "generated"
+    },
+    {
+      "testId": "CT003",
+      "fileName": "public-pages/ct003-api.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/ct003-api.spec.js",
+      "testType": "api",
+      "status": "generated"
+    },
+    {
+      "testId": "BD001",
+      "fileName": "public-pages/bd001-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/bd001-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "WD002",
+      "fileName": "public-pages/wd002-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/wd002-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "WD003",
+      "fileName": "public-pages/wd003-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/wd003-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "DM001",
+      "fileName": "public-pages/dm001-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/dm001-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "DC001",
+      "fileName": "public-pages/dc001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/dc001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "LG001",
+      "fileName": "authentication/lg001-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/lg001-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "LG002",
+      "fileName": "authentication/lg002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/lg002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "LG003",
+      "fileName": "authentication/lg003-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/lg003-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "LG004",
+      "fileName": "authentication/lg004-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/lg004-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "LG005",
+      "fileName": "authentication/lg005-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/lg005-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "LG006",
+      "fileName": "authentication/lg006-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/lg006-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SU001",
+      "fileName": "authentication/su001-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/su001-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "SU004",
+      "fileName": "authentication/su004-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/su004-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SU005",
+      "fileName": "authentication/su005-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/su005-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "IV001",
+      "fileName": "authentication/iv001-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/iv001-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "OB001",
+      "fileName": "authentication/ob001-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/ob001-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "OB002",
+      "fileName": "authentication/ob002-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/ob002-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "DB006",
+      "fileName": "dashboard/db006-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/dashboard/db006-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "SB001",
+      "fileName": "dashboard/sb001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/dashboard/sb001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SB002",
+      "fileName": "dashboard/sb002-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/dashboard/sb002-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "SB004",
+      "fileName": "dashboard/sb004-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/dashboard/sb004-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "SB005",
+      "fileName": "dashboard/sb005-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/dashboard/sb005-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AC005",
+      "fileName": "accounts/ac005-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac005-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AC006",
+      "fileName": "accounts/ac006-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac006-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AC007",
+      "fileName": "accounts/ac007-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac007-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AC101",
+      "fileName": "accounts/ac101-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac101-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AC102",
+      "fileName": "accounts/ac102-api.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac102-api.spec.js",
+      "testType": "api",
+      "status": "generated"
+    },
+    {
+      "testId": "AC103",
+      "fileName": "accounts/ac103-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac103-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AC104",
+      "fileName": "accounts/ac104-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac104-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AC205",
+      "fileName": "accounts/ac205-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac205-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AC206",
+      "fileName": "accounts/ac206-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac206-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AC301",
+      "fileName": "accounts/ac301-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac301-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AC303",
+      "fileName": "accounts/ac303-api.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac303-api.spec.js",
+      "testType": "api",
+      "status": "generated"
+    },
+    {
+      "testId": "AC304",
+      "fileName": "accounts/ac304-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac304-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "CN004",
+      "fileName": "contacts/cn004-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/contacts/cn004-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "CN005",
+      "fileName": "contacts/cn005-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/contacts/cn005-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "CN006",
+      "fileName": "contacts/cn006-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/contacts/cn006-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "EN005",
+      "fileName": "engagements/en005-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en005-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "EN006",
+      "fileName": "engagements/en006-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en006-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "EN101",
+      "fileName": "engagements/en101-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en101-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "EN102",
+      "fileName": "engagements/en102-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en102-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "EN103",
+      "fileName": "engagements/en103-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en103-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "EN104",
+      "fileName": "engagements/en104-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en104-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "EN203",
+      "fileName": "engagements/en203-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en203-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "EN204",
+      "fileName": "engagements/en204-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en204-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "EN301",
+      "fileName": "engagements/en301-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en301-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "CA002",
+      "fileName": "calendar/ca002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/calendar/ca002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "CA006",
+      "fileName": "calendar/ca006-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/calendar/ca006-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "GO004",
+      "fileName": "goals/go004-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/goals/go004-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "GO005",
+      "fileName": "goals/go005-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/goals/go005-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "SV004",
+      "fileName": "surveys/sv004-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/surveys/sv004-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "SV005",
+      "fileName": "surveys/sv005-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/surveys/sv005-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AN005",
+      "fileName": "analytics/an005-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/analytics/an005-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "ST001",
+      "fileName": "settings/st001-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/settings/st001-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "ST002",
+      "fileName": "settings/st002-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/settings/st002-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "ST003",
+      "fileName": "settings/st003-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/settings/st003-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "BI005",
+      "fileName": "billing/bi005-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/billing/bi005-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD002",
+      "fileName": "admin/ad002-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad002-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD003",
+      "fileName": "admin/ad003-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad003-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD004",
+      "fileName": "admin/ad004-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad004-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD102",
+      "fileName": "admin/ad102-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad102-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD202",
+      "fileName": "admin/ad202-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad202-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD203",
+      "fileName": "admin/ad203-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad203-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD302",
+      "fileName": "admin/ad302-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad302-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD303",
+      "fileName": "admin/ad303-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad303-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD401",
+      "fileName": "admin/ad401-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad401-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AD501",
+      "fileName": "admin/ad501-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad501-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "SA003",
+      "fileName": "super-admin/sa003-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/super-admin/sa003-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "SA005",
+      "fileName": "super-admin/sa005-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/super-admin/sa005-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    }
+  ],
+  "mixedFiles": [
+    {
+      "testId": "BD002",
+      "fileName": "public-pages/bd002-api.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/bd002-api.spec.js",
+      "testType": "api",
+      "status": "generated"
+    },
+    {
+      "testId": "WD001",
+      "fileName": "public-pages/wd001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/public-pages/wd001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SU002",
+      "fileName": "authentication/su002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/su002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SU003",
+      "fileName": "authentication/su003-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/su003-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SU006",
+      "fileName": "authentication/su006-api.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/su006-api.spec.js",
+      "testType": "api",
+      "status": "generated"
+    },
+    {
+      "testId": "IV002",
+      "fileName": "authentication/iv002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/authentication/iv002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "DB004",
+      "fileName": "dashboard/db004-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/dashboard/db004-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "DB005",
+      "fileName": "dashboard/db005-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/dashboard/db005-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "DB007",
+      "fileName": "dashboard/db007-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/dashboard/db007-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AC001",
+      "fileName": "accounts/ac001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AC002",
+      "fileName": "accounts/ac002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AC003",
+      "fileName": "accounts/ac003-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac003-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AC004",
+      "fileName": "accounts/ac004-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac004-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AC202",
+      "fileName": "accounts/ac202-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac202-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AC203",
+      "fileName": "accounts/ac203-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac203-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AC207",
+      "fileName": "accounts/ac207-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/accounts/ac207-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "CN001",
+      "fileName": "contacts/cn001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/contacts/cn001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "CN002",
+      "fileName": "contacts/cn002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/contacts/cn002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "CN007",
+      "fileName": "contacts/cn007-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/contacts/cn007-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "EN001",
+      "fileName": "engagements/en001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "EN002",
+      "fileName": "engagements/en002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "EN003",
+      "fileName": "engagements/en003-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en003-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "EN004",
+      "fileName": "engagements/en004-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en004-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "EN105",
+      "fileName": "engagements/en105-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en105-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "EN106",
+      "fileName": "engagements/en106-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en106-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "EN202",
+      "fileName": "engagements/en202-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/engagements/en202-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "CA004",
+      "fileName": "calendar/ca004-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/calendar/ca004-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "CA005",
+      "fileName": "calendar/ca005-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/calendar/ca005-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "GO001",
+      "fileName": "goals/go001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/goals/go001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SV001",
+      "fileName": "surveys/sv001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/surveys/sv001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SV006",
+      "fileName": "surveys/sv006-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/surveys/sv006-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AN002",
+      "fileName": "analytics/an002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/analytics/an002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AN003",
+      "fileName": "analytics/an003-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/analytics/an003-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AN004",
+      "fileName": "analytics/an004-component.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/analytics/an004-component.spec.js",
+      "testType": "component",
+      "status": "generated"
+    },
+    {
+      "testId": "AN006",
+      "fileName": "analytics/an006-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/analytics/an006-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "HS002",
+      "fileName": "health-scores/hs002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/health-scores/hs002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "HS003",
+      "fileName": "health-scores/hs003-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/health-scores/hs003-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "HS004",
+      "fileName": "health-scores/hs004-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/health-scores/hs004-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "BI002",
+      "fileName": "billing/bi002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/billing/bi002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AD001",
+      "fileName": "admin/ad001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AD301",
+      "fileName": "admin/ad301-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad301-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "AD502",
+      "fileName": "admin/ad502-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/admin/ad502-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SA001",
+      "fileName": "super-admin/sa001-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/super-admin/sa001-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SA002",
+      "fileName": "super-admin/sa002-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/super-admin/sa002-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SA004",
+      "fileName": "super-admin/sa004-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/super-admin/sa004-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    },
+    {
+      "testId": "SA006",
+      "fileName": "super-admin/sa006-playwright.spec.js",
+      "filePath": "/Users/adamwood/src/fastenr/testing-framework/tests/super-admin/sa006-playwright.spec.js",
+      "testType": "playwright",
+      "status": "generated"
+    }
+  ],
+  "summary": {
+    "successful": 122,
+    "failed": 0
+  }
+}
