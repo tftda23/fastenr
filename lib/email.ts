@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
 
 let resend: Resend | null = null;
 
@@ -10,6 +11,102 @@ function getResendClient(): Resend {
     resend = new Resend(process.env.RESEND_API_KEY);
   }
   return resend;
+}
+
+// Get the verified domain for an organization
+export async function getVerifiedDomainForOrg(organizationId: string): Promise<{
+  domain: string;
+  isCustom: boolean;
+}> {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // Check if organization has a verified custom domain
+    const { data: customDomain } = await supabase
+      .from('email_domains')
+      .select('name, status')
+      .eq('organization_id', organizationId)
+      .eq('status', 'verified')
+      .single();
+
+    if (customDomain) {
+      return {
+        domain: customDomain.name,
+        isCustom: true
+      };
+    }
+
+    // Fall back to fastenr.co (always available)
+    return {
+      domain: 'fastenr.co',
+      isCustom: false
+    };
+  } catch (error) {
+    console.error('Error getting verified domain:', error);
+    // Always fall back to fastenr.co
+    return {
+      domain: 'fastenr.co',
+      isCustom: false
+    };
+  }
+}
+
+// Get email settings for an organization
+export async function getEmailSettings(organizationId: string): Promise<{
+  fromEmail: string;
+  fromName: string;
+  replyToEmail: string;
+  domain: string;
+  isCustomDomain: boolean;
+}> {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // Get domain info
+    const domainInfo = await getVerifiedDomainForOrg(organizationId);
+
+    // Get email settings
+    const { data: settings } = await supabase
+      .from('email_settings')
+      .select('from_email, from_name, reply_to_email')
+      .eq('organization_id', organizationId)
+      .single();
+
+    if (settings) {
+      return {
+        fromEmail: settings.from_email || `noreply@${domainInfo.domain}`,
+        fromName: settings.from_name || 'Fastenr Customer Success',
+        replyToEmail: settings.reply_to_email || `support@${domainInfo.domain}`,
+        domain: domainInfo.domain,
+        isCustomDomain: domainInfo.isCustom
+      };
+    }
+
+    // Default settings
+    return {
+      fromEmail: `noreply@${domainInfo.domain}`,
+      fromName: 'Fastenr Customer Success',
+      replyToEmail: `support@${domainInfo.domain}`,
+      domain: domainInfo.domain,
+      isCustomDomain: domainInfo.isCustom
+    };
+  } catch (error) {
+    console.error('Error getting email settings:', error);
+    // Always fall back to fastenr.co defaults
+    return {
+      fromEmail: 'noreply@fastenr.co',
+      fromName: 'Fastenr Customer Success',
+      replyToEmail: 'support@fastenr.co',
+      domain: 'fastenr.co',
+      isCustomDomain: false
+    };
+  }
 }
 
 export interface EmailRecipient {
@@ -211,8 +308,9 @@ function createNotificationEmailHtml(data: NotificationEmailData, recipientName?
 export async function sendSurveyEmail(
   recipients: EmailRecipient[],
   surveyData: SurveyEmailData,
-  fromEmail: string = 'surveys@yourdomain.com',
-  fromName: string = 'Customer Success Team'
+  organizationId: string,
+  fromEmail?: string,
+  fromName?: string
 ) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY not configured, falling back to mock email');
@@ -221,11 +319,16 @@ export async function sendSurveyEmail(
   }
 
   try {
+    // Get email settings for the organization
+    const emailSettings = await getEmailSettings(organizationId);
+    const finalFromEmail = fromEmail || emailSettings.fromEmail;
+    const finalFromName = fromName || emailSettings.fromName;
+
     const emailPromises = recipients.map(async (recipient) => {
       const html = createSurveyEmailHtml(surveyData, recipient.name);
       
       return getResendClient().emails.send({
-        from: `${fromName} <${fromEmail}>`,
+        from: `${finalFromName} <${finalFromEmail}>`,
         to: recipient.email,
         subject: surveyData.subject,
         html,
@@ -257,8 +360,9 @@ export async function sendSurveyEmail(
 export async function sendNotificationEmail(
   recipients: EmailRecipient[],
   notificationData: NotificationEmailData,
-  fromEmail: string = 'notifications@yourdomain.com',
-  fromName: string = 'Customer Success Platform'
+  organizationId: string,
+  fromEmail?: string,
+  fromName?: string
 ) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY not configured, falling back to mock email');
@@ -267,11 +371,16 @@ export async function sendNotificationEmail(
   }
 
   try {
+    // Get email settings for the organization
+    const emailSettings = await getEmailSettings(organizationId);
+    const finalFromEmail = fromEmail || emailSettings.fromEmail;
+    const finalFromName = fromName || emailSettings.fromName;
+
     const emailPromises = recipients.map(async (recipient) => {
       const html = createNotificationEmailHtml(notificationData, recipient.name);
       
       return getResendClient().emails.send({
-        from: `${fromName} <${fromEmail}>`,
+        from: `${finalFromName} <${finalFromEmail}>`,
         to: recipient.email,
         subject: `${notificationData.accountName} - ${notificationData.type.replace('_', ' ').toUpperCase()}`,
         html,
@@ -303,8 +412,9 @@ export async function sendNotificationEmail(
 export async function sendInvitationEmail(
   recipient: EmailRecipient,
   invitationData: InvitationEmailData,
-  fromEmail: string = 'invitations@yourdomain.com',
-  fromName: string = 'Customer Success Platform'
+  organizationId: string,
+  fromEmail?: string,
+  fromName?: string
 ) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY not configured, falling back to mock email');
@@ -313,10 +423,15 @@ export async function sendInvitationEmail(
   }
 
   try {
+    // Get email settings for the organization
+    const emailSettings = await getEmailSettings(organizationId);
+    const finalFromEmail = fromEmail || emailSettings.fromEmail;
+    const finalFromName = fromName || emailSettings.fromName;
+
     const html = createInvitationEmailHtml(invitationData, recipient.name);
     
     const result = await getResendClient().emails.send({
-      from: `${fromName} <${fromEmail}>`,
+      from: `${finalFromName} <${finalFromEmail}>`,
       to: recipient.email,
       subject: `You're invited to join ${invitationData.organizationName}`,
       html,
@@ -342,9 +457,9 @@ export async function testEmailConfiguration(): Promise<boolean> {
   }
 
   try {
-    // Test with a simple email to verify configuration
+    // Test with a simple email to verify configuration using fastenr.co
     await getResendClient().emails.send({
-      from: process.env.EMAIL_FROM_NOTIFICATIONS || 'notifications@fastenr.com',
+      from: 'Fastenr Customer Success <noreply@fastenr.co>',
       to: 'test@fastenr.com',
       subject: 'Test Email Configuration',
       html: '<p>This is a test email to verify Resend configuration.</p>',

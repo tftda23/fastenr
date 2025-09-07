@@ -118,6 +118,12 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <script
+          src="/tracking/fastenr-analytics.js"
+          data-fastenr-key="1f0bbe1ad3c536820839a3404f631c21"
+          data-fastenr-api="/api/tracking"
+          data-fastenr-debug="true"
+        ></script>
         <ErrorBoundary>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}

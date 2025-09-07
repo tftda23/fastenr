@@ -27,6 +27,9 @@ export default function AccountForm({ account, isEditing = false }: AccountFormP
     industry: account?.industry || "",
     size: account?.size || "",
     arr: account?.arr?.toString() || "",
+    mrr: account?.mrr?.toString() || "",
+    seat_count: account?.seat_count?.toString() || "",
+    growth_tracking_method: account?.growth_tracking_method || "arr",
     status: account?.status || "active",
     owner_id: account?.owner_id || "unassigned",
   })
@@ -36,11 +39,22 @@ export default function AccountForm({ account, isEditing = false }: AccountFormP
     setIsLoading(true)
 
     try {
+      // Validate that at least one growth metric is provided
+      const hasGrowthMetric = formData.arr || formData.mrr || formData.seat_count;
+      if (!hasGrowthMetric) {
+        alert('Please provide at least one growth metric (ARR, MRR, or Seat Count)');
+        setIsLoading(false);
+        return;
+      }
+
       const payload = {
         name: formData.name,
         industry: formData.industry || null,
         size: formData.size || null,
         arr: formData.arr ? Number.parseFloat(formData.arr) : null,
+        mrr: formData.mrr ? Number.parseFloat(formData.mrr) : null,
+        seat_count: formData.seat_count ? Number.parseInt(formData.seat_count) : null,
+        growth_tracking_method: formData.growth_tracking_method,
         status: formData.status,
         owner_id: formData.owner_id === "unassigned" ? null : formData.owner_id,
       }
@@ -87,7 +101,7 @@ export default function AccountForm({ account, isEditing = false }: AccountFormP
       console.log('Users API response status:', response.status)
       if (response.ok) {
         const data = await response.json()
-        console.log('Users data received:', data)
+        console.log('Users data received, count:', data?.length || 0)
         setUsers(data)
       } else {
         const errorText = await response.text()
@@ -189,14 +203,77 @@ export default function AccountForm({ account, isEditing = false }: AccountFormP
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="arr">Annual Recurring Revenue</Label>
-                <Input
-                  id="arr"
-                  type="number"
-                  value={formData.arr}
-                  onChange={(e) => handleChange("arr", e.target.value)}
-                  placeholder="50000"
-                />
+                <Label htmlFor="growth_tracking_method">Growth Tracking Method *</Label>
+                <Select value={formData.growth_tracking_method} onValueChange={(value) => handleChange("growth_tracking_method", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tracking method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="arr">ARR - Annual Recurring Revenue</SelectItem>
+                    <SelectItem value="mrr">MRR - Monthly Recurring Revenue</SelectItem>
+                    <SelectItem value="seat_count">Seat Count - User Licenses</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Growth Metrics */}
+            <div className="space-y-4">
+              <div className="border-t pt-4">
+                <h3 className="text-lg font-medium mb-3">Growth Metrics</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  At least one metric is required. The selected tracking method above will be used for health score calculations.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="arr">
+                    Annual Recurring Revenue
+                    {formData.growth_tracking_method === 'arr' && <span className="text-blue-600 ml-1">(Primary)</span>}
+                  </Label>
+                  <Input
+                    id="arr"
+                    type="number"
+                    step="0.01"
+                    value={formData.arr}
+                    onChange={(e) => handleChange("arr", e.target.value)}
+                    placeholder="50000"
+                    className={formData.growth_tracking_method === 'arr' ? 'border-blue-300' : ''}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="mrr">
+                    Monthly Recurring Revenue
+                    {formData.growth_tracking_method === 'mrr' && <span className="text-blue-600 ml-1">(Primary)</span>}
+                  </Label>
+                  <Input
+                    id="mrr"
+                    type="number"
+                    step="0.01"
+                    value={formData.mrr}
+                    onChange={(e) => handleChange("mrr", e.target.value)}
+                    placeholder="4200"
+                    className={formData.growth_tracking_method === 'mrr' ? 'border-blue-300' : ''}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="seat_count">
+                    Seat Count
+                    {formData.growth_tracking_method === 'seat_count' && <span className="text-blue-600 ml-1">(Primary)</span>}
+                  </Label>
+                  <Input
+                    id="seat_count"
+                    type="number"
+                    min="0"
+                    value={formData.seat_count}
+                    onChange={(e) => handleChange("seat_count", e.target.value)}
+                    placeholder="25"
+                    className={formData.growth_tracking_method === 'seat_count' ? 'border-blue-300' : ''}
+                  />
+                </div>
               </div>
             </div>
 

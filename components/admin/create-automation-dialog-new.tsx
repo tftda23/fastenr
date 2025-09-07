@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createAutomation } from "@/lib/supabase/automation.client"
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/lib/hooks/use-toast";
 import { Zap, Mail, Slack, Calendar, AlertTriangle, CheckCircle } from "lucide-react";
 
 interface Props {

@@ -8,9 +8,10 @@ interface LogoProps {
   variant?: "black" | "white"
   size?: "sm" | "md" | "lg"
   className?: string
+  showBeta?: boolean
 }
 
-export function Logo({ variant = "black", size = "md", className }: LogoProps) {
+export function Logo({ variant = "black", size = "md", className, showBeta = true }: LogoProps) {
   const [imageError, setImageError] = useState(false)
   
   const sizeClasses = {
@@ -23,24 +24,31 @@ export function Logo({ variant = "black", size = "md", className }: LogoProps) {
 
   // If image failed to load, show fallback
   if (imageError) {
-    return <LogoWithIcon variant={variant} size={size} className={className} />
+    return <LogoWithIcon variant={variant} size={size} className={className} showBeta={showBeta} />
   }
 
   return (
-    <Image
-      src={logoSrc}
-      alt="Fastenr"
-      width={100}
-      height={32}
-      className={cn(sizeClasses[size], className)}
-      priority
-      onError={() => setImageError(true)}
-    />
+    <div className="flex items-center gap-2">
+      <Image
+        src={logoSrc}
+        alt="Fastenr"
+        width={100}
+        height={32}
+        className={cn(sizeClasses[size], className)}
+        priority
+        onError={() => setImageError(true)}
+      />
+      {showBeta && (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+          BETA
+        </span>
+      )}
+    </div>
   )
 }
 
 // Fallback component with text for when SVG is not available
-export function LogoWithIcon({ variant = "black", size = "md", className }: LogoProps) {
+export function LogoWithIcon({ variant = "black", size = "md", className, showBeta = true }: LogoProps) {
   const sizeClasses = {
     sm: "text-sm",
     md: "text-lg", 
@@ -50,14 +58,21 @@ export function LogoWithIcon({ variant = "black", size = "md", className }: Logo
   const textColor = variant === "white" ? "text-white" : "text-gray-900"
 
   return (
-    <span className={cn(
-      "font-bold font-inter",
-      textColor,
-      sizeClasses[size],
-      className
-    )}>
-      fastenr
-    </span>
+    <div className="flex items-center gap-2">
+      <span className={cn(
+        "font-bold font-inter",
+        textColor,
+        sizeClasses[size],
+        className
+      )}>
+        fastenr
+      </span>
+      {showBeta && (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+          BETA
+        </span>
+      )}
+    </div>
   )
 }
 

@@ -1,18 +1,20 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { useCurrencyConfig } from '@/lib/hooks/use-currency'
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
-  Card, CardContent, CardHeader, CardTitle,
+  Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import {
-  Building, Edit, Trash2, TrendingUp, AlertTriangle, DollarSign,
+  Building, Edit, Trash2, TrendingUp, TrendingDown, AlertTriangle,
   Calendar, Globe, MessageSquare, Target, Star, Plus, Users, Mail, Phone, UserPlus,
+  Ticket, Minus, Clock, CheckCircle2, AlertCircle, Settings,
 } from "lucide-react"
 import type {
   Account, Engagement, CustomerGoal, HealthMetric, ApiResponse, PaginatedResponse, Contact,
@@ -20,6 +22,7 @@ import type {
 import { OrgChartView } from "@/components/contacts/org-chart-view"
 import { AIInsightsButton } from "@/components/ai/ai-insights-button"
 import { CreateContactDialog } from "@/components/contacts/create-contact-dialog"
+import { HealthScoreDialog } from "@/components/health/health-score-dialog"
 
 type HealthBlock = {
   health_score: number
@@ -32,11 +35,6 @@ type HealthBlock = {
 }
 
 /* ---------- helpers ---------- */
-const fmtCurrency = (amount: number | null | undefined) =>
-  amount == null
-    ? "N/A"
-    : new Intl.NumberFormat("en-GB", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(amount)
-
 const fmtDate = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString() : "N/A")
 
 const sizeLabel = (size: Account["size"]) => {
@@ -249,15 +247,19 @@ interface AccountDetailsProps {
 }
 
 export default function AccountDetails({ account, canEdit, canDelete, accountContacts = [] }: AccountDetailsProps) {
+  const { formatCurrency, CurrencyIcon } = useCurrencyConfig()
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const [activeTab, setActiveTab] = useState<"overview" | "engagements" | "goals" | "health" | "contacts">("overview")
+  const [activeTab, setActiveTab] = useState<"overview" | "growth" | "engagements" | "goals" | "health" | "contacts" | "support">("overview")
 
   // Contact creation modal state
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false)
   const [contactGroups, setContactGroups] = useState([])
   const [accounts, setAccounts] = useState([account])
+  
+  // Health score dialog state
+  const [isHealthScoreDialogOpen, setIsHealthScoreDialogOpen] = useState(false)
 
   const [engagements, setEngagements] = useState<Engagement[] | null>(null)
   const [engagementsError, setEngagementsError] = useState<string | null>(null)
@@ -270,6 +272,10 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
   const [health, setHealth] = useState<HealthBlock | null>(null)
   const [healthError, setHealthError] = useState<string | null>(null)
   const [healthLoading, setHealthLoading] = useState(false)
+
+  const [supportMetrics, setSupportMetrics] = useState<any>(null)
+  const [supportLoading, setSupportLoading] = useState(false)
+  const [isPremium, setIsPremium] = useState(false)
 
   // Load contact groups when component mounts
   useEffect(() => {
@@ -285,6 +291,31 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
       }
     }
     loadContactGroups()
+  }, [])
+
+  // Check premium status
+  useEffect(() => {
+    const checkPremiumStatus = async () => {
+      try {
+        const response = await fetch('/api/debug/org')
+        if (response.ok) {
+          const data = await response.json()
+          
+          if (data.organization_id) {
+            const premiumResponse = await fetch(`/api/features/premium?org_id=${data.organization_id}`)
+            if (premiumResponse.ok) {
+              const premiumData = await premiumResponse.json()
+              setIsPremium(premiumData.isPremium || false)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check premium status:', error)
+        setIsPremium(false)
+      }
+    }
+
+    checkPremiumStatus()
   }, [])
 
   useEffect(() => {
@@ -350,7 +381,19 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
         })
         .finally(() => setHealthLoading(false))
     }
-  }, [activeTab, account, engagements, engagementsLoading, goals, goalsLoading, health, healthLoading])
+
+    // --- Support Metrics ---
+    if (activeTab === "support" && supportMetrics === null && !supportLoading) {
+      setSupportLoading(true)
+      fetchJSON<any>(`/api/support/metrics?accountId=${id}`)
+        .then((metrics) => setSupportMetrics(metrics))
+        .catch((e) => {
+          console.error('Failed to load support metrics:', e)
+          setSupportMetrics({ error: e.message || "Failed to load support metrics" })
+        })
+        .finally(() => setSupportLoading(false))
+    }
+  }, [activeTab, account, engagements, engagementsLoading, goals, goalsLoading, health, healthLoading, supportMetrics, supportLoading])
 
   const risk = useMemo(() => churnRiskMeta(account.churn_risk_score ?? 0), [account.churn_risk_score])
 
@@ -429,6 +472,16 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Health Score</p>
                 <p className={`text-2xl font-bold ${healthColour(account.health_score ?? 0)}`}>{account.health_score ?? 0}%</p>
+                {(account as any).health_components && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="mt-1 p-0 h-auto text-xs text-muted-foreground hover:text-foreground"
+                    onClick={() => setIsHealthScoreDialogOpen(true)}
+                  >
+                    View Breakdown →
+                  </Button>
+                )}
               </div>
               <TrendingUp className="h-8 w-8 text-muted-foreground" />
             </div>
@@ -451,10 +504,37 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Annual Revenue</p>
-                <p className="text-2xl font-bold text-foreground">{fmtCurrency(account.arr)}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  {account.growth_tracking_method === 'mrr' && 'Monthly Revenue'}
+                  {account.growth_tracking_method === 'seat_count' && 'Seat Count'}
+                  {(account.growth_tracking_method === 'arr' || !account.growth_tracking_method) && 'Annual Revenue'}
+                  <span className="ml-1 text-xs text-blue-600">
+                    ({account.growth_tracking_method?.toUpperCase() || 'ARR'} Tracking)
+                  </span>
+                </p>
+                <p className="text-2xl font-bold text-foreground">
+                  {account.growth_tracking_method === 'mrr' && formatCurrency(account.mrr)}
+                  {account.growth_tracking_method === 'seat_count' && (account.seat_count || 0).toLocaleString()}
+                  {(account.growth_tracking_method === 'arr' || !account.growth_tracking_method) && formatCurrency(account.arr)}
+                </p>
+                {/* Show secondary metrics */}
+                {account.growth_tracking_method !== 'arr' && account.arr && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    ARR: {formatCurrency(account.arr)}
+                  </p>
+                )}
+                {account.growth_tracking_method !== 'mrr' && account.mrr && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    MRR: {formatCurrency(account.mrr)}
+                  </p>
+                )}
+                {account.growth_tracking_method !== 'seat_count' && account.seat_count && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Seats: {account.seat_count.toLocaleString()}
+                  </p>
+                )}
               </div>
-              <DollarSign className="h-8 w-8 text-muted-foreground" />
+              <CurrencyIcon className="h-8 w-8 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -480,9 +560,11 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
       >
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="growth">Growth History</TabsTrigger>
           <TabsTrigger value="engagements">Engagements</TabsTrigger>
           <TabsTrigger value="goals">Goals</TabsTrigger>
           <TabsTrigger value="health">Health & NPS</TabsTrigger>
+          <TabsTrigger value="support">Support</TabsTrigger>
           <TabsTrigger value="contacts">Contacts ({accountContacts.length})</TabsTrigger>
           <TabsTrigger value="orgchart">Org Chart</TabsTrigger>
         </TabsList>
@@ -495,6 +577,19 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="font-medium text-muted-foreground">Growth Tracking</p>
+                    <p className="text-foreground">
+                      {account.growth_tracking_method === 'arr' && 'ARR (Annual Recurring Revenue)'}
+                      {account.growth_tracking_method === 'mrr' && 'MRR (Monthly Recurring Revenue)'}
+                      {account.growth_tracking_method === 'seat_count' && 'Seat Count (User Licenses)'}
+                      {!account.growth_tracking_method && 'ARR (Default)'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-muted-foreground">Last Updated</p>
+                    <p className="text-foreground">{fmtDate(account.last_growth_update) || 'Never'}</p>
+                  </div>
                   <div>
                     <p className="font-medium text-muted-foreground">Industry</p>
                     <p className="text-foreground">{account.industry || "N/A"}</p>
@@ -515,6 +610,85 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="growth" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Growth Metrics Summary</CardTitle>
+              <CardDescription>Current values and tracking method</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-muted/20 rounded-lg">
+                  <p className="text-sm font-medium text-muted-foreground">ARR</p>
+                  <p className="text-2xl font-bold text-foreground">{formatCurrency(account.arr)}</p>
+                  {account.growth_tracking_method === 'arr' && (
+                    <Badge variant="default" className="mt-2">Primary Tracking</Badge>
+                  )}
+                </div>
+                <div className="text-center p-4 bg-muted/20 rounded-lg">
+                  <p className="text-sm font-medium text-muted-foreground">MRR</p>
+                  <p className="text-2xl font-bold text-foreground">{formatCurrency(account.mrr)}</p>
+                  {account.growth_tracking_method === 'mrr' && (
+                    <Badge variant="default" className="mt-2">Primary Tracking</Badge>
+                  )}
+                </div>
+                <div className="text-center p-4 bg-muted/20 rounded-lg">
+                  <p className="text-sm font-medium text-muted-foreground">Seat Count</p>
+                  <p className="text-2xl font-bold text-foreground">{account.seat_count?.toLocaleString() || '0'}</p>
+                  {account.growth_tracking_method === 'seat_count' && (
+                    <Badge variant="default" className="mt-2">Primary Tracking</Badge>
+                  )}
+                </div>
+              </div>
+              
+              {/* Previous Values */}
+              {(account.previous_arr || account.previous_mrr || account.previous_seat_count) && (
+                <div className="mt-6 pt-6 border-t">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3">Previous Values</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    {account.previous_arr && (
+                      <div>
+                        <p className="font-medium">Previous ARR:</p>
+                        <p className="text-muted-foreground">{formatCurrency(account.previous_arr)}</p>
+                      </div>
+                    )}
+                    {account.previous_mrr && (
+                      <div>
+                        <p className="font-medium">Previous MRR:</p>
+                        <p className="text-muted-foreground">{formatCurrency(account.previous_mrr)}</p>
+                      </div>
+                    )}
+                    {account.previous_seat_count && (
+                      <div>
+                        <p className="font-medium">Previous Seats:</p>
+                        <p className="text-muted-foreground">{account.previous_seat_count.toLocaleString()}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Growth History</CardTitle>
+              <CardDescription>Historical growth data and calculations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Growth history tracking will be displayed here once historical data is available. 
+                Growth calculations are automatically tracked when account metrics are updated.
+              </p>
+              {account.last_growth_update && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Last update: {fmtDate(account.last_growth_update)}
+                </p>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="engagements">
@@ -572,6 +746,182 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
               {health === null && !healthLoading && !healthError && <LoadingRow />}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Support Tab */}
+        <TabsContent value="support" className="space-y-6">
+          {supportLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map(i => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                    <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : supportMetrics?.error ? (
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-center text-muted-foreground">
+                  <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+                  <p>Failed to load support metrics</p>
+                  <p className="text-sm">{supportMetrics.error}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : supportMetrics ? (
+            <div className="space-y-6">
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Total Tickets</p>
+                        <p className="text-2xl font-bold">{supportMetrics.summary.totalTickets}</p>
+                      </div>
+                      <Ticket className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <div className="flex items-center mt-2">
+                      {supportMetrics.summary.trend === 'increasing' ? (
+                        <TrendingUp className="h-4 w-4 text-red-500 mr-1" />
+                      ) : supportMetrics.summary.trend === 'decreasing' ? (
+                        <TrendingDown className="h-4 w-4 text-green-500 mr-1" />
+                      ) : (
+                        <Minus className="h-4 w-4 text-gray-500 mr-1" />
+                      )}
+                      <span className={`text-sm ${
+                        supportMetrics.summary.trend === 'increasing' ? 'text-red-600' :
+                        supportMetrics.summary.trend === 'decreasing' ? 'text-green-600' :
+                        'text-gray-600'
+                      }`}>
+                        {supportMetrics.summary.trend}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Resolution Rate</p>
+                        <p className="text-2xl font-bold">{supportMetrics.summary.resolutionRate}%</p>
+                      </div>
+                      <CheckCircle2 className="h-8 w-8 text-green-600" />
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {supportMetrics.summary.totalResolved} of {supportMetrics.summary.totalTickets} resolved
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Avg Resolution</p>
+                        <p className="text-2xl font-bold">{supportMetrics.summary.avgResolutionTime}h</p>
+                      </div>
+                      <Clock className="h-8 w-8 text-orange-600" />
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Average time to resolve
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Escalation Rate</p>
+                        <p className="text-2xl font-bold">{supportMetrics.summary.escalationRate}%</p>
+                      </div>
+                      <AlertCircle className={`h-8 w-8 ${
+                        supportMetrics.summary.escalationRate > 15 ? 'text-red-600' :
+                        supportMetrics.summary.escalationRate > 5 ? 'text-orange-600' :
+                        'text-green-600'
+                      }`} />
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {supportMetrics.summary.totalEscalated} escalated tickets
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Support Integrations */}
+              {supportMetrics.integrations.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      Connected Support Systems
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {supportMetrics.integrations.map((integration: any) => (
+                        <div key={integration.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-3 h-3 rounded-full ${
+                              integration.status === 'connected' ? 'bg-green-500' :
+                              integration.status === 'error' ? 'bg-red-500' :
+                              'bg-gray-400'
+                            }`} />
+                            <div>
+                              <p className="font-medium capitalize">{integration.provider}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Sync: {integration.sync_enabled ? 'Enabled' : 'Disabled'}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge className={`${
+                            integration.status === 'connected' ? 'bg-green-100 text-green-800' :
+                            integration.status === 'error' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {integration.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* No Data State */}
+              {supportMetrics.integrations.length === 0 && (
+                <Card>
+                  <CardContent className="p-12">
+                    <div className="text-center">
+                      <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No Support Integrations</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Connect your support systems to track ticket metrics and improve health scores.
+                      </p>
+                      <Button onClick={() => router.push('/dashboard/admin/integrations')}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Setup Support Integration
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="p-12">
+                <div className="text-center text-muted-foreground">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-4" />
+                  <p>No support data available</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="contacts">
@@ -681,6 +1031,15 @@ export default function AccountDetails({ account, canEdit, canDelete, accountCon
         accounts={accounts}
         defaultAccountId={account.id}
       />
+
+      {/* Health Score Breakdown Dialog */}
+      {(account as any).health_components && (
+        <HealthScoreDialog
+          account={account}
+          open={isHealthScoreDialogOpen}
+          onOpenChange={setIsHealthScoreDialogOpen}
+        />
+      )}
     </div>
   )
 }

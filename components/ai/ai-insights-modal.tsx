@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Loader2, Sparkles, AlertTriangle, TrendingUp, Calendar, ExternalLink, CheckCircle, Lock, Crown } from 'lucide-react'
 import Link from 'next/link'
+import PremiumPreviewModal from '@/components/premium/premium-preview-modal'
 
 interface AIInsight {
   type: 'risk' | 'opportunity' | 'action' | 'trend'
@@ -50,6 +51,7 @@ export function AIInsightsModal({ open, onOpenChange, pageType, pageContext }: A
   const [error, setError] = useState<string | null>(null)
   const [hasPremiumAccess, setHasPremiumAccess] = useState<boolean | null>(null)
   const [checkingAccess, setCheckingAccess] = useState(false)
+  const [showPremiumModal, setShowPremiumModal] = useState(false)
 
   // Check premium access when modal opens
   useEffect(() => {
@@ -185,7 +187,10 @@ export function AIInsightsModal({ open, onOpenChange, pageType, pageContext }: A
               Upgrade to Premium
             </Button>
           </Link>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => setShowPremiumModal(true)}>
+            Learn More
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
             Maybe Later
           </Button>
         </div>
@@ -202,7 +207,12 @@ export function AIInsightsModal({ open, onOpenChange, pageType, pageContext }: A
   )
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <PremiumPreviewModal 
+        open={showPremiumModal} 
+        onOpenChange={setShowPremiumModal} 
+      />
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -379,5 +389,6 @@ export function AIInsightsModal({ open, onOpenChange, pageType, pageContext }: A
         </div>
       </DialogContent>
     </Dialog>
+    </>
   )
 }

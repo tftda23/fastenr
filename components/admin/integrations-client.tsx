@@ -4,11 +4,18 @@ import { useEffect, useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useToast } from "@/lib/hooks/use-toast"
 import { createClient } from "@/lib/supabase/client"
 import {
   Plug, Settings, RefreshCw, Clock, Link as LinkIcon,
-  AlertCircle, CheckCircle2, MoreHorizontal, Database
+  AlertCircle, CheckCircle2, MoreHorizontal, Database,
+  MessageSquare, Ticket, HelpCircle, Headphones, Plus,
+  TrendingUp, TrendingDown, Minus, ExternalLink, Users, Trash2
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -18,7 +25,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-type Provider = "hubspot" | "salesforce"
+type CRMProvider = "hubspot" | "salesforce"
+type SupportProvider = 'intercom' | 'zendesk' | 'jira'
+type CommunicationProvider = 'slack' | 'teams'
+type Provider = CRMProvider | SupportProvider
 type SyncObject = "company" | "contact" | "deal"
 
 interface IntegrationsClientProps {
@@ -26,14 +36,14 @@ interface IntegrationsClientProps {
 }
 
 type ConnectionRow = {
-  provider: Provider
+  provider: CRMProvider
   status: string | null
   token_expires_at: string | null
   updated_at: string | null
 }
 
 type SyncStateRow = {
-  provider: Provider
+  provider: CRMProvider
   object_type: SyncObject
   phase: "initial" | "continuous"
   since: string | null
@@ -42,9 +52,108 @@ type SyncStateRow = {
   last_error: string | null
 }
 
+type SupportIntegration = {
+  id: string
+  provider: SupportProvider
+  status: "connected" | "disconnected" | "error"
+  api_endpoint?: string
+  workspace_id?: string
+  subdomain?: string
+  project_key?: string
+  sync_enabled: boolean
+  sync_frequency_hours: number
+  last_sync_at?: string
+  last_sync_status?: string
+  last_error?: string
+  created_at: string
+  updated_at: string
+}
+
 type ProviderState = {
   connection: ConnectionRow | null
   states: SyncStateRow[]
+}
+
+// Support Integration Card Component
+const SupportIntegrationCard = ({ 
+  provider, 
+  supportIntegrations, 
+  supportProviderConfig, 
+  openSetupDialog, 
+  toggleSupportSync, 
+  deleteSupportIntegration 
+}: { 
+  provider: SupportProvider
+  supportIntegrations: SupportIntegration[]
+  supportProviderConfig: any
+  openSetupDialog: (provider: SupportProvider) => void
+  toggleSupportSync: (id: string, enabled: boolean) => void
+  deleteSupportIntegration: (id: string) => void
+}) => {
+  const config = supportProviderConfig[provider]
+  const integration = supportIntegrations.find(i => i.provider === provider)
+  const isActive = integration?.status === "connected" && integration?.sync_enabled
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 flex items-center justify-center">
+              <img src={config.logo} alt={config.name} className="w-8 h-8 object-contain" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">{config.name}</CardTitle>
+              <CardDescription className="text-sm">Support ticket management</CardDescription>
+            </div>
+          </div>
+          {integration ? (
+            <Badge className={isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+              {isActive ? "Active" : "Inactive"}
+            </Badge>
+          ) : (
+            <Badge className="bg-gray-100 text-gray-800">Not configured</Badge>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        {integration ? (
+          <div className="space-y-4">
+            <div className="text-xs text-muted-foreground space-y-1">
+              <div>Status: {integration.status}</div>
+              <div>Sync: {integration.sync_enabled ? "Enabled" : "Disabled"}</div>
+              <div>Last sync: {integration.last_sync_at ? new Date(integration.last_sync_at).toLocaleString() : 'Never'}</div>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => openSetupDialog(provider)}>
+                <Settings className="h-4 w-4 mr-2" />
+                Manage
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => deleteSupportIntegration(integration.id)}
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Remove
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Connect {config.name} to track support metrics and customer interactions.
+            </p>
+            <Button onClick={() => openSetupDialog(provider)} className="w-full">
+              <Settings className="h-4 w-4 mr-2" />
+              Setup {config.name}
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
 }
 
 export default function IntegrationsClient({ organizationId }: IntegrationsClientProps) {
@@ -52,23 +161,36 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
   const { toast } = useToast()
 
   const [loading, setLoading] = useState(true)
-  const [syncing, setSyncing] = useState<null | { provider: Provider; target: "all" | SyncObject }>(null)
-  const [etlRunning, setEtlRunning] = useState<null | Provider>(null)
+  const [supportLoading, setSupportLoading] = useState(true)
+  const [syncing, setSyncing] = useState<null | { provider: CRMProvider; target: "all" | SyncObject }>(null)
+  const [etlRunning, setEtlRunning] = useState<null | CRMProvider>(null)
+  const [activeTab, setActiveTab] = useState("crm")
+  const [supportIntegrations, setSupportIntegrations] = useState<SupportIntegration[]>([])
+  const [setupDialogOpen, setSetupDialogOpen] = useState(false)
+  const [selectedProvider, setSelectedProvider] = useState<SupportProvider | CommunicationProvider | null>(null)
+  const [setupForm, setSetupForm] = useState({
+    api_endpoint: "",
+    workspace_id: "",
+    subdomain: "",
+    project_key: "",
+    api_token: "",
+    sync_frequency_hours: 24
+  })
 
   // provider → state
-  const [byProvider, setByProvider] = useState<Record<Provider, ProviderState>>({
+  const [byProvider, setByProvider] = useState<Record<CRMProvider, ProviderState>>({
     hubspot: { connection: null, states: [] },
     salesforce: { connection: null, states: [] },
   })
 
-  const sortedStates = (provider: Provider) =>
+  const sortedStates = (provider: CRMProvider) =>
     (byProvider[provider].states || [])
       ? ["company", "contact", "deal"]
           .map((k) => byProvider[provider].states.find((s) => s.object_type === (k as SyncObject)))
           .filter(Boolean) as SyncStateRow[]
       : []
 
-  async function load() {
+  async function loadCRM() {
     setLoading(true)
     try {
       // Fetch connections for both providers
@@ -88,17 +210,17 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
       if (connErr) throw connErr
       if (stateErr) throw stateErr
 
-      const next: Record<Provider, ProviderState> = {
+      const next: Record<CRMProvider, ProviderState> = {
         hubspot: { connection: null, states: [] },
         salesforce: { connection: null, states: [] },
       }
 
       ;(conns ?? []).forEach((c: any) => {
-        const p = c.provider as Provider
+        const p = c.provider as CRMProvider
         next[p].connection = c
       })
       ;(states ?? []).forEach((s: any) => {
-        const p = s.provider as Provider
+        const p = s.provider as CRMProvider
         next[p].states.push(s)
       })
 
@@ -111,8 +233,27 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
     }
   }
 
+  async function loadSupportIntegrations() {
+    setSupportLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from("support_integrations")
+        .select("*")
+        .eq("organization_id", organizationId)
+
+      if (error) throw error
+      setSupportIntegrations(data || [])
+    } catch (e) {
+      console.error(e)
+      toast({ title: "Load failed", description: "Could not load support integrations.", variant: "destructive" })
+    } finally {
+      setSupportLoading(false)
+    }
+  }
+
   useEffect(() => {
-    load()
+    loadCRM()
+    loadSupportIntegrations()
   }, [organizationId])
 
   // ---------- UI helpers ----------
@@ -123,28 +264,74 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
     return d.toLocaleString()
   }
 
-  const connectStartByProvider: Record<Provider, (orgId: string) => string> = {
+  const connectStartByProvider: Record<CRMProvider, (orgId: string) => string> = {
     hubspot: (orgId) => `/api/integrations/hubspot/start?organizationId=${orgId}`,
     salesforce: (orgId) => `/api/integrations/salesforce/start?organizationId=${orgId}`,
   }
 
-  const syncEndpointByProvider: Record<Provider, string> = {
+  const syncEndpointByProvider: Record<CRMProvider, string> = {
     hubspot: "/api/integrations/hubspot/sync",
     salesforce: "/api/integrations/salesforce/sync",
   }
 
   // Reuse your existing ETL endpoint, but include provider in the body.
   // (If you later split ETL endpoints, just swap this map to different URLs.)
-  const etlEndpointByProvider: Record<Provider, string> = {
+  const etlEndpointByProvider: Record<CRMProvider, string> = {
     hubspot: "/api/etl/accounts/from-crm",
     salesforce: "/api/etl/accounts/from-crm",
   }
 
-  function openConnect(provider: Provider) {
+  const supportProviderConfig = {
+    intercom: {
+      name: "Intercom",
+      logo: "/images/logos/intercom.svg",
+      color: "bg-blue-500",
+      description: "Customer support conversations and tickets",
+      setupFields: ["api_token", "workspace_id"],
+      docUrl: "https://developers.intercom.com/building-apps/docs/authorization"
+    },
+    zendesk: {
+      name: "Zendesk", 
+      logo: "/images/logos/zendesk.svg",
+      color: "bg-green-500",
+      description: "Support tickets and customer service data",
+      setupFields: ["subdomain", "api_token"],
+      docUrl: "https://developer.zendesk.com/api-reference/ticketing/introduction/"
+    },
+    jira: {
+      name: "Jira Service Management",
+      logo: "/images/logos/jira.svg",
+      color: "bg-blue-600",
+      description: "Service desk tickets and issues",
+      setupFields: ["api_endpoint", "project_key", "api_token"],
+      docUrl: "https://developer.atlassian.com/cloud/jira/service-desk/rest/intro/"
+    }
+  }
+
+  const communicationProviderConfig = {
+    slack: {
+      name: "Slack",
+      logo: "/images/logos/slack.svg",
+      color: "bg-purple-500",
+      description: "Team communication and customer notifications",
+      setupFields: ["workspace_id", "api_token"],
+      docUrl: "https://api.slack.com/authentication/basics"
+    },
+    teams: {
+      name: "Microsoft Teams",
+      logo: "/images/logos/microsoft-teams.svg",
+      color: "bg-blue-700",
+      description: "Team collaboration and customer communication",
+      setupFields: ["api_endpoint", "api_token"],
+      docUrl: "https://docs.microsoft.com/en-us/graph/teams-concept-overview"
+    }
+  }
+
+  function openConnect(provider: CRMProvider) {
     window.location.href = connectStartByProvider[provider](organizationId)
   }
 
-  async function runEtl(provider: Provider, lookbackMinutes = 240) {
+  async function runEtl(provider: CRMProvider, lookbackMinutes = 240) {
     try {
       setEtlRunning(provider)
       const etlUrl = etlEndpointByProvider[provider]
@@ -169,7 +356,7 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
     }
   }
 
-  async function syncNow(provider: Provider, target: "all" | SyncObject, pageLimit = 2, withEtl = false) {
+  async function syncNow(provider: CRMProvider, target: "all" | SyncObject, pageLimit = 2, withEtl = false) {
     try {
       setSyncing({ provider, target })
       const res = await fetch(syncEndpointByProvider[provider], {
@@ -185,7 +372,7 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
         title: `${titleFor(provider)} sync complete`,
         description: target === "all" ? "Incremental sync ran successfully." : `Synced ${target}s.`,
       })
-      await load()
+      await loadCRM()
       if (withEtl) {
         await runEtl(provider, 240)
       }
@@ -196,11 +383,11 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
     }
   }
 
-  async function syncObject(provider: Provider, obj: SyncObject, withEtl = false) {
+  async function syncObject(provider: CRMProvider, obj: SyncObject, withEtl = false) {
     await syncNow(provider, obj, 2, withEtl)
   }
 
-  async function resetSyncState(provider: Provider) {
+  async function resetSyncState(provider: CRMProvider) {
     try {
       // Reset all object types for this provider
       const objectTypes = provider === "hubspot" ? ["company", "contact", "deal"] : ["company", "contact", "deal"]
@@ -223,16 +410,165 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
       }
       
       toast({ title: `${titleFor(provider)} sync state reset`, description: "Initial backfill will resume on next sync." })
-      await load()
+      await loadCRM()
     } catch (e: any) {
       toast({ title: "Reset failed", description: e?.message ?? "Could not reset sync state.", variant: "destructive" })
     }
   }
 
+  async function setupSupportIntegration(provider: SupportProvider | CommunicationProvider) {
+    try {
+      const { error } = await supabase
+        .from("support_integrations")
+        .insert({
+          organization_id: organizationId,
+          provider,
+          api_endpoint: setupForm.api_endpoint || null,
+          workspace_id: setupForm.workspace_id || null,
+          subdomain: setupForm.subdomain || null,
+          project_key: setupForm.project_key || null,
+          encrypted_token: setupForm.api_token, // In production, encrypt this
+          sync_frequency_hours: setupForm.sync_frequency_hours,
+          status: "disconnected" // Will be "connected" after first successful sync
+        })
+
+      if (error) throw error
+
+      toast({ title: "Integration added", description: `${(supportProviderConfig[provider] || communicationProviderConfig[provider]).name} integration configured successfully.` })
+      setSetupDialogOpen(false)
+      setSetupForm({ api_endpoint: "", workspace_id: "", subdomain: "", project_key: "", api_token: "", sync_frequency_hours: 24 })
+      await loadSupportIntegrations()
+    } catch (e: any) {
+      toast({ title: "Setup failed", description: e?.message ?? "Could not setup integration.", variant: "destructive" })
+    }
+  }
+
+  async function toggleSupportSync(integrationId: string, enabled: boolean) {
+    try {
+      const { error } = await supabase
+        .from("support_integrations")
+        .update({ sync_enabled: enabled })
+        .eq("id", integrationId)
+        .eq("organization_id", organizationId)
+
+      if (error) throw error
+
+      toast({ title: enabled ? "Sync enabled" : "Sync disabled", description: "Integration sync settings updated." })
+      await loadSupportIntegrations()
+    } catch (e: any) {
+      toast({ title: "Update failed", description: e?.message ?? "Could not update sync settings.", variant: "destructive" })
+    }
+  }
+
+  async function deleteSupportIntegration(integrationId: string) {
+    try {
+      const { error } = await supabase
+        .from("support_integrations")
+        .delete()
+        .eq("id", integrationId)
+        .eq("organization_id", organizationId)
+
+      if (error) throw error
+
+      toast({ title: "Integration removed", description: "Support integration deleted successfully." })
+      await loadSupportIntegrations()
+    } catch (e: any) {
+      toast({ title: "Delete failed", description: e?.message ?? "Could not delete integration.", variant: "destructive" })
+    }
+  }
+
+  function openSetupDialog(provider: SupportProvider | CommunicationProvider) {
+    setSelectedProvider(provider)
+    setSetupForm({ api_endpoint: "", workspace_id: "", subdomain: "", project_key: "", api_token: "", sync_frequency_hours: 24 })
+    setSetupDialogOpen(true)
+  }
+
   // ---------- Render helpers ----------
-  const titleFor = (p: Provider) => (p === "hubspot" ? "HubSpot" : "Salesforce")
-  const emojiFor = (p: Provider) => (p === "hubspot" ? "🔶" : "🌀")
-  const isConnected = (p: Provider) => !!byProvider[p].connection
+  const titleFor = (p: CRMProvider) => (p === "hubspot" ? "HubSpot" : "Salesforce")
+  const emojiFor = (p: CRMProvider) => (p === "hubspot" ? "🔶" : "🌀")
+  const isConnected = (p: CRMProvider) => !!byProvider[p].connection
+
+  // Communication Integration Card Component
+  const CommunicationIntegrationCard = ({ 
+    provider, 
+    supportIntegrations, 
+    communicationProviderConfig, 
+    openSetupDialog, 
+    toggleSupportSync, 
+    deleteSupportIntegration 
+  }: {
+    provider: CommunicationProvider
+    supportIntegrations: SupportIntegration[]
+    communicationProviderConfig: any
+    openSetupDialog: (provider: CommunicationProvider) => void
+    toggleSupportSync: (id: string, enabled: boolean) => void
+    deleteSupportIntegration: (id: string) => void
+  }) => {
+    const config = communicationProviderConfig[provider]
+    const integration = supportIntegrations.find(i => i.provider === provider)
+    const isActive = integration?.status === "connected" && integration?.sync_enabled
+
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 flex items-center justify-center">
+                <img src={config.logo} alt={config.name} className="w-8 h-8 object-contain" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">{config.name}</CardTitle>
+                <CardDescription className="text-sm">Team communication</CardDescription>
+              </div>
+            </div>
+            {integration ? (
+              <Badge className={isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                {isActive ? "Active" : "Inactive"}
+              </Badge>
+            ) : (
+              <Badge className="bg-gray-100 text-gray-800">Not configured</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {integration ? (
+            <div className="space-y-4">
+              <div className="text-xs text-muted-foreground space-y-1">
+                <div>Status: {integration.status}</div>
+                <div>Sync: {integration.sync_enabled ? "Enabled" : "Disabled"}</div>
+                <div>Last sync: {integration.last_sync_at ? new Date(integration.last_sync_at).toLocaleString() : 'Never'}</div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => openSetupDialog(provider)}>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Manage
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => deleteSupportIntegration(integration.id)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Remove
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Connect {config.name} to track team communication and customer interactions.
+              </p>
+              <Button onClick={() => openSetupDialog(provider)} className="w-full">
+                <Settings className="h-4 w-4 mr-2" />
+                Setup {config.name}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
 
   const ConnectedBadge = ({ connected }: { connected: boolean }) =>
     connected ? (
@@ -241,61 +577,72 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
       <Badge className="bg-gray-100 text-gray-700 cursor-default select-none">Not connected</Badge>
     )
 
-  const ProviderTile = ({ provider }: { provider: Provider }) => {
+  const CRMIntegrationCard = ({ provider }: { provider: CRMProvider }) => {
     const conn = byProvider[provider].connection
-    const list = sortedStates(provider)
     const connected = isConnected(provider)
+    const logoPath = provider === "hubspot" ? "/images/logos/hubspot.svg" : "/images/logos/salesforce.svg"
 
     return (
-      <div className="flex items-start justify-between p-4 border rounded-lg">
-        <div className="flex items-center gap-4">
-          <div className="text-2xl">{emojiFor(provider)}</div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold">{titleFor(provider)}</h3>
-              {connected ? (
-                <span className="inline-flex items-center text-xs text-green-700">
-                  <CheckCircle2 className="h-4 w-4 mr-1" /> Connected
-                </span>
-              ) : (
-                <span className="inline-flex items-center text-xs text-gray-600">
-                  <AlertCircle className="h-4 w-4 mr-1" /> Not connected
-                </span>
-              )}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 flex items-center justify-center">
+                <img src={logoPath} alt={titleFor(provider)} className="w-8 h-8 object-contain" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">{titleFor(provider)}</CardTitle>
+                <CardDescription className="text-sm">CRM data synchronization</CardDescription>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Sync companies, contacts, and deals into fastenr. Then run ETL to materialise Accounts.
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={() => openConnect(provider)}>
+            {connected ? (
+              <Badge className="bg-green-100 text-green-800">Active</Badge>
+            ) : (
+              <Badge className="bg-gray-100 text-gray-800">Inactive</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {connected ? (
+            <div className="space-y-4">
+              <div className="text-xs text-muted-foreground space-y-1">
+                <div>Status: Connected</div>
+                <div>Last sync: {fmt(conn?.updated_at)}</div>
+                <div>Token expires: {fmt(conn?.token_expires_at)}</div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => openConnect(provider)}>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Manage
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => syncNow(provider, "all", 2)}
+                  disabled={syncing !== null}
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Sync Now
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Connect {titleFor(provider)} to sync companies, contacts, and deals.
+              </p>
+              <Button onClick={() => openConnect(provider)} className="w-full">
                 <Settings className="h-4 w-4 mr-2" />
-                {connected ? "Reconnect" : "Connect"}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => syncNow(provider, "all", 5)}
-                disabled={!connected || syncing !== null}
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Full sync (page ×5)
+                Connect {titleFor(provider)}
               </Button>
             </div>
-          </div>
-        </div>
-
-        <div className="text-xs text-muted-foreground">
-          <div className="flex items-center">
-            <Clock className="h-3.5 w-3.5 mr-1" />
-            Last updated: {fmt(conn?.updated_at)}
-          </div>
-          <div>Token expires: {fmt(conn?.token_expires_at)}</div>
-        </div>
-      </div>
+          )}
+        </CardContent>
+      </Card>
     )
   }
 
-  const ProviderActions = ({ provider }: { provider: Provider }) => {
+  const ProviderActions = ({ provider }: { provider: CRMProvider }) => {
     const connected = isConnected(provider)
     const conn = byProvider[provider].connection
 
@@ -369,169 +716,245 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
 
   return (
     <div className="space-y-6">
-      {/* HubSpot Card */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle className="flex items-center">
-              <Plug className="h-5 w-5 mr-2" />
-              Integrations — HubSpot
-            </CardTitle>
-            <CardDescription>Connect fastenr with your HubSpot CRM data source.</CardDescription>
-          </div>
-          <ProviderActions provider="hubspot" />
-        </CardHeader>
-        <CardContent>
-          <ProviderTile provider="hubspot" />
 
-          {/* Sync status table */}
-          <div className="mt-6">
-            <h4 className="text-sm font-semibold mb-2">Sync status</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {loading && (
-                <div className="text-sm text-muted-foreground p-3 border rounded-md">Loading…</div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="crm" className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            CRM & Sales
+          </TabsTrigger>
+          <TabsTrigger value="support" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Support & Service
+          </TabsTrigger>
+          <TabsTrigger value="communication" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Communication
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="crm" className="space-y-6 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {loading ? (
+              <>  
+                {[1, 2].map(i => (
+                  <Card key={i} className="animate-pulse">
+                    <CardHeader>
+                      <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </>
+            ) : (
+              <>
+                <CRMIntegrationCard provider="hubspot" />
+                <CRMIntegrationCard provider="salesforce" />
+              </>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="support" className="space-y-6 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {supportLoading ? (
+              <>  
+                {[1, 2, 3].map(i => (
+                  <Card key={i} className="animate-pulse">
+                    <CardHeader>
+                      <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </>
+            ) : (
+              <>
+                <SupportIntegrationCard 
+                  provider="intercom" 
+                  supportIntegrations={supportIntegrations}
+                  supportProviderConfig={supportProviderConfig}
+                  openSetupDialog={openSetupDialog}
+                  toggleSupportSync={toggleSupportSync}
+                  deleteSupportIntegration={deleteSupportIntegration}
+                />
+                <SupportIntegrationCard 
+                  provider="zendesk" 
+                  supportIntegrations={supportIntegrations}
+                  supportProviderConfig={supportProviderConfig}
+                  openSetupDialog={openSetupDialog}
+                  toggleSupportSync={toggleSupportSync}
+                  deleteSupportIntegration={deleteSupportIntegration}
+                />
+                <SupportIntegrationCard 
+                  provider="jira" 
+                  supportIntegrations={supportIntegrations}
+                  supportProviderConfig={supportProviderConfig}
+                  openSetupDialog={openSetupDialog}
+                  toggleSupportSync={toggleSupportSync}
+                  deleteSupportIntegration={deleteSupportIntegration}
+                />
+              </>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="communication" className="space-y-6 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {supportLoading ? (
+              <>  
+                {[1, 2].map(i => (
+                  <Card key={i} className="animate-pulse">
+                    <CardHeader>
+                      <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </>
+            ) : (
+              <>
+                <CommunicationIntegrationCard 
+                  provider="slack" 
+                  supportIntegrations={supportIntegrations}
+                  communicationProviderConfig={communicationProviderConfig}
+                  openSetupDialog={openSetupDialog}
+                  toggleSupportSync={toggleSupportSync}
+                  deleteSupportIntegration={deleteSupportIntegration}
+                />
+                <CommunicationIntegrationCard 
+                  provider="teams" 
+                  supportIntegrations={supportIntegrations}
+                  communicationProviderConfig={communicationProviderConfig}
+                  openSetupDialog={openSetupDialog}
+                  toggleSupportSync={toggleSupportSync}
+                  deleteSupportIntegration={deleteSupportIntegration}
+                />
+              </>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Setup Dialog */}
+      <Dialog open={setupDialogOpen} onOpenChange={setSetupDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedProvider && (() => {
+                const config = supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider]
+                return config?.logo ? <img src={config.logo} alt={config.name} className="w-5 h-5 object-contain" /> : null
+              })()}
+              Setup {selectedProvider && (supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.name} Integration
+            </DialogTitle>
+            <DialogDescription>
+              Configure your {selectedProvider && (supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.name} integration to track metrics and improve customer success.
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedProvider && (
+            <div className="space-y-4">
+              {(supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.setupFields.includes("api_endpoint") && (
+                <div className="space-y-2">
+                  <Label htmlFor="api_endpoint">API Endpoint</Label>
+                  <Input
+                    id="api_endpoint"
+                    placeholder="https://your-domain.atlassian.net"
+                    value={setupForm.api_endpoint}
+                    onChange={(e) => setSetupForm(prev => ({ ...prev, api_endpoint: e.target.value }))}
+                  />
+                </div>
               )}
 
-              {!loading &&
-                (sortedStates("hubspot").length ? (
-                  sortedStates("hubspot").map((s) => (
-                    <div key={`hubspot-${s.object_type}`} className="p-3 border rounded-md">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium capitalize">{s.object_type}</span>
-                        <Badge
-                          className={`cursor-default select-none ${
-                            s.phase === "continuous"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-amber-100 text-amber-900"
-                          }`}
-                        >
-                          {s.phase}
-                        </Badge>
-                      </div>
-                      <div className="text-xs text-muted-foreground space-y-1">
-                        <div>Since: {fmt(s.since)}</div>
-                        <div>Last run: {fmt(s.last_run_at)}</div>
-                        <div>Last success: {fmt(s.last_success_at)}</div>
-                        {s.last_error ? (
-                          <div className="text-red-700">Error: {s.last_error}</div>
-                        ) : null}
-                      </div>
-                      <div className="mt-2 flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => syncObject("hubspot", s.object_type)}
-                          disabled={!isConnected("hubspot") || syncing !== null}
-                        >
-                          <RefreshCw className="h-4 w-4 mr-2" />
-                          Sync
-                        </Button>
-                        {s.object_type === "company" && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => syncObject("hubspot", "company", true)}
-                            disabled={!isConnected("hubspot") || syncing !== null || etlRunning === "hubspot"}
-                            title="Sync companies then run ETL"
-                          >
-                            <Database className="h-4 w-4 mr-2" />
-                            Sync companies + ETL
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-sm text-muted-foreground p-3 border rounded-md">
-                    No sync state yet. Connect HubSpot, then run an initial sync.
-                  </div>
-                ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Salesforce Card */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle className="flex items-center">
-              <Plug className="h-5 w-5 mr-2" />
-              Integrations — Salesforce
-            </CardTitle>
-            <CardDescription>Connect fastenr with your Salesforce CRM data source.</CardDescription>
-          </div>
-          <ProviderActions provider="salesforce" />
-        </CardHeader>
-        <CardContent>
-          <ProviderTile provider="salesforce" />
-
-          {/* Sync status table */}
-          <div className="mt-6">
-            <h4 className="text-sm font-semibold mb-2">Sync status</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {loading && (
-                <div className="text-sm text-muted-foreground p-3 border rounded-md">Loading…</div>
+              {(supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.setupFields.includes("workspace_id") && (
+                <div className="space-y-2">
+                  <Label htmlFor="workspace_id">Workspace ID</Label>
+                  <Input
+                    id="workspace_id"
+                    placeholder="abc123"
+                    value={setupForm.workspace_id}
+                    onChange={(e) => setSetupForm(prev => ({ ...prev, workspace_id: e.target.value }))}
+                  />
+                </div>
               )}
 
-              {!loading &&
-                (sortedStates("salesforce").length ? (
-                  sortedStates("salesforce").map((s) => (
-                    <div key={`salesforce-${s.object_type}`} className="p-3 border rounded-md">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium capitalize">{s.object_type}</span>
-                        <Badge
-                          className={`cursor-default select-none ${
-                            s.phase === "continuous"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-amber-100 text-amber-900"
-                          }`}
-                        >
-                          {s.phase}
-                        </Badge>
-                      </div>
-                      <div className="text-xs text-muted-foreground space-y-1">
-                        <div>Since: {fmt(s.since)}</div>
-                        <div>Last run: {fmt(s.last_run_at)}</div>
-                        <div>Last success: {fmt(s.last_success_at)}</div>
-                        {s.last_error ? (
-                          <div className="text-red-700">Error: {s.last_error}</div>
-                        ) : null}
-                      </div>
-                      <div className="mt-2 flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => syncObject("salesforce", s.object_type)}
-                          disabled={!isConnected("salesforce") || syncing !== null}
-                        >
-                          <RefreshCw className="h-4 w-4 mr-2" />
-                          Sync
-                        </Button>
-                        {s.object_type === "company" && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => syncObject("salesforce", "company", true)}
-                            disabled={!isConnected("salesforce") || syncing !== null || etlRunning === "salesforce"}
-                            title="Sync companies then run ETL"
-                          >
-                            <Database className="h-4 w-4 mr-2" />
-                            Sync companies + ETL
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-sm text-muted-foreground p-3 border rounded-md">
-                    No sync state yet. Connect Salesforce, then run an initial sync.
+              {(supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.setupFields.includes("subdomain") && (
+                <div className="space-y-2">
+                  <Label htmlFor="subdomain">Subdomain</Label>
+                  <Input
+                    id="subdomain"
+                    placeholder="your-company"
+                    value={setupForm.subdomain}
+                    onChange={(e) => setSetupForm(prev => ({ ...prev, subdomain: e.target.value }))}
+                  />
+                </div>
+              )}
+
+              {(supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.setupFields.includes("project_key") && (
+                <div className="space-y-2">
+                  <Label htmlFor="project_key">Project Key</Label>
+                  <Input
+                    id="project_key"
+                    placeholder="SERVICE"
+                    value={setupForm.project_key}
+                    onChange={(e) => setSetupForm(prev => ({ ...prev, project_key: e.target.value }))}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="api_token">API Token</Label>
+                <Input
+                  id="api_token"
+                  type="password"
+                  placeholder="Your API token"
+                  value={setupForm.api_token}
+                  onChange={(e) => setSetupForm(prev => ({ ...prev, api_token: e.target.value }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sync_frequency">Sync Frequency (hours)</Label>
+                <Input
+                  id="sync_frequency"
+                  type="number"
+                  min="1"
+                  max="168"
+                  value={setupForm.sync_frequency_hours}
+                  onChange={(e) => setSetupForm(prev => ({ ...prev, sync_frequency_hours: parseInt(e.target.value) || 24 }))}
+                />
+              </div>
+
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-800">What we'll track</p>
+                    <ul className="text-sm text-blue-600 mt-1 space-y-1">
+                      <li>• Daily ticket volumes and trends</li>
+                      <li>• Resolution times and escalation rates</li>
+                      <li>• Customer satisfaction scores (if available)</li>
+                      <li>• Support health metrics for account scores</li>
+                    </ul>
                   </div>
-                ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSetupDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => selectedProvider && setupSupportIntegration(selectedProvider)}
+              disabled={!setupForm.api_token}
+            >
+              Setup Integration
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -1,11 +1,17 @@
 "use client"
 
 import { useState, useMemo, useCallback } from "react"
+import { useCurrencyConfig } from '@/lib/hooks/use-currency'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Heart, AlertTriangle, TrendingUp, TrendingDown, Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Heart, AlertTriangle, TrendingUp, TrendingDown, Search, Eye, BarChart3, Building } from "lucide-react"
+import { DataTable } from "@/components/analytics/data-table"
+import { ColumnDef } from "@tanstack/react-table"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface HealthClientProps {
   accounts: any[]
@@ -13,9 +19,12 @@ interface HealthClientProps {
 }
 
 export function HealthClient({ accounts, dashboardStats }: HealthClientProps) {
+  const { formatCurrency } = useCurrencyConfig()
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [riskFilter, setRiskFilter] = useState("all")
   const [healthFilter, setHealthFilter] = useState("all")
+  // Remove modal-related state since we're navigating to a page now
 
   const getHealthColor = useCallback((score: number) => {
     if (score >= 80) return "bg-green-100 text-green-800"
@@ -34,6 +43,109 @@ export function HealthClient({ accounts, dashboardStats }: HealthClientProps) {
     if (score >= 60) return <TrendingUp className="h-4 w-4 text-yellow-600" />
     return <AlertTriangle className="h-4 w-4 text-red-600" />
   }, [])
+
+  // Remove handleViewHealthScore since we're using Link navigation now
+
+  // Table columns definition
+  const columns: ColumnDef<any>[] = useMemo(
+    () => [
+      {
+        id: "account",
+        accessorKey: "name",
+        header: "Account",
+        size: 250,
+        minSize: 200,
+        cell: ({ row }) => {
+          const account = row.original
+          return (
+            <div className="flex items-center space-x-3">
+              <Building className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <div className="font-medium">{account.name}</div>
+                <div className="text-sm text-muted-foreground">
+                  ARR: {formatCurrency(account.arr || 0)}
+                </div>
+              </div>
+            </div>
+          )
+        },
+      },
+      {
+        id: "health_score",
+        accessorKey: "health_score",
+        header: "Health Score",
+        size: 120,
+        minSize: 100,
+        cell: ({ row }) => {
+          const score = row.original.health_score
+          return (
+            <div className="flex items-center gap-2">
+              {getHealthIcon(score)}
+              <Badge className={getHealthColor(score)}>
+                {score}/100
+              </Badge>
+            </div>
+          )
+        },
+      },
+      {
+        id: "churn_risk",
+        accessorKey: "churn_risk_score",
+        header: "Churn Risk",
+        size: 120,
+        minSize: 100,
+        cell: ({ row }) => {
+          const riskScore = row.original.churn_risk_score
+          return (
+            <Badge className={getRiskColor(riskScore)}>
+              {riskScore}%
+            </Badge>
+          )
+        },
+      },
+      {
+        id: "last_engagement",
+        accessorKey: "last_engagement",
+        header: "Last Engagement",
+        size: 140,
+        minSize: 120,
+        cell: ({ row }) => {
+          const lastEngagement = row.original.last_engagement
+          if (!lastEngagement) return <span className="text-muted-foreground text-sm">Never</span>
+          
+          return (
+            <span className="text-sm">
+              {new Date(lastEngagement).toLocaleDateString()}
+            </span>
+          )
+        },
+      },
+      {
+        id: "actions",
+        header: "",
+        size: 140,
+        minSize: 120,
+        cell: ({ row }) => {
+          const account = row.original
+          const url = `/dashboard/health/${account.id}`
+          
+          return (
+            <a href={url} className="inline-block">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2"
+              >
+                <BarChart3 className="h-3 w-3" />
+                View Breakdown
+              </Button>
+            </a>
+          )
+        },
+      },
+    ],
+    [getHealthIcon, getHealthColor, getRiskColor, router]
+  )
 
   const filteredAccounts = useMemo(() => {
     return (
@@ -136,50 +248,18 @@ export function HealthClient({ accounts, dashboardStats }: HealthClientProps) {
             </Select>
           </div>
 
-          {/* Accounts List */}
-          <div className="space-y-4">
-            {filteredAccounts.map((account) => (
-              <div
-                key={account.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-              >
-                <div className="flex items-center gap-4">
-                  {getHealthIcon(account.health_score)}
-                  <div>
-                    <h4 className="font-medium">{account.name}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      ARR: ${account.arr?.toLocaleString() || 0}
-                      {account.last_engagement && (
-                        <span className="ml-2">
-                          • Last engagement: {new Date(account.last_engagement).toLocaleDateString()}
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="text-sm font-medium">Health Score</div>
-                    <Badge className={getHealthColor(account.health_score)}>{account.health_score}/100</Badge>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">Churn Risk</div>
-                    <Badge className={getRiskColor(account.churn_risk_score)}>{account.churn_risk_score}%</Badge>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {filteredAccounts.length === 0 && (
-            <div className="text-center py-8">
-              <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No accounts found</h3>
-              <p className="text-muted-foreground">Try adjusting your search or filter criteria.</p>
-            </div>
-          )}
+          {/* Accounts Table */}
+          <DataTable
+            data={filteredAccounts}
+            columns={columns}
+            title={`Health Scores (${filteredAccounts.length})`}
+            description="Account health scores and churn risk analysis"
+            searchPlaceholder="Search accounts..."
+            exportFilename="health-scores"
+          />
         </CardContent>
       </Card>
+
     </div>
   )
 }

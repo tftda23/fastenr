@@ -44,20 +44,20 @@ export default async function DashboardPage() {
   }
 
   try {
-    const [stats, churnRiskAccounts, recentActivities] = await Promise.all([
-      getDashboardStats(), 
+    // Use the regular dashboard queries - the dynamic calculation will happen in the client components
+    const [dashboardStats, churnRiskAccounts, recentActivities] = await Promise.all([
+      getDashboardStats(),
       getChurnRiskAccounts(10),
       getRecentActivities(10) // Get latest 10 activities
     ])
 
-    // Get accounts for health distribution
-    const { data: accounts } = await supabase.from("accounts").select("id, health_score, name, owner_id").eq("organization_id", profile.organization_id)
+    // Use the regular dashboard stats - dynamic health scores will be calculated in client components
+    const stats = dashboardStats
 
     console.log('Dashboard server-side data:')
     console.log('- Stats:', !!stats)
     console.log('- Churn risk accounts:', churnRiskAccounts?.length || 0)
     console.log('- Recent activities:', recentActivities?.length || 0)
-    console.log('- Accounts:', accounts?.length || 0)
 
     if (!stats) {
       return (
@@ -71,7 +71,7 @@ export default async function DashboardPage() {
       <DashboardClient
         initialStats={stats}
         initialChurnRiskAccounts={churnRiskAccounts || []}
-        initialAccounts={(accounts || []) as any}
+        initialAccounts={[]} 
         initialActivities={recentActivities}
         currentUserId={profile.id}
         userFullName={profile.full_name}

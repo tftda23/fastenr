@@ -14,6 +14,9 @@ import {
 import { devLog } from '@/lib/logger'
 import { ContactsTable } from './contacts-table'
 import { ContactGroupsManager } from './contact-groups-manager'
+import { ContactsHelp } from '@/components/ui/help-system'
+import { useTour } from '@/lib/hooks/use-tour'
+import { TOUR_DUMMY_CONTACTS } from '@/lib/tour-dummy-data'
 import { 
   Contact, 
   ContactGroup, 
@@ -47,6 +50,7 @@ export function ContactsClient({
   const [currentPage, setCurrentPage] = useState(initialPage)
   const [loading, setLoading] = useState(false)
   const [selectedTab, setSelectedTab] = useState('list')
+  const { shouldShowDummyData } = useTour()
 
   // Debug logging removed for production security
 
@@ -121,13 +125,33 @@ export function ContactsClient({
     setCurrentPage(page)
   }
 
+  // Transform dummy data to match Contact interface
+  const displayContacts = shouldShowDummyData ? {
+    data: TOUR_DUMMY_CONTACTS.map(contact => ({
+      id: contact.id,
+      name: contact.name,
+      email: contact.email,
+      role: contact.role,
+      account_name: contact.account_name,
+      last_contact: contact.last_contact,
+      engagement_score: contact.engagement_score,
+      contact_status: contact.status as any,
+      relationship_strength: contact.status === 'champion' ? 'champion' : 'neutral' as any,
+      decision_maker_level: contact.role.includes('VP') || contact.role.includes('CEO') || contact.role.includes('Director') ? 'Primary' : undefined
+    })),
+    count: TOUR_DUMMY_CONTACTS.length,
+    page: 1,
+    per_page: 25,
+    total_pages: 1
+  } : contacts
+
   // Calculate summary stats
-  const totalContacts = contacts.count || contacts.data.length
-  const activeContacts = contacts.data.filter(c => c.contact_status === 'active').length
-  const decisionMakers = contacts.data.filter(c => 
+  const totalContacts = displayContacts.count || displayContacts.data.length
+  const activeContacts = displayContacts.data.filter(c => c.contact_status === 'active').length
+  const decisionMakers = displayContacts.data.filter(c => 
     ['Primary', 'Influencer'].includes(c.decision_maker_level || '')
   ).length
-  const champions = contacts.data.filter(c => c.relationship_strength === 'champion').length
+  const champions = displayContacts.data.filter(c => c.relationship_strength === 'champion').length
 
   return (
     <div className="h-full flex flex-col">
@@ -186,6 +210,7 @@ export function ContactsClient({
         </Card>
       </div>
 
+
       {/* Main Content Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col">
         <TabsList className="w-full mb-4">
@@ -202,7 +227,7 @@ export function ContactsClient({
         {/* Contact List Tab */}
         <TabsContent value="list" className="flex-1 flex flex-col">
           <ContactsTable
-            contacts={contacts}
+            contacts={displayContacts}
             contactGroups={groups}
             accounts={accounts}
             filters={filters}
@@ -220,7 +245,7 @@ export function ContactsClient({
         <TabsContent value="groups" className="flex-1 flex flex-col">
           <ContactGroupsManager
             contactGroups={groups}
-            contacts={contacts.data}
+            contacts={displayContacts.data}
             onRefresh={refreshGroups}
           />
         </TabsContent>

@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Clock } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { AIInsightsButton } from '@/components/ai/ai-insights-button'
 import { devLog } from '@/lib/logger'
 import { CreateEngagementDialog } from './create-engagement-dialog'
 import { EngagementDetailsModal } from './engagement-details-modal'
+import { EngagementsHelp } from '@/components/ui/help-system'
 
 type ViewMode = 'month' | 'week' | 'day'
 
@@ -41,10 +43,36 @@ export default function CalendarClient() {
   const [createEngagementDate, setCreateEngagementDate] = useState<Date | null>(null)
   const [createEngagementTime, setCreateEngagementTime] = useState<string | null>(null)
   const [selectedEngagement, setSelectedEngagement] = useState<Engagement | null>(null)
+  const [isPremium, setIsPremium] = useState(false)
 
   useEffect(() => {
     fetchEngagements()
   }, [currentDate, viewMode])
+
+  // Check premium status
+  useEffect(() => {
+    const checkPremiumStatus = async () => {
+      try {
+        const response = await fetch('/api/debug/org')
+        if (response.ok) {
+          const data = await response.json()
+          
+          if (data.organization_id) {
+            const premiumResponse = await fetch(`/api/features/premium?org_id=${data.organization_id}`)
+            if (premiumResponse.ok) {
+              const premiumData = await premiumResponse.json()
+              setIsPremium(premiumData.isPremium || false)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check premium status:', error)
+        setIsPremium(false)
+      }
+    }
+
+    checkPremiumStatus()
+  }, [])
 
   const fetchEngagements = async () => {
     setLoading(true)
@@ -178,20 +206,32 @@ export default function CalendarClient() {
           <div
             key={day.toString()}
             className={cn(
-              "min-h-24 bg-white dark:bg-gray-900 p-1 border-b border-r border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800",
+              "min-h-24 bg-white dark:bg-gray-900 p-1 border-b border-r border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 group",
               !isSameMonth(day, monthStart) ? "bg-gray-50 dark:bg-gray-800 text-gray-400" : "",
               isSameDay(day, new Date()) ? "bg-blue-50 dark:bg-blue-900" : ""
             )}
-            onClick={() => setSelectedDate(cloneDay)}
+            onClick={() => {
+              setSelectedDate(cloneDay)
+              // Single click also triggers engagement creation for better UX
+              handleCreateEngagement(cloneDay)
+            }}
             onDoubleClick={() => handleCreateEngagement(cloneDay)}
           >
-            <span className={cn(
-              "text-sm",
-              !isSameMonth(day, monthStart) ? "text-gray-400" : "text-gray-900 dark:text-gray-100",
-              isSameDay(day, new Date()) ? "font-bold text-blue-600 dark:text-blue-400" : ""
-            )}>
-              {format(day, dateFormat)}
-            </span>
+            <div className="flex items-center justify-between">
+              <span className={cn(
+                "text-sm",
+                !isSameMonth(day, monthStart) ? "text-gray-400" : "text-gray-900 dark:text-gray-100",
+                isSameDay(day, new Date()) ? "font-bold text-blue-600 dark:text-blue-400" : ""
+              )}>
+                {format(day, dateFormat)}
+              </span>
+              {isSameMonth(day, monthStart) && (
+                <Plus 
+                  className="h-3 w-3 text-gray-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" 
+                  title="Click to add engagement"
+                />
+              )}
+            </div>
             <div className="space-y-1 mt-1">
               {dayEngagements.slice(0, 2).map(engagement => (
                 <div
@@ -397,6 +437,27 @@ export default function CalendarClient() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Calendar</h1>
+          <p className="text-muted-foreground">View and manage your engagements</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <EngagementsHelp variant="icon" size="md" />
+          <AIInsightsButton
+            pageType="engagements"
+            pageContext={{}}
+          />
+          <Button
+            onClick={() => handleCreateEngagement()}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Log Engagement
+          </Button>
+        </div>
+      </div>
+
+      {/* Navigation and View Controls */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Button
@@ -427,56 +488,74 @@ export default function CalendarClient() {
           </Button>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-            <Button
-              variant={viewMode === 'month' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('month')}
-            >
-              Month
-            </Button>
-            <Button
-              variant={viewMode === 'week' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('week')}
-            >
-              Week
-            </Button>
-            <Button
-              variant={viewMode === 'day' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('day')}
-            >
-              Day
-            </Button>
-          </div>
-          
-          <CreateEngagementDialog
-            selectedDate={createEngagementDate || undefined}
-            selectedTime={createEngagementTime || undefined}
-            onEngagementCreated={handleEngagementCreated}
-          />
-
-          <AIInsightsButton 
-            pageType="dashboard" 
-            pageContext={{ 
-              filters: {
-                viewMode,
-                currentDate: currentDate.toISOString(),
-                selectedDate: selectedDate?.toISOString()
-              }
-            }}
-          />
+        <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <Button
+            variant={viewMode === 'month' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('month')}
+          >
+            Month
+          </Button>
+          <Button
+            variant={viewMode === 'week' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('week')}
+          >
+            Week
+          </Button>
+          <Button
+            variant={viewMode === 'day' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('day')}
+          >
+            Day
+          </Button>
         </div>
       </div>
 
+      {/* Hidden Dialog Component */}
+      <CreateEngagementDialog
+        open={!!createEngagementDate}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCreateEngagementDate(null)
+            setCreateEngagementTime(null)
+          }
+        }}
+        selectedDate={createEngagementDate || undefined}
+        selectedTime={createEngagementTime || undefined}
+        onEngagementCreated={handleEngagementCreated}
+      />
+
       {/* Calendar Content */}
       {loading ? (
-        <div className="flex items-center justify-center h-96 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-          <div className="text-center">
-            <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-2"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading engagements...</p>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+              <span className="text-sm text-muted-foreground">Loading engagements...</span>
+            </div>
+          </div>
+          <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            {/* Calendar skeleton */}
+            <div className="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-700">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className="bg-gray-50 dark:bg-gray-800 p-2 text-center">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-700">
+              {Array.from({ length: 35 }).map((_, i) => (
+                <div key={i} className="min-h-24 bg-white dark:bg-gray-900 p-1 border-b border-r border-gray-200 dark:border-gray-700">
+                  <div className="h-3 w-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                  <div className="space-y-1">
+                    <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded animate-pulse"></div>
+                    <div className="h-2 w-3/4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ) : (

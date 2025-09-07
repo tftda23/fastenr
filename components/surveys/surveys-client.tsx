@@ -9,7 +9,7 @@ import { Plus, Calendar, Clock, Users, BarChart3, MoreHorizontal, Eye, TrendingU
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import CreateSurveyDialog from "./create-survey-dialog"
 import SurveyDetailsDialog from "./survey-details-dialog"
-import SendSurveyDialog from "./send-survey-dialog"
+import EnhancedSendSurveyDialog from "./enhanced-send-survey-dialog"
 import type { Account } from "@/lib/types"
 
 interface Survey {
@@ -318,7 +318,7 @@ export default function SurveysClient({
         onSend={handleSendSurvey}
       />
 
-      <SendSurveyDialog survey={selectedSurvey} open={showSendDialog} onOpenChange={setShowSendDialog} />
+      <EnhancedSendSurveyDialog survey={selectedSurvey} open={showSendDialog} onOpenChange={setShowSendDialog} />
     </div>
   )
 }

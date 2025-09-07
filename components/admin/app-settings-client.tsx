@@ -9,8 +9,10 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Cog, Save, RefreshCw, Slack, AlertTriangle, Heart, TrendingUp, MessageCircle, Star, BarChart3 } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { Cog, Save, RefreshCw, Slack, AlertTriangle, Heart, TrendingUp, MessageCircle, Star, BarChart3, DollarSign } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useToast } from "@/lib/hooks/use-toast"
+import { AVAILABLE_CURRENCIES } from '@/lib/currency'
 
 interface AppSettingsClientProps {
   organizationId: string
@@ -32,11 +34,10 @@ interface AppSettings {
   slack_webhook_url?: string
   slack_default_channel?: string
   slack_notification_types?: string[]
-  health_score_template?: 'balanced' | 'engagement_focused' | 'satisfaction_focused' | 'custom'
-  health_score_engagement_weight?: number
-  health_score_nps_weight?: number
-  health_score_activity_weight?: number
-  health_score_growth_weight?: number
+  currency_code?: string
+  currency_symbol?: string
+  date_format?: string
+  number_format?: string
 }
 
 export default function AppSettingsClient({ organizationId }: AppSettingsClientProps) {
@@ -55,11 +56,10 @@ export default function AppSettingsClient({ organizationId }: AppSettingsClientP
     slack_webhook_url: "",
     slack_default_channel: "",
     slack_notification_types: [],
-    health_score_template: 'balanced',
-    health_score_engagement_weight: 30,
-    health_score_nps_weight: 25,
-    health_score_activity_weight: 25,
-    health_score_growth_weight: 20
+    currency_code: "GBP",
+    currency_symbol: "£",
+    date_format: "DD/MM/YYYY",
+    number_format: "en-GB"
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -110,7 +110,7 @@ export default function AppSettingsClient({ organizationId }: AppSettingsClientP
       
       toast({
         title: "Success",
-        description: "Settings saved successfully"
+        description: "Settings saved successfully."
       })
     } catch (error) {
       console.error("Error saving settings:", error)
@@ -140,11 +140,6 @@ export default function AppSettingsClient({ organizationId }: AppSettingsClientP
       slack_webhook_url: "",
       slack_default_channel: "",
       slack_notification_types: [],
-      health_score_template: 'balanced',
-      health_score_engagement_weight: 30,
-      health_score_nps_weight: 25,
-      health_score_activity_weight: 25,
-      health_score_growth_weight: 20
     })
   }
 
@@ -152,30 +147,6 @@ export default function AppSettingsClient({ organizationId }: AppSettingsClientP
     setSettings(prev => {
       const updated = { ...prev, [key]: value }
       
-      // Apply template presets when template changes
-      if (key === 'health_score_template') {
-        switch (value) {
-          case 'balanced':
-            updated.health_score_engagement_weight = 30
-            updated.health_score_nps_weight = 25
-            updated.health_score_activity_weight = 25
-            updated.health_score_growth_weight = 20
-            break
-          case 'engagement_focused':
-            updated.health_score_engagement_weight = 45
-            updated.health_score_nps_weight = 20
-            updated.health_score_activity_weight = 20
-            updated.health_score_growth_weight = 15
-            break
-          case 'satisfaction_focused':
-            updated.health_score_engagement_weight = 20
-            updated.health_score_nps_weight = 45
-            updated.health_score_activity_weight = 20
-            updated.health_score_growth_weight = 15
-            break
-          // Custom template keeps existing weights
-        }
-      }
       
       return updated
     })
@@ -183,17 +154,63 @@ export default function AppSettingsClient({ organizationId }: AppSettingsClientP
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <RefreshCw className="h-6 w-6 animate-spin" />
-        <span className="ml-2">Loading settings...</span>
+      <div className="space-y-6">
+        {/* Tabs skeleton */}
+        <div className="flex space-x-1 border-b">
+          <Skeleton className="h-10 w-20" />
+          <Skeleton className="h-10 w-16" />
+        </div>
+        
+        {/* General settings skeleton */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-4 w-64" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-10 w-32" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-72" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-56" />
+                  </div>
+                  <Skeleton className="h-6 w-12" />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     )
   }
 
   return (
     <Tabs defaultValue="general" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="general">General Settings</TabsTrigger>
+        <TabsTrigger value="localization">Currency & Format</TabsTrigger>
         <TabsTrigger value="slack">Slack Setup</TabsTrigger>
       </TabsList>
 
@@ -310,170 +327,6 @@ export default function AppSettingsClient({ organizationId }: AppSettingsClientP
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Heart className="h-5 w-5 mr-2" />
-              Health Score Configuration
-            </CardTitle>
-            <CardDescription>Configure how customer health scores are calculated</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="health-template">Health Score Template</Label>
-              <Select
-                value={settings.health_score_template || 'balanced'}
-                onValueChange={(value) => updateSetting('health_score_template', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="balanced">
-                    <div className="flex items-center">
-                      <BarChart3 className="h-4 w-4 mr-2" />
-                      <div>
-                        <div className="font-medium">Balanced (Recommended)</div>
-                        <div className="text-xs text-muted-foreground">Even weight across all factors</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="engagement_focused">
-                    <div className="flex items-center">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      <div>
-                        <div className="font-medium">Engagement Focused</div>
-                        <div className="text-xs text-muted-foreground">Prioritizes customer interactions</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="satisfaction_focused">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 mr-2" />
-                      <div>
-                        <div className="font-medium">Satisfaction Focused</div>
-                        <div className="text-xs text-muted-foreground">Heavily weights NPS and feedback</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="custom">
-                    <div className="flex items-center">
-                      <Cog className="h-4 w-4 mr-2" />
-                      <div>
-                        <div className="font-medium">Custom</div>
-                        <div className="text-xs text-muted-foreground">Define your own weightings</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Choose a template that matches your business model and customer success strategy
-              </p>
-            </div>
-
-            {settings.health_score_template === 'custom' && (
-              <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-medium text-sm">Custom Weightings</h4>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Adjust the importance of each factor. Weights should total 100%.
-                </p>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label className="flex items-center">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Engagement Weight ({settings.health_score_engagement_weight}%)
-                    </Label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={settings.health_score_engagement_weight}
-                      onChange={(e) => updateSetting('health_score_engagement_weight', parseInt(e.target.value))}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-muted-foreground">Meetings, calls, emails, support tickets</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center">
-                      <Star className="h-4 w-4 mr-2" />
-                      NPS & Satisfaction ({settings.health_score_nps_weight}%)
-                    </Label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={settings.health_score_nps_weight}
-                      onChange={(e) => updateSetting('health_score_nps_weight', parseInt(e.target.value))}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-muted-foreground">Survey responses and feedback scores</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center">
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      Activity & Usage ({settings.health_score_activity_weight}%)
-                    </Label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={settings.health_score_activity_weight}
-                      onChange={(e) => updateSetting('health_score_activity_weight', parseInt(e.target.value))}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-muted-foreground">Login frequency, feature adoption</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="flex items-center">
-                      <BarChart3 className="h-4 w-4 mr-2" />
-                      Growth & Value ({settings.health_score_growth_weight}%)
-                    </Label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={settings.health_score_growth_weight}
-                      onChange={(e) => updateSetting('health_score_growth_weight', parseInt(e.target.value))}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-muted-foreground">Revenue growth, expansion, renewals</p>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <span className="text-sm font-medium">
-                    Total: {(settings.health_score_engagement_weight || 0) + 
-                           (settings.health_score_nps_weight || 0) + 
-                           (settings.health_score_activity_weight || 0) + 
-                           (settings.health_score_growth_weight || 0)}%
-                  </span>
-                  {((settings.health_score_engagement_weight || 0) + 
-                    (settings.health_score_nps_weight || 0) + 
-                    (settings.health_score_activity_weight || 0) + 
-                    (settings.health_score_growth_weight || 0)) !== 100 && (
-                    <span className="text-xs text-amber-600 ml-2">
-                      (Weights should total 100%)
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-800 mb-2">How Health Scores Are Calculated</h4>
-              <div className="text-sm text-blue-700 space-y-2">
-                <p><strong>Engagement (30%):</strong> Recent meetings, emails, and interactions</p>
-                <p><strong>NPS & Satisfaction (25%):</strong> Survey responses and customer feedback</p>
-                <p><strong>Activity & Usage (25%):</strong> Product usage and feature adoption</p>
-                <p><strong>Growth & Value (20%):</strong> Revenue trends and account expansion</p>
-                <p className="text-xs mt-2 pt-2 border-t border-blue-200">
-                  Health scores are updated automatically and range from 0-100. 
-                  Higher scores indicate healthier customer relationships.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         <Card>
           <CardHeader>
@@ -541,6 +394,132 @@ export default function AppSettingsClient({ organizationId }: AppSettingsClientP
         </div>
       </TabsContent>
 
+      <TabsContent value="localization" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <DollarSign className="h-5 w-5 mr-2" />
+              Currency & Localization Settings
+            </CardTitle>
+            <CardDescription>
+              Configure currency display, number formatting, and regional preferences
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start">
+                <DollarSign className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
+                <div>
+                  <h4 className="font-medium text-blue-800">Currency Display Settings</h4>
+                  <p className="text-sm text-blue-700 mt-1">
+                    This setting changes how currency amounts are displayed throughout the application. 
+                    <strong> No automatic currency conversion takes place</strong> - all monetary values remain 
+                    in their original amounts, only the display format changes.
+                  </p>
+                  <p className="text-sm text-blue-700 mt-2">
+                    Need help with currency conversion? Contact our team: 
+                    <a href="mailto:support@fastenr.co" className="underline font-medium">
+                      support@fastenr.co
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="currency">Currency</Label>
+                <Select 
+                  value={settings.currency_code} 
+                  onValueChange={(value) => {
+                    const selectedCurrency = AVAILABLE_CURRENCIES.find(c => c.code === value)
+                    if (selectedCurrency) {
+                      setSettings(prev => ({
+                        ...prev, 
+                        currency_code: value,
+                        currency_symbol: selectedCurrency.symbol
+                      }))
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {AVAILABLE_CURRENCIES.map(currency => (
+                      <SelectItem key={currency.code} value={currency.code}>
+                        {currency.symbol} - {currency.name} ({currency.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  This currency will be used throughout the application for displaying financial data
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="date_format">Date Format</Label>
+                <Select 
+                  value={settings.date_format} 
+                  onValueChange={(value) => setSettings(prev => ({...prev, date_format: value}))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select date format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DD/MM/YYYY">DD/MM/YYYY (UK)</SelectItem>
+                    <SelectItem value="MM/DD/YYYY">MM/DD/YYYY (US)</SelectItem>
+                    <SelectItem value="YYYY-MM-DD">YYYY-MM-DD (ISO)</SelectItem>
+                    <SelectItem value="DD.MM.YYYY">DD.MM.YYYY (DE)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="number_format">Number Format</Label>
+                <Select 
+                  value={settings.number_format} 
+                  onValueChange={(value) => setSettings(prev => ({...prev, number_format: value}))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select number format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en-GB">British (1,234.56)</SelectItem>
+                    <SelectItem value="en-US">American (1,234.56)</SelectItem>
+                    <SelectItem value="de-DE">German (1.234,56)</SelectItem>
+                    <SelectItem value="fr-FR">French (1 234,56)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Preview</Label>
+                <div className="p-3 bg-muted rounded-lg">
+                  <div className="text-sm space-y-1">
+                    <div>Currency: <span className="font-mono">{settings.currency_symbol}1,234.56</span></div>
+                    <div>Date: <span className="font-mono">{new Date().toLocaleDateString('en-GB', {
+                      day: '2-digit',
+                      month: '2-digit', 
+                      year: 'numeric'
+                    })}</span></div>
+                    <div>Number: <span className="font-mono">{(12345.67).toLocaleString(settings.number_format)}</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end">
+          <Button onClick={saveSettings} disabled={saving}>
+            <Save className="h-4 w-4 mr-2" />
+            {saving ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+      </TabsContent>
+
       <TabsContent value="slack" className="space-y-6">
         <Card>
           <CardHeader>
@@ -598,7 +577,6 @@ export default function AppSettingsClient({ organizationId }: AppSettingsClientP
               <Label>Notification Types</Label>
               <div className="space-y-2">
                 {[
-                  { id: "health_score_changes", label: "Health Score Changes", description: "When account health scores change significantly" },
                   { id: "churn_risk_alerts", label: "Churn Risk Alerts", description: "When accounts are flagged as high churn risk" },
                   { id: "engagement_updates", label: "Engagement Updates", description: "New customer engagements and interactions" },
                   { id: "goal_achievements", label: "Goal Achievements", description: "When customers reach important milestones" },

@@ -133,8 +133,8 @@ export function DataTable<T>({
         </div>
 
         {/* Table */}
-        <div className="rounded-md border">
-          <Table>
+        <div className="w-full overflow-x-auto rounded-md border">
+          <Table className="min-w-[700px]">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -177,6 +177,7 @@ export function DataTable<T>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
+                    className="group"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -263,10 +264,10 @@ export const HealthScoreBadge = ({ score }: { score: number }) => {
   }
 
   const getColor = (score: number) => {
-    if (score >= 90) return "text-green-600"
-    if (score >= 70) return "text-blue-600"
-    if (score >= 50) return "text-yellow-600"
-    return "text-red-600"
+    if (score >= 90) return "text-emerald-600/80"
+    if (score >= 70) return "text-blue-600/80"
+    if (score >= 50) return "text-amber-600/80"
+    return "text-red-600/80"
   }
 
   return (

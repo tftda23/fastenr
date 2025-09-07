@@ -1,10 +1,17 @@
-import { getCustomerGoals, getAccounts } from "@/lib/supabase/queries"
+import { getCustomerGoals, getAccounts, getCurrentUserOrganization } from "@/lib/supabase/queries"
 import { GoalsClient } from "@/components/goals/goals-client"
+import FeatureGate from "@/components/feature-gate"
+import { redirect } from "next/navigation"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
 
 export default async function GoalsPage() {
+  const { user, organization } = await getCurrentUserOrganization()
+
+  if (!user || !organization) {
+    redirect("/auth/login")
+  }
   // Always attempt both requests; don’t hide the UI if one fails
   let goals: Awaited<ReturnType<typeof getCustomerGoals>> = []
   let accounts: Awaited<ReturnType<typeof getAccounts>>["data"] = []
@@ -53,14 +60,16 @@ export default async function GoalsPage() {
         </p>
       </div>
 
-      {/* Small debug banner (only in dev) */}
-      {process.env.NODE_ENV !== "production" && loadError && (
-        <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-800">
-          {loadError}
-        </div>
-      )}
+      <FeatureGate organizationId={organization.id} feature="goals_management">
+        {/* Small debug banner (only in dev) */}
+        {process.env.NODE_ENV !== "production" && loadError && (
+          <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-800">
+            {loadError}
+          </div>
+        )}
 
-      <GoalsClient initialGoals={initialGoals as any} accounts={accounts as any} />
+        <GoalsClient initialGoals={initialGoals as any} accounts={accounts as any} />
+      </FeatureGate>
     </div>
   )
 }

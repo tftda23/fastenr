@@ -17,8 +17,10 @@ import {
   Clock,
   XCircle,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface BillingOrganization {
   organization_id: string
@@ -211,9 +213,73 @@ export function BillingDashboard() {
 
   if (loading) {
     return (
-      <div className="py-8 text-center">
-        <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p>Loading billing dashboard...</p>
+      <div className="space-y-6">
+        {/* Stats cards skeleton */}
+        <div className="grid gap-4 md:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-2">
+                  <Skeleton className="h-5 w-5 rounded" />
+                  <Skeleton className="h-5 w-24" />
+                </div>
+                <Skeleton className="h-8 w-16 mt-2" />
+                <Skeleton className="h-4 w-32 mt-1" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        
+        {/* Organizations table skeleton */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <Skeleton className="h-6 w-32 mb-2" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="h-10 w-32" />
+                <Skeleton className="h-10 w-28" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="grid grid-cols-6 gap-4 p-4 border rounded-lg">
+                  <div>
+                    <Skeleton className="h-4 w-24 mb-1" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-4 w-16 mb-1" />
+                    <Skeleton className="h-3 w-12" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-4 w-20 mb-1" />
+                    <Skeleton className="h-3 w-14" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-6 w-16" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                  <div className="flex gap-1">
+                    <Skeleton className="h-8 w-8" />
+                    <Skeleton className="h-8 w-8" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Loading spinner in center */}
+        <div className="flex justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       </div>
     )
   }

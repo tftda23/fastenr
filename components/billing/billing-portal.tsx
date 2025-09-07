@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { CreditCard, Download, Calendar, AlertCircle } from 'lucide-react'
+import { CreditCard, Download, Calendar, AlertCircle, Loader2 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { PaymentMethodSetup } from './payment-method-setup'
 import { InvoiceList } from './invoice-list'
 
@@ -108,7 +109,73 @@ export function BillingPortal() {
   }
 
   if (loading) {
-    return <div className="py-8 text-center">Loading billing information...</div>
+    return (
+      <div className="space-y-6">
+        {/* Current subscription skeleton */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded" />
+                <Skeleton className="h-6 w-40" />
+              </div>
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-8" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-5 w-14" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-6 w-20" />
+              </div>
+            </div>
+            <Skeleton className="h-12 w-full rounded-lg" />
+          </CardContent>
+        </Card>
+        
+        {/* Tabs skeleton */}
+        <div className="space-y-4">
+          <div className="flex space-x-1 border-b">
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-20" />
+          </div>
+          
+          {/* Payment methods skeleton */}
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-64" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                {Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-5 w-5 rounded" />
+                      <div className="space-y-1">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                      <Skeleton className="h-6 w-16" />
+                    </div>
+                  </div>
+                ))}
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   if (!billingData) {

@@ -1,5 +1,6 @@
 "use client"
 
+import { useCurrencyConfig } from '@/lib/hooks/use-currency'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, TrendingDown, TrendingUp, Loader2 } from "lucide-react"
@@ -17,6 +18,7 @@ interface ChurnRiskChartProps {
 }
 
 export default function ChurnRiskChart({ accounts, loading = false }: ChurnRiskChartProps) {
+  const { formatCurrency: formatCurrencyWithConfig } = useCurrencyConfig()
   const getRiskLevel = (score: number) => {
     if (score >= 80) return { label: "Critical", color: "bg-red-100 text-red-800", icon: AlertTriangle }
     if (score >= 60) return { label: "High", color: "bg-orange-100 text-orange-800", icon: TrendingDown }
@@ -26,11 +28,7 @@ export default function ChurnRiskChart({ accounts, loading = false }: ChurnRiskC
 
   const formatCurrency = (amount: number | null) => {
     if (!amount) return "N/A"
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-    }).format(amount)
+    return formatCurrencyWithConfig(amount)
   }
 
   const formatDate = (dateString: string | null) => {
@@ -49,11 +47,27 @@ export default function ChurnRiskChart({ accounts, loading = false }: ChurnRiskC
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="flex items-center space-x-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-muted-foreground">Loading churn risk data...</span>
-            </div>
+          <div className="space-y-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between p-4 border rounded-lg animate-pulse">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="h-4 w-4 bg-gray-200 rounded"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                      <div className="h-3 w-48 bg-gray-100 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="text-right space-y-2">
+                    <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-20 bg-gray-100 rounded"></div>
+                  </div>
+                  <div className="h-6 w-16 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="space-y-4">

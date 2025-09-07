@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
+import { hasFeatureAccess } from "@/lib/features"
 
 export const dynamic = 'force-dynamic'
 
@@ -19,6 +20,18 @@ export async function GET(request: NextRequest) {
     const supabase = createServerClient()
     const admin = await requireAdmin(supabase)
     if ("error" in admin) return admin.error
+
+    const hasAccess = await hasFeatureAccess(admin.organizationId, 'automation')
+    if (!hasAccess) {
+      return NextResponse.json(
+        {
+          error: 'Automation requires a Premium subscription',
+          premium_required: true,
+          feature: 'automation'
+        },
+        { status: 402 }
+      )
+    }
 
     const { searchParams } = new URL(request.url)
     const organizationId = searchParams.get("organizationId") || admin.organizationId
@@ -65,6 +78,18 @@ export async function POST(request: NextRequest) {
     const supabase = createServerClient()
     const admin = await requireAdmin(supabase)
     if ("error" in admin) return admin.error
+
+    const hasAccess = await hasFeatureAccess(admin.organizationId, 'automation')
+    if (!hasAccess) {
+      return NextResponse.json(
+        {
+          error: 'Automation requires a Premium subscription',
+          premium_required: true,
+          feature: 'automation'
+        },
+        { status: 402 }
+      )
+    }
 
     const body = await request.json().catch(() => ({}))
     const { workflowId, accountId } = body as { workflowId?: string; accountId?: string }

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import type { Account, Engagement, NPSSurvey, CustomerGoal, User } from "@/lib/types"
 import type { AutomationWorkflow } from '@/lib/types';
+import type { CurrencyConfig } from '@/lib/currency';
 
 // Get current user's organization ID
 export async function getCurrentUserOrganization() {
@@ -40,6 +41,56 @@ export async function getCurrentUserOrganization() {
       full_name: profile.full_name,
     },
     organization,
+  }
+}
+
+// Get organization's currency configuration
+export async function getOrganizationCurrencyConfig(organizationId?: string): Promise<CurrencyConfig> {
+  const supabase = createClient()
+  
+  let orgId = organizationId
+  if (!orgId) {
+    const { organization } = await getCurrentUserOrganization()
+    if (!organization) {
+      // Return default GBP config if no organization found
+      return {
+        currency_code: 'GBP',
+        currency_symbol: '£',
+        currency_name: 'British Pound',
+        decimal_places: 2,
+        symbol_position: 'before',
+        thousands_separator: ',',
+        decimal_separator: '.'
+      }
+    }
+    orgId = organization.id
+  }
+
+  const { data, error } = await supabase
+    .rpc('get_org_currency_config', { org_id: orgId })
+    .single()
+
+  if (error || !data) {
+    // Return default GBP config on error
+    return {
+      currency_code: 'GBP',
+      currency_symbol: '£',
+      currency_name: 'British Pound',
+      decimal_places: 2,
+      symbol_position: 'before',
+      thousands_separator: ',',
+      decimal_separator: '.'
+    }
+  }
+
+  return {
+    currency_code: data.currency_code,
+    currency_symbol: data.currency_symbol,
+    currency_name: data.currency_name,
+    decimal_places: data.decimal_places,
+    symbol_position: data.symbol_position as 'before' | 'after',
+    thousands_separator: data.thousands_separator,
+    decimal_separator: data.decimal_separator
   }
 }
 
@@ -909,7 +960,7 @@ export async function getRecentActivities(limit: number = 10, filterByUserId?: s
     }
 
     // Get recent NPS surveys
-    let npsQuery = supabase
+    const npsQuery = supabase
       .from('nps_surveys')
       .select(`
         id,
@@ -956,4 +1007,27 @@ export async function getRecentActivities(limit: number = 10, filterByUserId?: s
   }
 
   return sortedActivities
+}
+
+// Dynamic Health Score queries
+export async function getDashboardStatsWithDynamicHealthScores(ownerId?: string) {
+  try {
+    const endpoint = `/api/dashboard/stats-dynamic${ownerId ? `?owner_id=${ownerId}` : ''}`
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Cache-Control': 'no-cache'
+      }
+    })
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch dynamic stats')
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching dynamic dashboard stats:', error)
+    // Fallback to regular stats if dynamic fails
+    return getDashboardStats()
+  }
 }

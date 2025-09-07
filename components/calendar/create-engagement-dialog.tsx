@@ -10,10 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Calendar, Clock, Plus } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from '@/lib/hooks/use-toast'
 
 interface CreateEngagementDialogProps {
   children?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   selectedDate?: Date
   selectedTime?: string
   onEngagementCreated?: () => void
@@ -21,11 +23,15 @@ interface CreateEngagementDialogProps {
 
 export function CreateEngagementDialog({ 
   children, 
+  open: externalOpen = false,
+  onOpenChange,
   selectedDate, 
   selectedTime,
   onEngagementCreated 
 }: CreateEngagementDialogProps) {
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = externalOpen || internalOpen
+  const setOpen = onOpenChange || setInternalOpen
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -122,20 +128,12 @@ export function CreateEngagementDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        {children || (
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="h-4 w-4 mr-2" />
-            New Engagement
-          </Button>
-        )}
-      </DialogTrigger>
       
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-blue-600" />
-            Create New Engagement
+            Log Engagement
           </DialogTitle>
         </DialogHeader>
 

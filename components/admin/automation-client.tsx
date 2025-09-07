@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Zap, Plus, Settings, Play, TrendingUp, CheckCircle, XCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/lib/hooks/use-toast";
 import type { AutomationWorkflow } from "@/lib/types";
 import CreateAutomationDialog from "./create-automation-dialog-new";
 import EditAutomationDialog from "./edit-automation-dialog";

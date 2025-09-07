@@ -6,12 +6,18 @@ import { redirect } from "next/navigation"
 
 // Sign in action
 export async function signIn(prevState: any, formData: FormData) {
+  console.log("signIn action called")
+  
   if (!formData) {
+    console.error("No form data provided")
     return { error: "Form data is missing" }
   }
 
   const email = formData.get("email")
   const password = formData.get("password")
+
+  console.log("Login attempt for email:", email ? "present" : "missing")
+  console.log("Password:", password ? "present" : "missing")
 
   if (!email || !password) {
     return { error: "Email and password are required" }
@@ -21,12 +27,14 @@ export async function signIn(prevState: any, formData: FormData) {
   const supabase = createServerActionClient({ cookies: () => cookieStore })
 
   try {
+    console.log("Attempting Supabase auth with email:", email.toString())
     const { data: authData, error } = await supabase.auth.signInWithPassword({
       email: email.toString(),
       password: password.toString(),
     })
 
     if (error) {
+      console.error("Supabase auth error:", error)
       return { error: error.message }
     }
 

@@ -36,9 +36,22 @@ export default function LoginForm() {
   const [state, setState] = useState<{ error?: string; success?: boolean } | null>(null)
   const router = useRouter()
 
-  // Check for OAuth errors in URL params
+  // Check for OAuth errors in URL params and clean up any sensitive data
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
+    
+    // SECURITY: Check for any sensitive data in URL and clear it immediately
+    const hasPassword = urlParams.has('password')
+    const hasEmail = urlParams.has('email')
+    
+    if (hasPassword) {
+      console.error('SECURITY VIOLATION: Password found in URL! This should never happen.')
+      // Clear the URL immediately for security
+      window.history.replaceState({}, '', window.location.pathname)
+      setState({ error: 'Security error detected. Please try logging in again.' })
+      return
+    }
+    
     const error = urlParams.get('error')
     if (error) {
       const errorMessages: Record<string, string> = {
@@ -47,7 +60,10 @@ export default function LoginForm() {
         callback_error: 'Authentication callback failed. Please try again.'
       }
       setState({ error: errorMessages[error] || 'An error occurred during login.' })
-      // Clean up URL
+    }
+    
+    // Clean up URL if there are any params (including email for privacy)
+    if (hasEmail || error || hasPassword) {
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [])

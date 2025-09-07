@@ -3,7 +3,9 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase/client"
-import { Github, Chrome, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import Image from "next/image"
+import { isSocialLoginEnabled, isProviderEnabled, type AuthProvider } from "@/lib/auth-config"
 
 interface SocialLoginButtonsProps {
   redirectTo?: string
@@ -12,7 +14,13 @@ interface SocialLoginButtonsProps {
 export default function SocialLoginButtons({ redirectTo = "/dashboard" }: SocialLoginButtonsProps) {
   const [loading, setLoading] = useState<string | null>(null)
 
-  const handleSocialLogin = async (provider: "google" | "github") => {
+  const handleSocialLogin = async (provider: AuthProvider) => {
+    // Check if provider is enabled in config
+    if (!isProviderEnabled(provider)) {
+      alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login is not configured yet. Please use email login.`)
+      return
+    }
+
     setLoading(provider)
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -28,6 +36,10 @@ export default function SocialLoginButtons({ redirectTo = "/dashboard" }: Social
 
       if (error) {
         console.error(`${provider} login error:`, error)
+        // Check for provider not enabled error
+        if (error.message?.includes('provider is not enabled') || error.message?.includes('Unsupported provider')) {
+          alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login is not configured yet. Please contact support or use email login.`)
+        }
         setLoading(null)
       }
       // Don't set loading to null on success - the page will redirect
@@ -35,6 +47,11 @@ export default function SocialLoginButtons({ redirectTo = "/dashboard" }: Social
       console.error(`${provider} login error:`, error)
       setLoading(null)
     }
+  }
+
+  // Don't render social login section if disabled
+  if (!isSocialLoginEnabled()) {
+    return null
   }
 
   return (
@@ -48,35 +65,62 @@ export default function SocialLoginButtons({ redirectTo = "/dashboard" }: Social
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Button
-          variant="outline"
-          onClick={() => handleSocialLogin("google")}
-          disabled={loading !== null}
-          className="w-full"
-        >
-          {loading === "google" ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Chrome className="mr-2 h-4 w-4" />
-          )}
-          Google
-        </Button>
+      <div className="space-y-3">
+        {isProviderEnabled('google') && (
+          <Button
+            variant="outline"
+            onClick={() => handleSocialLogin("google")}
+            disabled={loading !== null}
+            className="w-full"
+          >
+            {loading === "google" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Image src="/images/logos/google.svg" alt="Google" width={16} height={16} className="mr-2" />
+            )}
+            Continue with Google
+          </Button>
+        )}
 
-        <Button
-          variant="outline"
-          onClick={() => handleSocialLogin("github")}
-          disabled={loading !== null}
-          className="w-full"
-        >
-          {loading === "github" ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Github className="mr-2 h-4 w-4" />
-          )}
-          GitHub
-        </Button>
+        {isProviderEnabled('azure') && (
+          <Button
+            variant="outline"
+            onClick={() => handleSocialLogin("azure")}
+            disabled={loading !== null}
+            className="w-full"
+          >
+            {loading === "azure" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Image src="/images/logos/microsoft.svg" alt="Microsoft" width={16} height={16} className="mr-2" />
+            )}
+            Continue with Microsoft
+          </Button>
+        )}
+
+        {isProviderEnabled('apple') && (
+          <Button
+            variant="outline"
+            onClick={() => handleSocialLogin("apple")}
+            disabled={loading !== null}
+            className="w-full"
+          >
+            {loading === "apple" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Image src="/images/logos/apple.svg" alt="Apple" width={16} height={16} className="mr-2" />
+            )}
+            Continue with Apple
+          </Button>
+        )}
       </div>
+
+      {/* Show message if no providers are enabled */}
+      {!isProviderEnabled('google') && !isProviderEnabled('azure') && !isProviderEnabled('apple') && (
+        <div className="text-center text-sm text-muted-foreground py-2">
+          Social login coming soon
+        </div>
+      )}
     </div>
   )
 }

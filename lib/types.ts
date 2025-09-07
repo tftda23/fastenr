@@ -44,13 +44,27 @@ export interface Account {
   owner_id?: string
   health_score?: number
   arr?: number
+  mrr?: number
+  seat_count?: number
+  growth_tracking_method?: 'arr' | 'mrr' | 'seat_count'
+  previous_arr?: number
+  previous_mrr?: number
+  previous_seat_count?: number
+  last_growth_update?: string
   churn_risk_score?: number
-  status?: 'active' | 'churned' | 'at_risk' | 'onboarding'
+  status?: 'active' | 'onboarding' | 'churned' | 'at_risk'
   size?: 'startup' | 'small' | 'medium' | 'large' | 'enterprise'
   industry?: string
   domain?: string
   created_at: string
   updated_at: string
+  
+  // Onboarding fields
+  onboarding_status?: 'not_started' | 'in_progress' | 'completed' | 'on_hold' | 'cancelled'
+  onboarding_started_at?: string
+  onboarding_completed_at?: string
+  onboarding_plan_id?: string
+  csm_id?: string
   
   // Populated fields from joins
   owner?: User

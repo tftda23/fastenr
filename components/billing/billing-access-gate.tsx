@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { AlertTriangle, CreditCard, CheckCircle2 } from 'lucide-react'
+import { AlertTriangle, CreditCard, CheckCircle2, Clock, LogOut } from 'lucide-react'
 import { PaymentMethodSetup } from './payment-method-setup'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
 
 interface BillingAccessGateProps {
   children: React.ReactNode
@@ -24,33 +26,25 @@ const CACHE_KEY = 'billing_status'
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
 export function BillingAccessGate({ children }: BillingAccessGateProps) {
-  const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(() => {
-    // Try to load cached status immediately for better UX
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = sessionStorage.getItem(CACHE_KEY)
-        if (cached) {
-          const { data, timestamp } = JSON.parse(cached)
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            return data
-          }
-        }
-      } catch (e) {
-        // Ignore cache errors
-      }
-    }
-    // Default to optimistic access - fail open
-    return {
-      hasAccess: true,
-      needsBilling: false,
-      hasPaymentMethod: false
-    }
-  })
+  const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(null)
   const [showPaymentSetup, setShowPaymentSetup] = useState(false)
+  const [hasMounted, setHasMounted] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const supabase = createClientComponentClient()
+  const router = useRouter()
 
   useEffect(() => {
-    // Always check in background, never show loading
-    checkBillingAccess()
+    setHasMounted(true)
+    
+    // Clear any cached billing status during this temporary disable period
+    try {
+      sessionStorage.removeItem(CACHE_KEY)
+    } catch (e) {
+      // Ignore cache errors
+    }
+    
+    // Skip billing check during temporary disable
+    // checkBillingAccess()
   }, [])
 
   const checkBillingAccess = async () => {
@@ -80,9 +74,9 @@ export function BillingAccessGate({ children }: BillingAccessGateProps) {
           hasPaymentMethod: data.has_payment_method || false
         }
       } else {
-        // Other error
+        // Other error - fail open for authenticated users
         newStatus = {
-          hasAccess: true, // Fail open for now
+          hasAccess: true,
           needsBilling: false,
           hasPaymentMethod: false
         }
@@ -103,14 +97,12 @@ export function BillingAccessGate({ children }: BillingAccessGateProps) {
       }
     } catch (error) {
       console.error('Billing access check failed:', error)
-      const errorStatus = {
-        hasAccess: true, // Fail open for now
+      // Fail open for errors
+      setBillingStatus({
+        hasAccess: true,
         needsBilling: false,
         hasPaymentMethod: false
-      }
-      setBillingStatus(errorStatus)
-    } finally {
-      // No loading state to manage
+      })
     }
   }
 
@@ -119,8 +111,34 @@ export function BillingAccessGate({ children }: BillingAccessGateProps) {
     checkBillingAccess() // Recheck access
   }
 
-  // If access is granted (default), show the protected content
-  if (billingStatus?.hasAccess) {
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true)
+      await supabase.auth.signOut()
+      router.push('/auth/login')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
+  // Don't render anything until component has mounted (prevents hydration mismatch)
+  if (!hasMounted) {
+    return null
+  }
+
+  // TEMPORARY: Disable billing gate entirely until payment system is ready
+  // This prevents users from getting stuck and allows full app access
+  return <>{children}</>
+
+  // If still loading billing status, show children (fail open approach)
+  if (!billingStatus) {
+    return <>{children}</>
+  }
+
+  // If access is granted, show the protected content
+  if (billingStatus.hasAccess) {
     return <>{children}</>
   }
 
@@ -195,8 +213,20 @@ export function BillingAccessGate({ children }: BillingAccessGateProps) {
               </div>
             )}
 
-            <div className="text-xs text-muted-foreground text-center">
-              Need help? Contact support at support@fastenr.com
+            <div className="space-y-2">
+              <div className="text-xs text-muted-foreground text-center">
+                Need help? Contact support at support@fastenr.com
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="w-full text-muted-foreground hover:text-foreground"
+              >
+                <LogOut className="h-3 w-3 mr-2" />
+                {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+              </Button>
             </div>
           </CardContent>
         </Card>

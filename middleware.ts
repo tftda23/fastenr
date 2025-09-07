@@ -20,6 +20,7 @@ const BYPASS_PREFIXES = [
   "/about", // Company about page
   "/careers", // Careers page
   "/contact", // Contact page
+  "/terms", // Terms of Service page
   "/blog", // Blog page
   "/support", // Support page
   "/documentation", // Help Center/Documentation

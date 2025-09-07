@@ -1,7 +1,7 @@
 "use client"
 
 import { ToastProvider, ToastViewport } from "@/components/ui/toast"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/lib/hooks/use-toast"
 import {
   Toast,
   ToastClose,

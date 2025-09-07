@@ -26,7 +26,10 @@ export default async function AdminIntegrationsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Integrations</h1>
-        <p className="text-muted-foreground">Manage third-party integrations and API connections</p>
+        <p className="text-muted-foreground">
+          Connect your CRM, support tools, and communication platforms to sync customer data, 
+          track interactions, and get a unified view of your customer success operations.
+        </p>
       </div>
       <IntegrationsClient organizationId={organization.id} />
     </div>

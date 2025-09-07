@@ -164,7 +164,7 @@ Edit `config/test-config.js` to configure:
 environments: {
   local: {
     baseUrl: 'http://localhost:3000',
-    apiUrl: 'http://localhost:3000/api'
+    apiUrl: process.env.NODE_ENV === 'production' ? 'https://fastenr.co/api' : 'http://localhost:3000/api'
   },
   staging: {
     baseUrl: 'https://staging.fastenr.com',

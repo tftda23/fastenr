@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react"
 import EngagementList from "@/components/engagements/engagement-list"
+import { EngagementsHelp } from "@/components/ui/help-system"
 import type { Engagement } from "@/lib/types"
 
 type NumLike = number | string | null | undefined

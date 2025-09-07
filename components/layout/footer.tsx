@@ -18,9 +18,10 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Product</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><Link href="/demo" className="hover:text-white">Demo</Link></li>
-              <li><Link href="/documentation" className="hover:text-white">Features</Link></li>
-              <li><Link href="/status" className="hover:text-white">Status</Link></li>
+              <li><Link href="/dashboard" className="hover:text-white">Dashboard</Link></li>
+              <li><Link href="/dashboard/analytics" className="hover:text-white">Analytics</Link></li>
+              <li><Link href="/dashboard/health" className="hover:text-white">Health Scores</Link></li>
+              <li><Link href="/dashboard/ai-insights" className="hover:text-white">AI Insights</Link></li>
             </ul>
           </div>
           
@@ -39,13 +40,12 @@ export default function Footer() {
             <ul className="space-y-2 text-gray-400">
               <li><Link href="/support" className="hover:text-white">Help Center</Link></li>
               <li><Link href="/documentation" className="hover:text-white">Documentation</Link></li>
-              <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
             </ul>
           </div>
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 fastenr. All rights reserved.</p>
+          <p>&copy; 2025 Fastenr. All rights reserved.</p>
         </div>
       </div>
     </footer>

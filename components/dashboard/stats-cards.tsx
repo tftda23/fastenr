@@ -1,3 +1,4 @@
+import { useCurrencyConfig } from '@/lib/hooks/use-currency'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, TrendingUp, AlertTriangle, DollarSign, Star, Loader2 } from "lucide-react"
 interface DashboardStats {
@@ -17,19 +18,33 @@ interface StatsCardsProps {
 }
 
 export default function StatsCards({ stats, loading = false }: StatsCardsProps) {
+  const { formatCurrency, CurrencyIcon } = useCurrencyConfig()
+  
+  // Provide default values to prevent undefined errors
+  const safeStats = {
+    totalAccounts: stats?.totalAccounts ?? 0,
+    activeAccounts: stats?.activeAccounts ?? 0,
+    totalRevenue: stats?.totalRevenue ?? 0,
+    averageHealthScore: stats?.averageHealthScore ?? 0,
+    criticalAccounts: stats?.criticalAccounts ?? 0,
+    atRiskAccounts: stats?.atRiskAccounts ?? 0,
+    totalARR: stats?.totalARR ?? 0,
+    npsScore: stats?.npsScore ?? 0,
+  }
+
   const cards = [
     {
       title: "Total Accounts",
-      value: stats.totalAccounts.toLocaleString(),
+      value: safeStats.totalAccounts.toLocaleString(),
       icon: Users,
-      description: `${stats.activeAccounts} active`,
+      description: `${safeStats.activeAccounts} active`,
       trend: "+12% from last month",
       color: "text-blue-600",
       bgColor: "bg-blue-50",
     },
     {
       title: "Average Health Score",
-      value: `${stats.averageHealthScore}%`,
+      value: `${safeStats.averageHealthScore}%`,
       icon: TrendingUp,
       description: "Across all accounts",
       trend: "+5% from last month",
@@ -38,17 +53,17 @@ export default function StatsCards({ stats, loading = false }: StatsCardsProps) 
     },
     {
       title: "At Risk Accounts",
-      value: stats.atRiskAccounts.toLocaleString(),
+      value: safeStats.atRiskAccounts.toLocaleString(),
       icon: AlertTriangle,
-      description: `${Math.round((stats.atRiskAccounts / stats.totalAccounts) * 100)}% of total`,
+      description: `${safeStats.totalAccounts > 0 ? Math.round((safeStats.atRiskAccounts / safeStats.totalAccounts) * 100) : 0}% of total`,
       trend: "-3% from last month",
       color: "text-red-600",
       bgColor: "bg-red-50",
     },
     {
       title: "Total ARR",
-      value: `$${(stats.totalARR / 1000).toFixed(0)}K`,
-      icon: DollarSign,
+      value: `${formatCurrency(safeStats.totalARR / 1000)}K`,
+      icon: CurrencyIcon,
       description: "Annual recurring revenue",
       trend: "+18% from last month",
       color: "text-green-600",
@@ -56,7 +71,7 @@ export default function StatsCards({ stats, loading = false }: StatsCardsProps) 
     },
     {
       title: "NPS Score",
-      value: stats.npsScore.toFixed(1),
+      value: safeStats.npsScore.toFixed(1),
       icon: Star,
       description: "Last 90 days",
       trend: "+0.5 from last month",
@@ -77,9 +92,10 @@ export default function StatsCards({ stats, loading = false }: StatsCardsProps) 
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="flex items-center space-x-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <div className="text-2xl font-bold text-muted-foreground">Loading...</div>
+              <div className="animate-pulse space-y-2">
+                <div className="h-8 w-20 bg-gray-200 rounded"></div>
+                <div className="h-3 w-28 bg-gray-100 rounded"></div>
+                <div className="h-3 w-24 bg-gray-100 rounded"></div>
               </div>
             ) : (
               <>

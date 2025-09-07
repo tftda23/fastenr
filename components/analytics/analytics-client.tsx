@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useCurrencyConfig } from '@/lib/hooks/use-currency'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, Users, DollarSign, Heart, AlertTriangle } from "lucide-react"
@@ -27,6 +28,7 @@ interface AnalyticsClientProps {
 }
 
 export function AnalyticsClient({ dashboardStats, churnRiskAccounts, npsData }: AnalyticsClientProps) {
+  const { formatCurrency, CurrencyIcon } = useCurrencyConfig()
   const accountStatusData = useMemo(
     () => [
       { name: "Active", value: dashboardStats?.activeAccounts || 0, color: "#10b981" },
@@ -82,10 +84,10 @@ export function AnalyticsClient({ dashboardStats, churnRiskAccounts, npsData }: 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total ARR</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CurrencyIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${dashboardStats.totalARR?.toLocaleString() || 0}</div>
+            <div className="text-2xl font-bold">{formatCurrency(dashboardStats.totalARR || 0)}</div>
             <p className="text-xs text-muted-foreground">Annual recurring revenue</p>
           </CardContent>
         </Card>
@@ -207,7 +209,7 @@ export function AnalyticsClient({ dashboardStats, churnRiskAccounts, npsData }: 
                   <AlertTriangle className="h-5 w-5 text-red-500" />
                   <div>
                     <h4 className="font-medium">{account.name}</h4>
-                    <p className="text-sm text-muted-foreground">ARR: ${account.arr?.toLocaleString() || 0}</p>
+                    <p className="text-sm text-muted-foreground">ARR: {formatCurrency(account.arr || 0)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

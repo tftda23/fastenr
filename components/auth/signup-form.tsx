@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2, Mail, Lock, User, Building } from "lucide-react"
 import Link from "next/link"
 import { signUp } from "@/lib/actions"
@@ -104,6 +105,17 @@ export default function SignUpForm() {
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input id="password" name="password" type="password" required className="pl-10" />
             </div>
+          </div>
+
+          <div className="flex items-start space-x-2">
+            <Checkbox id="acceptTerms" name="acceptTerms" required className="mt-1" />
+            <label htmlFor="acceptTerms" className="text-sm text-muted-foreground leading-relaxed">
+              I agree to the{" "}
+              <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-700 underline">
+                Terms of Service
+              </Link>
+              {" "}and understand this is a beta product.
+            </label>
           </div>
 
           <SubmitButton />

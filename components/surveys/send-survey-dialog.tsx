@@ -22,7 +22,7 @@ import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import { Mail, Users, Plus, X, Upload, Send, CheckCircle, AlertCircle } from "lucide-react"
 import { sendSurvey } from "@/lib/surveys"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/lib/hooks/use-toast"
 
 interface Survey {
   id: string

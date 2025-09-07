@@ -44,10 +44,8 @@ export default async function ContactsPage({
       getAccounts(1, 100) // Get up to 100 accounts for the filter
     ])
     
-    console.log('ContactsPage - Fetched contactsResult:', JSON.stringify(contactsResult, null, 2))
     console.log('ContactsPage - Contacts data length:', contactsResult?.data?.length)
     console.log('ContactsPage - Contacts count:', contactsResult?.count)
-    console.log('ContactsPage - Fetched contactGroups:', JSON.stringify(contactGroups, null, 2))
     console.log('ContactsPage - Contact groups length:', contactGroups?.length)
 
     return (

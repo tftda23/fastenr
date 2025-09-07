@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Upload, Plus, X, Link as LinkIcon, Sparkles, Star, TrendingUp, Calendar, Clock, Send } from "lucide-react"
 import { createSurvey } from "@/lib/surveys"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/lib/hooks/use-toast"
 import {
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
 } from "@/components/ui/select"

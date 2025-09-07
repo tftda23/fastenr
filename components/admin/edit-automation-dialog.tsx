@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/lib/hooks/use-toast";
 import { Trash2, AlertTriangle } from "lucide-react";
 import type { AutomationWorkflow } from "@/lib/types";
 import { updateAutomation, deleteAutomation } from "@/lib/supabase/automation.client"

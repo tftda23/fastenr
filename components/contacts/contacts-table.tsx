@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
   MoreHorizontal, Eye, Edit, Trash2, Mail, Phone, 
-  Building2, Crown, Users, Filter, RefreshCw, Briefcase
+  Building2, Crown, Users, Filter, RefreshCw, Briefcase, Copy
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -48,38 +48,42 @@ interface ContactsTableProps {
 const SeniorityBadge = ({ level }: { level?: string }) => {
   if (!level) return null
   
-  const getVariant = (level: string) => {
+  const getStyles = (level: string) => {
     switch (level) {
-      case 'C-Level': return 'default'
-      case 'VP': return 'secondary'
-      case 'Director': return 'outline'
-      default: return 'outline'
+      case 'C-Level': return 'bg-slate-100 text-slate-700 border-slate-200'
+      case 'VP': return 'bg-blue-50 text-blue-700 border-blue-200'
+      case 'Director': return 'bg-gray-50 text-gray-600 border-gray-200'
+      default: return 'bg-gray-50 text-gray-600 border-gray-200'
     }
   }
   
-  return <Badge variant={getVariant(level)}>{level}</Badge>
+  return (
+    <Badge variant="outline" className={`text-xs px-1.5 py-0.5 ${getStyles(level)}`}>
+      {level}
+    </Badge>
+  )
 }
 
 const DecisionMakerBadge = ({ level }: { level?: string }) => {
   if (!level) return null
   
-  const getVariant = (level: string) => {
+  const getStyles = (level: string) => {
     switch (level) {
-      case 'Primary': return 'default'
-      case 'Influencer': return 'secondary'
-      case 'User': return 'outline'
-      case 'Gatekeeper': return 'outline'
-      default: return 'outline'
+      case 'Primary': return 'bg-purple-50 text-purple-700 border-purple-200'
+      case 'Influencer': return 'bg-green-50 text-green-700 border-green-200'
+      case 'User': return 'bg-gray-50 text-gray-600 border-gray-200'
+      case 'Gatekeeper': return 'bg-orange-50 text-orange-600 border-orange-200'
+      default: return 'bg-gray-50 text-gray-600 border-gray-200'
     }
   }
   
   const getIcon = (level: string) => {
-    if (level === 'Primary') return <Crown className="h-3 w-3 mr-1" />
+    if (level === 'Primary') return <Crown className="h-2.5 w-2.5 mr-1" />
     return null
   }
   
   return (
-    <Badge variant={getVariant(level)} className="flex items-center">
+    <Badge variant="outline" className={`text-xs px-1.5 py-0.5 flex items-center ${getStyles(level)}`}>
       {getIcon(level)}
       {level}
     </Badge>
@@ -89,17 +93,21 @@ const DecisionMakerBadge = ({ level }: { level?: string }) => {
 const RelationshipBadge = ({ strength }: { strength?: string }) => {
   if (!strength) return null
   
-  const getVariant = (strength: string) => {
+  const getStyles = (strength: string) => {
     switch (strength) {
-      case 'champion': return 'default'
-      case 'supporter': return 'secondary'
-      case 'neutral': return 'outline'
-      case 'detractor': return 'destructive'
-      default: return 'outline'
+      case 'champion': return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      case 'supporter': return 'bg-lime-50 text-lime-700 border-lime-200'
+      case 'neutral': return 'bg-gray-50 text-gray-600 border-gray-200'
+      case 'detractor': return 'bg-red-50 text-red-700 border-red-200'
+      default: return 'bg-gray-50 text-gray-600 border-gray-200'
     }
   }
   
-  return <Badge variant={getVariant(strength)}>{strength}</Badge>
+  return (
+    <Badge variant="outline" className={`text-xs px-1.5 py-0.5 ${getStyles(strength)}`}>
+      {strength}
+    </Badge>
+  )
 }
 
 const StatusBadge = ({ status }: { status?: string }) => {
@@ -135,136 +143,220 @@ export function ContactsTable({
   const columns: ColumnDef<Contact>[] = useMemo(
     () => [
       {
-        id: "name",
-        accessorKey: "full_name",
-        header: "Name",
+        id: "contact",
+        accessorKey: "last_name",
+        header: "Contact",
+        size: 350,
+        minSize: 280,
+        sortingFn: (rowA, rowB) => {
+          const lastNameA = rowA.original.last_name || ''
+          const lastNameB = rowB.original.last_name || ''
+          return lastNameA.localeCompare(lastNameB)
+        },
         cell: ({ row }) => {
           const contact = row.original
           const fullName = contact.full_name || `${contact.first_name} ${contact.last_name}`
           return (
-            <div className="space-y-1">
-              <div className="font-medium">{fullName}</div>
-              <div className="text-sm text-muted-foreground">
+            <div className="space-y-2">
+              {/* Name and Title */}
+              <div>
+                <div className="font-medium">{fullName}</div>
                 {contact.title && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Briefcase className="h-3 w-3" />
                     {contact.title}
-                  </div>
-                )}
-                {contact.department && (
-                  <div className="text-xs text-muted-foreground">
-                    {contact.department}
+                    {contact.department && (
+                      <span className="text-xs">• {contact.department}</span>
+                    )}
                   </div>
                 )}
               </div>
+              
+
+              {/* Account */}
+              {contact.account_name && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Building2 className="h-3 w-3" />
+                  <span className="truncate">{contact.account_name}</span>
+                </div>
+              )}
             </div>
           )
         },
       },
       {
-        id: "contact_info",
-        header: "Contact Info",
+        id: "role",
+        header: "Role",
+        size: 140,
+        minSize: 120,
         cell: ({ row }) => {
           const contact = row.original
           return (
-            <div className="space-y-1">
-              {contact.email && (
-                <div className="flex items-center gap-1 text-sm">
-                  <Mail className="h-3 w-3" />
-                  <a href={`mailto:${contact.email}`} className="hover:underline">
-                    {contact.email}
-                  </a>
-                </div>
+            <div className="flex flex-wrap gap-1">
+              {/* Only show most important badges */}
+              {contact.decision_maker_level && ['Primary', 'Influencer'].includes(contact.decision_maker_level) && (
+                <DecisionMakerBadge level={contact.decision_maker_level} />
               )}
-              {contact.phone && (
-                <div className="flex items-center gap-1 text-sm">
-                  <Phone className="h-3 w-3" />
-                  <a href={`tel:${contact.phone}`} className="hover:underline">
-                    {contact.phone}
-                  </a>
-                </div>
+              {contact.seniority_level && ['C-Level', 'VP'].includes(contact.seniority_level) && (
+                <SeniorityBadge level={contact.seniority_level} />
+              )}
+              {/* Show relationship if it's strong/weak */}
+              {contact.relationship_strength && ['champion', 'detractor'].includes(contact.relationship_strength) && (
+                <RelationshipBadge strength={contact.relationship_strength} />
               )}
             </div>
           )
         },
       },
       {
-        id: "account",
-        accessorKey: "account_name",
-        header: "Account",
+        id: "email",
+        accessorKey: "email",
+        header: "Email",
+        size: 200,
+        minSize: 160,
         cell: ({ row }) => {
-          const contact = row.original
-          return contact.account_name ? (
-            <div className="flex items-center gap-1">
-              <Building2 className="h-3 w-3" />
-              {contact.account_name}
+          const email = row.original.email
+          if (!email) return <span className="text-muted-foreground text-sm">-</span>
+          
+          return (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 text-sm">
+                <Mail className="h-3 w-3 text-muted-foreground" />
+                <a href={`mailto:${email}`} className="hover:underline truncate">
+                  {email}
+                </a>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => navigator.clipboard.writeText(email)}
+                title="Copy email"
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
             </div>
-          ) : (
-            <span className="text-muted-foreground">No account</span>
           )
         },
       },
       {
-        id: "seniority",
-        accessorKey: "seniority_level",
-        header: "Seniority",
-        cell: ({ row }) => <SeniorityBadge level={row.original.seniority_level} />,
-      },
-      {
-        id: "decision_maker",
-        accessorKey: "decision_maker_level",
-        header: "Decision Maker",
-        cell: ({ row }) => <DecisionMakerBadge level={row.original.decision_maker_level} />,
-      },
-      {
-        id: "relationship",
-        accessorKey: "relationship_strength",
-        header: "Relationship",
-        cell: ({ row }) => <RelationshipBadge strength={row.original.relationship_strength} />,
+        id: "phone",
+        accessorKey: "phone", 
+        header: "Phone",
+        size: 160,
+        minSize: 140,
+        cell: ({ row }) => {
+          const phone = row.original.phone
+          if (!phone) return <span className="text-muted-foreground text-sm">-</span>
+          
+          return (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 text-sm">
+                <Phone className="h-3 w-3 text-muted-foreground" />
+                <a href={`tel:${phone}`} className="hover:underline whitespace-nowrap">
+                  {phone}
+                </a>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => navigator.clipboard.writeText(phone)}
+                title="Copy phone"
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
+            </div>
+          )
+        },
       },
       {
         id: "status",
         accessorKey: "contact_status",
         header: "Status",
-        cell: ({ row }) => <StatusBadge status={row.original.contact_status} />,
-      },
-      {
-        id: "last_engagement",
-        accessorKey: "last_engagement_date",
-        header: "Last Engagement",
+        size: 100,
+        minSize: 80,
         cell: ({ row }) => {
-          const date = row.original.last_engagement_date
-          if (!date) return <span className="text-muted-foreground">Never</span>
+          const status = row.original.contact_status
+          if (!status) return <span className="text-muted-foreground text-sm">-</span>
           
-          const engagementDate = new Date(date)
-          const daysSince = Math.floor((Date.now() - engagementDate.getTime()) / (1000 * 60 * 60 * 24))
+          const getStatusDisplay = (status: string) => {
+            switch (status) {
+              case 'active': return { text: 'Active', color: 'text-green-600' }
+              case 'inactive': return { text: 'Inactive', color: 'text-gray-500' }
+              case 'left_company': return { text: 'Left', color: 'text-red-500' }
+              case 'unresponsive': return { text: 'Unresponsive', color: 'text-yellow-600' }
+              default: return { text: status, color: 'text-gray-500' }
+            }
+          }
           
+          const statusDisplay = getStatusDisplay(status)
           return (
-            <div className="text-sm">
-              <div>{format(engagementDate, "MMM dd, yyyy")}</div>
-              <div className={`text-xs ${daysSince > 90 ? 'text-red-500' : daysSince > 30 ? 'text-yellow-500' : 'text-green-500'}`}>
-                {daysSince === 0 ? 'Today' : `${daysSince} days ago`}
-              </div>
-            </div>
+            <span className={`text-sm font-medium ${statusDisplay.color}`}>
+              {statusDisplay.text}
+            </span>
           )
         },
       },
       {
-        id: "manager",
-        accessorKey: "manager_name",
-        header: "Manager",
+        id: "engagement",
+        accessorKey: "last_engagement_date",
+        header: "Last Contact",
+        size: 120,
+        minSize: 100,
+        sortingFn: (rowA, rowB) => {
+          const dateA = rowA.original.last_engagement_date
+          const dateB = rowB.original.last_engagement_date
+          
+          // Handle null dates - put them at the end
+          if (!dateA && !dateB) return 0
+          if (!dateA) return 1
+          if (!dateB) return -1
+          
+          // Compare actual dates
+          return new Date(dateA).getTime() - new Date(dateB).getTime()
+        },
         cell: ({ row }) => {
-          const manager = row.original.manager_name
-          return manager ? (
-            <div className="text-sm">{manager}</div>
-          ) : (
-            <span className="text-muted-foreground">-</span>
+          const date = row.original.last_engagement_date
+          if (!date) return <span className="text-muted-foreground text-sm">Never</span>
+          
+          const engagementDate = new Date(date)
+          const daysSince = Math.floor((Date.now() - engagementDate.getTime()) / (1000 * 60 * 60 * 24))
+          
+          // Better date formatting
+          const formatDate = (date: Date) => {
+            const now = new Date()
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+            const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+            const diffInDays = Math.floor((today.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24))
+            
+            if (diffInDays === 0) return 'Today'
+            if (diffInDays === 1) return 'Yesterday'
+            if (diffInDays < 7) return `${diffInDays} days ago`
+            if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`
+            if (diffInDays < 365) return format(date, 'MMM d, yyyy')
+            return format(date, 'MMM d, yyyy')
+          }
+          
+          const getColor = (daysSince: number) => {
+            if (daysSince <= 7) return 'text-green-600'
+            if (daysSince <= 30) return 'text-yellow-600' 
+            if (daysSince <= 90) return 'text-orange-500'
+            return 'text-red-500'
+          }
+          
+          return (
+            <span className={`text-sm ${getColor(daysSince)}`}>
+              {formatDate(engagementDate)}
+            </span>
           )
         },
       },
       {
         id: "actions",
-        header: "Actions",
+        header: "",
+        size: 60,
+        minSize: 50,
         cell: ({ row }) => {
           const contact = row.original
           
@@ -278,12 +370,6 @@ export function ContactsTable({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(contact.email || '')}
-                >
-                  Copy email
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Eye className="mr-2 h-4 w-4" />
                   View details
@@ -292,6 +378,7 @@ export function ContactsTable({
                   <Edit className="mr-2 h-4 w-4" />
                   Edit contact
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-red-600">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete contact
@@ -306,7 +393,7 @@ export function ContactsTable({
   )
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-tour="contacts-table">
       {/* Filters */}
       <Card>
         <CardHeader>
@@ -442,14 +529,16 @@ export function ContactsTable({
       </Card>
 
       {/* Data Table */}
-      <DataTable
-        data={contacts.data}
-        columns={columns}
-        title={`Contacts (${contacts.count || contacts.data.length})`}
-        description="Manage customer contacts and stakeholders"
-        searchPlaceholder="Search contacts..."
-        exportFilename="contacts"
-      />
+      <div className="w-full overflow-hidden">
+        <DataTable
+          data={contacts.data}
+          columns={columns}
+          title={`Contacts (${contacts.count || contacts.data.length})`}
+          description="Manage customer contacts and stakeholders"
+          searchPlaceholder="Search contacts..."
+          exportFilename="contacts"
+        />
+      </div>
     </div>
   )
 }

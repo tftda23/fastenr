@@ -1,1 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="#2563eb"/><text x="16" y="22" text-anchor="middle" fill="white" font-family="Arial" font-size="18" font-weight="bold">F</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g clip-path="url(#SvgjsClipPath1125)"><rect width="1000" height="1000" fill="#ffffff"></rect><g transform="matrix(6.796116504854369,0,0,6.796116504854369,150,217.9611650485437)"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="103" height="83"><svg width="103" height="83" viewBox="0 0 103 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_5_7)">
+<path d="M61.6572 0C84.5634 0 103.133 18.5694 103.133 41.4756C103.133 64.3818 84.5635 82.9512 61.6572 82.9512C38.751 82.9512 20.1816 64.3818 20.1816 41.4756C20.1817 18.5694 38.7511 1.03094e-05 61.6572 0ZM61.6572 22.0078C50.9054 22.0078 42.1895 30.7238 42.1895 41.4756C42.1895 52.2275 50.9053 60.9433 61.6572 60.9434C72.4091 60.9434 81.125 52.2275 81.125 41.4756C81.1249 30.7238 72.4091 22.0078 61.6572 22.0078Z" fill="black"></path>
+<rect x="62" y="83" width="62" height="11" transform="rotate(-180 62 83)" fill="black"></rect>
+</g>
+<defs>
+<clipPath id="clip0_5_7">
+<rect width="103" height="83" fill="white"></rect>
+</clipPath>
+<clipPath id="SvgjsClipPath1125"><rect width="1000" height="1000" x="0" y="0" rx="150" ry="150"></rect></clipPath></defs>
+</svg></svg></g></g></svg>

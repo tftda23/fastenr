@@ -31,6 +31,18 @@ export async function GET() {
       return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 })
     }
 
+    // Get organization currency settings
+    const { data: orgSettings, error: orgError } = await supabase
+      .from("organizations")
+      .select("currency_code, currency_symbol, date_format, number_format")
+      .eq("id", organization.id)
+      .single()
+
+    if (orgError) {
+      console.error("Error fetching organization settings:", orgError)
+      return NextResponse.json({ error: "Failed to fetch organization settings" }, { status: 500 })
+    }
+
     // If no settings exist, create default ones using upsert
     if (!settings) {
       const { data: newSettings, error: createError } = await supabase
@@ -49,10 +61,22 @@ export async function GET() {
         return NextResponse.json({ error: "Failed to create default settings" }, { status: 500 })
       }
 
-      return NextResponse.json(newSettings)
+      // Combine with organization settings
+      const responseData = {
+        ...newSettings,
+        ...orgSettings
+      }
+
+      return NextResponse.json(responseData)
     }
 
-    return NextResponse.json(settings)
+    // Combine app settings with organization settings
+    const responseData = {
+      ...settings,
+      ...orgSettings
+    }
+
+    return NextResponse.json(responseData)
   } catch (error) {
     console.error("Error in app settings GET:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
@@ -89,13 +113,40 @@ export async function PUT(request: NextRequest) {
       'gdpr_compliance_enabled',
       'slack_webhook_url',
       'slack_default_channel',
-      'slack_notification_types'
+      'slack_notification_types',
+      'health_score_template',
+      'health_score_engagement_weight',
+      'health_score_nps_weight',
+      'health_score_activity_weight',
+      'health_score_growth_weight'
     ]
 
     const updateData: any = {}
     for (const field of allowedFields) {
       if (field in body) {
         updateData[field] = body[field]
+      }
+    }
+
+    // Handle currency fields - these go to organizations table
+    const currencyFields = ['currency_code', 'currency_symbol', 'date_format', 'number_format']
+    const currencyUpdateData: any = {}
+    for (const field of currencyFields) {
+      if (field in body) {
+        currencyUpdateData[field] = body[field]
+      }
+    }
+
+    // Update organization currency settings if any currency fields are present
+    if (Object.keys(currencyUpdateData).length > 0) {
+      const { error: orgError } = await supabase
+        .from("organizations")
+        .update(currencyUpdateData)
+        .eq("id", organization.id)
+
+      if (orgError) {
+        console.error("Error updating organization currency settings:", orgError)
+        return NextResponse.json({ error: "Failed to update currency settings" }, { status: 500 })
       }
     }
 
@@ -118,7 +169,13 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Failed to update settings" }, { status: 500 })
     }
 
-    return NextResponse.json(settings)
+    // Include currency settings in response
+    const responseData = {
+      ...settings,
+      ...currencyUpdateData
+    }
+
+    return NextResponse.json(responseData)
   } catch (error) {
     console.error("Error in app settings PUT:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

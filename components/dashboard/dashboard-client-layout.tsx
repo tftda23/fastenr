@@ -20,6 +20,7 @@ export default function DashboardClientLayout({
   children: React.ReactNode
 }) {
   const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [organizationId, setOrganizationId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [contentLoading, setContentLoading] = useState(false)
   const { setTheme } = useTheme()
@@ -66,7 +67,7 @@ export default function DashboardClientLayout({
 
         const { data: userProfile, error: profileError } = await supabase
           .from("user_profiles")
-          .select("full_name, email, role")
+          .select("full_name, email, role, organization_id")
           .eq("id", user.id)
           .maybeSingle()
 
@@ -81,19 +82,14 @@ export default function DashboardClientLayout({
         }
 
         setProfile(userProfile)
+        setOrganizationId((userProfile as any).organization_id)
 
-        const { data: orgData } = await supabase
-          .from("organizations")
-          .select("id")
-          .eq("owner_id", user.id)
-          .maybeSingle()
-
-        if (orgData) {
+        if ((userProfile as any).organization_id) {
           const { data: preferences } = await supabase
             .from("user_preferences")
             .select("theme")
             .eq("user_id", user.id)
-            .eq("organization_id", (orgData as any)?.id)
+            .eq("organization_id", (userProfile as any).organization_id)
             .maybeSingle()
 
           if ((preferences as any)?.theme) {
@@ -118,7 +114,6 @@ export default function DashboardClientLayout({
     return (
       <div className="flex h-screen items-center justify-center bg-white">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <span className="ml-2 text-sm text-muted-foreground">Loading...</span>
       </div>
     )
   }
@@ -135,14 +130,11 @@ export default function DashboardClientLayout({
 
   return (
       <div className="flex h-screen bg-background">
-        <Sidebar userProfile={profile} />
+        <Sidebar userProfile={profile} organizationId={organizationId || undefined} />
         <main className="flex-1 overflow-auto ml-64">
           {contentLoading && (
             <div className="absolute inset-0 ml-64 bg-background/90 backdrop-blur-sm z-10 flex items-center justify-center">
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                <span className="text-sm text-muted-foreground">Loading...</span>
-              </div>
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
             </div>
           )}
           <div className="p-6">{children}</div>

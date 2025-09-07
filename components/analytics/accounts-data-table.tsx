@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useCurrencyConfig } from '@/lib/hooks/use-currency'
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable, HealthScoreBadge, StatusBadge } from "./data-table"
 import { Button } from "@/components/ui/button"
@@ -51,6 +52,7 @@ export function AccountsDataTable({
   onEditAccount, 
   onDeleteAccount 
 }: AccountsDataTableProps) {
+  const { formatCurrency } = useCurrencyConfig()
   const accountsData = useMemo(() => generateAccountsData(), [])
 
   const columns: ColumnDef<any>[] = useMemo(
@@ -101,7 +103,7 @@ export function AccountsDataTable({
         header: "Monthly Revenue",
         cell: ({ row }) => {
           const amount = parseFloat(row.getValue("revenue"))
-          return <div className="font-medium">${amount.toLocaleString()}</div>
+          return <div className="font-medium">{formatCurrency(amount)}</div>
         },
       },
       {
@@ -110,7 +112,7 @@ export function AccountsDataTable({
         header: "Contract Value",
         cell: ({ row }) => {
           const amount = parseFloat(row.getValue("contractValue"))
-          return <div className="font-medium">${amount.toLocaleString()}</div>
+          return <div className="font-medium">{formatCurrency(amount)}</div>
         },
       },
       {
@@ -170,9 +172,9 @@ export function AccountsDataTable({
         cell: ({ row }) => {
           const score = row.getValue("npsScore") as number
           const getColor = (score: number) => {
-            if (score >= 70) return "text-green-600"
-            if (score >= 30) return "text-yellow-600"
-            return "text-red-600"
+            if (score >= 70) return "text-emerald-600/80"
+            if (score >= 30) return "text-amber-600/80"
+            return "text-red-600/80"
           }
           return <div className={`font-medium ${getColor(score)}`}>{score}</div>
         },

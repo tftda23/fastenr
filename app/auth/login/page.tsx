@@ -54,8 +54,8 @@ export default async function LoginPage() {
       </div>
       <div className="flex w-full lg:w-1/2 items-center justify-center bg-background px-4 py-12">
         <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <Logo variant="black" size="lg" className="mx-auto mb-4" />
+          <div className="flex justify-center mb-8">
+            <Logo variant="black" size="lg" className="mb-4" />
           </div>
           <LoginForm />
         </div>

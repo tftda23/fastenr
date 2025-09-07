@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import { CreditCard, Users, CheckCircle2, Info, AlertTriangle } from "lucide-react"
+import { CreditCard, Users, CheckCircle2, Info, AlertTriangle, Loader2 } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface SubscriptionClientProps {
   organizationId: string
@@ -155,7 +156,85 @@ export default function SubscriptionClient({ organizationId }: SubscriptionClien
   }, [snap, newSeats, premiumAddon])
 
   if (loading || !snap || !preview) {
-    return <div className="py-8 text-center">Loading subscription…</div>
+    return (
+      <div className="space-y-6">
+        {/* Current subscription skeleton */}
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-7 w-40" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-6 w-24" />
+              </div>
+            </div>
+            <Skeleton className="h-4 w-96 mt-2" />
+          </CardHeader>
+          <CardContent className="grid gap-6 md:grid-cols-3">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-2 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-6 w-20" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-6 w-28" />
+              <Skeleton className="h-4 w-36" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Two-column skeleton */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Seat cap skeleton */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded" />
+                <Skeleton className="h-6 w-20" />
+              </div>
+              <Skeleton className="h-4 w-80" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-9 w-40" />
+              </div>
+              <div className="rounded-md border p-3">
+                <Skeleton className="h-4 w-32 mb-2" />
+                <Skeleton className="h-4 w-64" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Cost summary skeleton */}
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-4 w-56" />
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Loading spinner in center */}
+        <div className="flex justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </div>
+    )
   }
 
   const seatBarPct = Math.min(100, (snap.activeUsers / Math.max(1, snap.seatCap)) * 100)

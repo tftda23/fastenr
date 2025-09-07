@@ -1,0 +1,911 @@
+"use client"
+
+import React, { useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { 
+  BarChart3, 
+  Users, 
+  MousePointer, 
+  Eye, 
+  Clock, 
+  TrendingUp,
+  Code, 
+  Plus, 
+  Copy, 
+  CheckCircle2,
+  Zap,
+  Sparkles,
+  Crown,
+  ExternalLink,
+  Settings,
+  Building
+} from "lucide-react"
+import Link from "next/link"
+
+interface UsageProduct {
+  id: string
+  name: string
+  domain: string
+  tracking_key: string
+  created_at: string
+  is_active: boolean
+  last_activity_at: string | null
+}
+
+interface UsageMetrics {
+  product_id: string
+  tracked_account_id: string | null
+  unique_users: number
+  total_sessions: number
+  avg_session_duration: number
+  page_views: number
+  feature_usage: any
+  recorded_at: string
+}
+
+interface TrackedAccount {
+  id: string
+  account_id: string | null
+  account_name: string | null
+  account_domain: string | null
+  product_id: string
+  last_activity_at: string
+  usage_tracking_products: { name: string }
+}
+
+interface UsageMetricsClientProps {
+  products: UsageProduct[]
+  metrics: UsageMetrics[] | null
+  trackedAccounts: TrackedAccount[]
+  hasData: boolean
+  organization: any
+}
+
+export function UsageMetricsClient({ products, metrics, trackedAccounts, hasData, organization }: UsageMetricsClientProps) {
+  const [showSetupDialog, setShowSetupDialog] = useState(false)
+  const [selectedFramework, setSelectedFramework] = useState('vanilla')
+  const [copiedCode, setCopiedCode] = useState(false)
+  const [newProductName, setNewProductName] = useState('')
+  const [newProductDomain, setNewProductDomain] = useState('')
+  const [isCreatingProduct, setIsCreatingProduct] = useState(false)
+  const [createdProduct, setCreatedProduct] = useState<any>(null)
+  const [isMultiTenant, setIsMultiTenant] = useState(false)
+  const [selectedAccount, setSelectedAccount] = useState<string>('all')
+
+  const handleCreateProduct = async () => {
+    if (!newProductName.trim()) return
+    
+    setIsCreatingProduct(true)
+    try {
+      const response = await fetch('/api/usage-tracking/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newProductName.trim(),
+          domain: newProductDomain.trim() || null
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        setCreatedProduct(data.product)
+        setNewProductName('')
+        setNewProductDomain('')
+        // Don't reload - show the embed code instead
+      } else {
+        console.error('Failed to create product:', data.error)
+        alert(`Failed to create product: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Failed to create product:', error)
+      alert('Failed to create product. Please try again.')
+    } finally {
+      setIsCreatingProduct(false)
+    }
+  }
+
+  const generateEmbedCode = (trackingKey: string, framework: string, isMultiTenant = false) => {
+    const baseUrl = window.location.origin
+
+    if (isMultiTenant) {
+      switch (framework) {
+        case 'vanilla':
+          return `<!-- Fastenr Analytics - Multi-Tenant User Tracking -->
+<script>
+  (function() {
+    var script = document.createElement('script');
+    script.src = '${baseUrl}/tracking/fastenr-analytics.js';
+    script.onload = function() {
+      // Initialize tracking with account context
+      fastenr('${trackingKey}', {
+        debug: false, // Set to true for development
+        apiUrl: '${baseUrl}/api/tracking',
+        
+        // REQUIRED: Identify which account/tenant this user belongs to
+        account: {
+          // Option 1: Use your internal account ID
+          id: getCurrentAccountId(), // Replace with your account ID logic
+          
+          // Option 2: Use account domain/subdomain
+          // domain: window.location.hostname, // e.g., 'customer1.yourapp.com'
+          
+          // Option 3: Use custom identifier
+          // customId: getCustomAccountIdentifier(),
+          
+          // Optional: Account name for easier identification
+          name: getCurrentAccountName() // Replace with your account name logic
+        }
+      });
+      
+      // Example helper functions (implement these based on your app):
+      function getCurrentAccountId() {
+        // Return the current user's account ID
+        // Example: return window.currentUser?.accountId || document.querySelector('[data-account-id]')?.dataset.accountId;
+        return 'your-account-id-here'; // Replace this
+      }
+      
+      function getCurrentAccountName() {
+        // Return the current account's display name
+        // Example: return window.currentAccount?.name;
+        return 'Account Name'; // Replace this
+      }
+    };
+    document.head.appendChild(script);
+  })();
+</script>`
+
+        case 'react':
+          return `// Install: npm install fastenr-analytics (coming soon)
+import { useEffect } from 'react';
+import { useAccount } from './your-account-context'; // Your account context
+
+// Fastenr Analytics Hook for Multi-Tenant Apps
+export function useFastenrAnalytics(trackingKey) {
+  const { currentAccount } = useAccount(); // Get current account from your context
+  
+  useEffect(() => {
+    if (typeof window === 'undefined' || !currentAccount) return;
+    
+    const script = document.createElement('script');
+    script.src = '${baseUrl}/tracking/fastenr-analytics.js';
+    script.onload = () => {
+      window.fastenr('${trackingKey}', {
+        debug: process.env.NODE_ENV === 'development',
+        apiUrl: '${baseUrl}/api/tracking',
+        
+        // REQUIRED: Account context for multi-tenant tracking
+        account: {
+          id: currentAccount.id, // Your internal account ID
+          name: currentAccount.name, // Account display name
+          // domain: currentAccount.domain, // Optional: account domain
+        }
+      });
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, [trackingKey, currentAccount?.id]); // Re-initialize if account changes
+}
+
+// Usage in your app
+function App() {
+  useFastenrAnalytics('${trackingKey}');
+  
+  return <div>Your Multi-Tenant App</div>;
+}`
+
+        case 'nextjs':
+          return `// pages/_app.js or app/layout.js - Multi-Tenant Setup
+import Script from 'next/script'
+import { useAccount } from '@/contexts/AccountContext' // Your account context
+
+export default function MyApp({ Component, pageProps }) {
+  const { currentAccount } = useAccount();
+  
+  return (
+    <>
+      {currentAccount && (
+        <Script 
+          src="${baseUrl}/tracking/fastenr-analytics.js"
+          onLoad={() => {
+            fastenr('${trackingKey}', {
+              debug: process.env.NODE_ENV === 'development',
+              apiUrl: '${baseUrl}/api/tracking',
+              
+              // REQUIRED: Account context for multi-tenant tracking
+              account: {
+                id: currentAccount.id,
+                name: currentAccount.name,
+                // domain: currentAccount.domain,
+              }
+            });
+          }}
+        />
+      )}
+      <Component {...pageProps} />
+    </>
+  )
+}`
+
+        case 'vue':
+          return `// main.js or App.vue - Multi-Tenant Setup
+<template>
+  <div v-if="currentAccount">
+    <!-- Your app content -->
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      currentAccount: null // Load from your auth/account system
+    }
+  },
+  
+  watch: {
+    currentAccount: {
+      handler(newAccount) {
+        if (newAccount) {
+          this.initializeFastenrAnalytics();
+        }
+      },
+      immediate: true
+    }
+  },
+  
+  methods: {
+    initializeFastenrAnalytics() {
+      if (typeof window === 'undefined' || !this.currentAccount) return;
+      
+      const script = document.createElement('script');
+      script.src = '${baseUrl}/tracking/fastenr-analytics.js';
+      script.onload = () => {
+        window.fastenr('${trackingKey}', {
+          debug: process.env.NODE_ENV === 'development',
+          apiUrl: '${baseUrl}/api/tracking',
+          
+          // REQUIRED: Account context for multi-tenant tracking
+          account: {
+            id: this.currentAccount.id,
+            name: this.currentAccount.name,
+            // domain: this.currentAccount.domain,
+          }
+        });
+      };
+      document.head.appendChild(script);
+    }
+  }
+}
+</script>`
+
+        case 'angular':
+          return `// app.component.ts - Multi-Tenant Setup
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { AccountService } from './services/account.service'; // Your account service
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html'
+})
+export class AppComponent implements OnInit, OnDestroy {
+  private accountSubscription: Subscription;
+
+  constructor(private accountService: AccountService) {}
+
+  ngOnInit() {
+    this.accountSubscription = this.accountService.currentAccount$.subscribe(
+      account => {
+        if (account) {
+          this.initializeFastenrAnalytics(account);
+        }
+      }
+    );
+  }
+  
+  ngOnDestroy() {
+    this.accountSubscription?.unsubscribe();
+  }
+
+  private initializeFastenrAnalytics(account: any) {
+    const script = document.createElement('script');
+    script.src = '${baseUrl}/tracking/fastenr-analytics.js';
+    script.onload = () => {
+      (window as any).fastenr('${trackingKey}', {
+        debug: !environment.production,
+        apiUrl: '${baseUrl}/api/tracking',
+        
+        // REQUIRED: Account context for multi-tenant tracking
+        account: {
+          id: account.id,
+          name: account.name,
+          // domain: account.domain,
+        }
+      });
+    };
+    document.head.appendChild(script);
+  }
+}`
+
+        default:
+          return generateEmbedCode(trackingKey, 'vanilla', true)
+      }
+    } else {
+      // Single-tenant code (existing)
+      switch (framework) {
+        case 'vanilla':
+          return `<!-- Fastenr Analytics - Single Application Tracking -->
+<script>
+  (function() {
+    var script = document.createElement('script');
+    script.src = '${baseUrl}/tracking/fastenr-analytics.js';
+    script.onload = function() {
+      fastenr('${trackingKey}', {
+        debug: false, // Set to true for development
+        apiUrl: '${baseUrl}/api/tracking'
+      });
+    };
+    document.head.appendChild(script);
+  })();
+</script>`
+
+      case 'react':
+        return `// Install: npm install fastenr-analytics (coming soon)
+import { useEffect } from 'react';
+
+// Fastenr Analytics Hook
+export function useFastenrAnalytics(trackingKey) {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const script = document.createElement('script');
+    script.src = '${baseUrl}/tracking/fastenr-analytics.js';
+    script.onload = () => {
+      window.fastenr('${trackingKey}', {
+        debug: process.env.NODE_ENV === 'development',
+        apiUrl: '${baseUrl}/api/tracking'
+      });
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, [trackingKey]);
+}
+
+// Usage in your app
+function App() {
+  useFastenrAnalytics('${trackingKey}');
+  
+  return <div>Your App</div>;
+}`
+
+      case 'nextjs':
+        return `// pages/_app.js or app/layout.js
+import Script from 'next/script'
+
+export default function MyApp({ Component, pageProps }) {
+  return (
+    <>
+      <Script 
+        src="${baseUrl}/tracking/fastenr-analytics.js"
+        onLoad={() => {
+          fastenr('${trackingKey}', {
+            debug: process.env.NODE_ENV === 'development',
+            apiUrl: '${baseUrl}/api/tracking'
+          });
+        }}
+      />
+      <Component {...pageProps} />
+    </>
+  )
+}`
+
+      case 'vue':
+        return `// main.js or App.vue
+<script>
+export default {
+  mounted() {
+    if (typeof window === 'undefined') return;
+    
+    const script = document.createElement('script');
+    script.src = '${baseUrl}/tracking/fastenr-analytics.js';
+    script.onload = () => {
+      window.fastenr('${trackingKey}', {
+        debug: process.env.NODE_ENV === 'development',
+        apiUrl: '${baseUrl}/api/tracking'
+      });
+    };
+    document.head.appendChild(script);
+  }
+}
+</script>`
+
+      case 'angular':
+        return `// app.component.ts
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html'
+})
+export class AppComponent implements OnInit {
+  ngOnInit() {
+    this.loadFastenrAnalytics();
+  }
+
+  private loadFastenrAnalytics() {
+    const script = document.createElement('script');
+    script.src = '${baseUrl}/tracking/fastenr-analytics.js';
+    script.onload = () => {
+      (window as any).fastenr('${trackingKey}', {
+        debug: !environment.production,
+        apiUrl: '${baseUrl}/api/tracking'
+      });
+    };
+    document.head.appendChild(script);
+  }
+}`
+
+      default:
+        return generateEmbedCode(trackingKey, 'vanilla')
+    }
+  }
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedCode(true)
+      setTimeout(() => setCopiedCode(false), 2000)
+    })
+  }
+
+  const isPremiumRequired = products.length >= 1 && !organization.subscription?.includes('premium')
+
+  if (!hasData) {
+    return (
+      <div className="space-y-6">
+        {/* No Data State */}
+        <Card className="border-2 border-dashed border-gray-300">
+          <CardHeader className="text-center">
+            <div className="mx-auto h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+              <BarChart3 className="h-6 w-6 text-blue-600" />
+            </div>
+            <CardTitle>No Usage Data Detected</CardTitle>
+            <CardDescription className="max-w-2xl mx-auto">
+              Your usage adoption metrics information is not present as there is no current usage tracking 
+              of the application in any of your products. Get started by embedding our innovative tracking code.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-center mb-2">
+                <Sparkles className="h-5 w-5 text-purple-600 mr-2" />
+                <h3 className="font-medium text-purple-800">Innovative User Identification</h3>
+              </div>
+              <p className="text-sm text-purple-700">
+                Our advanced fingerprinting technology tracks unique users without requiring login or cookies. 
+                Uses behavioral patterns, browser fingerprints, and smart persistence for accurate metrics.
+              </p>
+            </div>
+            
+            <Button onClick={() => setShowSetupDialog(true)} size="lg">
+              <Code className="h-4 w-4 mr-2" />
+              Get Embed Code
+            </Button>
+            
+            <p className="text-xs text-muted-foreground mt-4">
+              Embed code works with any web application, SPA, or static site
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Premium Upsell */}
+        <Card className="border-yellow-200 bg-gradient-to-r from-yellow-50 to-orange-50">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Crown className="h-5 w-5 text-yellow-600" />
+                <CardTitle className="text-yellow-800">Multiple Product Tracking</CardTitle>
+                <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">Premium</Badge>
+              </div>
+            </div>
+            <CardDescription className="text-yellow-700">
+              Want to track usage across multiple products or applications? Upgrade to premium for unlimited tracking products.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <p className="font-medium text-yellow-800">Premium Features:</p>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                <li>• Unlimited tracking products</li>
+                <li>• Advanced behavioral analytics</li>
+                <li>• Custom event tracking</li>
+                <li>• Real-time user journey mapping</li>
+              </ul>
+            </div>
+            <div className="flex justify-start">
+              <Button asChild className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                <Link href="/dashboard/admin/subscription">
+                  <Crown className="h-4 w-4 mr-2" />
+                  Upgrade to Premium
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Setup Dialog */}
+        <Dialog open={showSetupDialog} onOpenChange={setShowSetupDialog}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center">
+                <Zap className="h-5 w-5 mr-2 text-blue-600" />
+                Setup Usage Tracking
+              </DialogTitle>
+              <DialogDescription>
+                Add innovative user tracking to your application in minutes. No user authentication required.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-6">
+              {/* Product Setup */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">1. Create Your First Product</h3>
+                <div className="grid gap-4">
+                  <div>
+                    <Label htmlFor="product-name">Product Name</Label>
+                    <Input
+                      id="product-name"
+                      placeholder="My Web App"
+                      value={newProductName}
+                      onChange={(e) => setNewProductName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="product-domain">Domain (Optional)</Label>
+                    <Input
+                      id="product-domain"
+                      placeholder="myapp.com"
+                      value={newProductDomain}
+                      onChange={(e) => setNewProductDomain(e.target.value)}
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleCreateProduct}
+                    disabled={!newProductName.trim() || isCreatingProduct}
+                    className="w-fit"
+                  >
+                    {isCreatingProduct ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Product
+                      </>
+                    )}
+                  </Button>
+                  
+                  {createdProduct && (
+                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center mb-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-600 mr-2" />
+                        <span className="font-medium text-green-800">Product Created Successfully!</span>
+                      </div>
+                      <p className="text-sm text-green-700">
+                        <strong>{createdProduct.name}</strong> is ready for tracking. 
+                        Use the embed code below with your unique tracking key.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Multi-tenant Selection - Only show when product is created */}
+              {createdProduct && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">2. Select Tracking Type</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card 
+                      className={`cursor-pointer transition-colors ${!isMultiTenant ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      onClick={() => setIsMultiTenant(false)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${!isMultiTenant ? 'border-blue-500 bg-blue-500' : 'border-gray-300'}`}>
+                            {!isMultiTenant && <div className="h-2 w-2 rounded-full bg-white"></div>}
+                          </div>
+                          <span className="font-medium">Single Application</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Track one application or website. All users are tracked under this single product.
+                        </p>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card 
+                      className={`cursor-pointer transition-colors ${isMultiTenant ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      onClick={() => setIsMultiTenant(true)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${isMultiTenant ? 'border-blue-500 bg-blue-500' : 'border-gray-300'}`}>
+                            {isMultiTenant && <div className="h-2 w-2 rounded-full bg-white"></div>}
+                          </div>
+                          <span className="font-medium">Multi-Tenant Application</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Track usage by customer account. Perfect for SaaS applications serving multiple customers.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  {isMultiTenant && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <div className="flex items-center mb-2">
+                        <Settings className="h-5 w-5 text-amber-600 mr-2" />
+                        <span className="font-medium text-amber-800">Multi-Tenant Setup Required</span>
+                      </div>
+                      <p className="text-sm text-amber-700 mb-2">
+                        The embed code will include examples showing how to pass account context. You'll need to:
+                      </p>
+                      <ul className="text-sm text-amber-700 space-y-1">
+                        <li>• Identify which account/customer the current user belongs to</li>
+                        <li>• Pass account ID or domain when initializing tracking</li>
+                        <li>• Ensure account context is available in your application</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Framework Selection - Only show when product is created */}
+              {createdProduct && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">3. Choose Your Framework</h3>
+                  <Tabs value={selectedFramework} onValueChange={setSelectedFramework}>
+                    <TabsList className="grid w-full grid-cols-5">
+                      <TabsTrigger value="vanilla">HTML/JS</TabsTrigger>
+                      <TabsTrigger value="react">React</TabsTrigger>
+                      <TabsTrigger value="nextjs">Next.js</TabsTrigger>
+                      <TabsTrigger value="vue">Vue</TabsTrigger>
+                      <TabsTrigger value="angular">Angular</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value={selectedFramework} className="mt-4">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">Embed Code</h4>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => copyToClipboard(generateEmbedCode(createdProduct.tracking_key, selectedFramework, isMultiTenant))}
+                          >
+                            {copiedCode ? <CheckCircle2 className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+                            {copiedCode ? 'Copied!' : 'Copy'}
+                          </Button>
+                        </div>
+                        <Textarea
+                          value={generateEmbedCode(createdProduct.tracking_key, selectedFramework, isMultiTenant)}
+                          readOnly
+                          className="font-mono text-sm h-64"
+                        />
+                        <div className="text-xs text-muted-foreground">
+                          <strong>Tracking Key:</strong> {createdProduct.tracking_key}
+                          {createdProduct.domain && (
+                            <><br /><strong>Domain:</strong> {createdProduct.domain}</>
+                          )}
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </div>
+              )}
+
+              {/* Instructions when no product created yet */}
+              {!createdProduct && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center mb-2">
+                    <Zap className="h-5 w-5 text-blue-600 mr-2" />
+                    <span className="font-medium text-blue-800">Ready to Get Started?</span>
+                  </div>
+                  <p className="text-sm text-blue-700">
+                    Create your first product above to get your unique tracking code and start measuring user engagement!
+                  </p>
+                </div>
+              )}
+
+              {/* Features */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">3. What Gets Tracked</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span className="font-medium">Unique Users</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Innovative fingerprinting without requiring login
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <MousePointer className="h-4 w-4 text-green-600" />
+                        <span className="font-medium">User Engagement</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Clicks, scrolls, form interactions, and behavioral patterns
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Eye className="h-4 w-4 text-purple-600" />
+                        <span className="font-medium">Page Views</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Page visits and navigation patterns
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Clock className="h-4 w-4 text-orange-600" />
+                        <span className="font-medium">Session Data</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Time spent, session duration, and user flow
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    )
+  }
+
+  // Filter metrics based on selected account
+  const filteredMetrics = selectedAccount === 'all' 
+    ? metrics 
+    : metrics?.filter(m => m.tracked_account_id === selectedAccount)
+
+  // If we have data, show the dashboard
+  return (
+    <div className="space-y-6">
+      {/* Account Filter - Show only if there are tracked accounts */}
+      {trackedAccounts && trackedAccounts.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Building className="h-5 w-5 mr-2" />
+              Account Filter
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={selectedAccount === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedAccount('all')}
+              >
+                All Accounts ({metrics?.length || 0} sessions)
+              </Button>
+              {trackedAccounts.map(account => {
+                const accountMetrics = metrics?.filter(m => m.tracked_account_id === account.id) || []
+                const displayName = account.account_name || account.account_id || account.account_domain || `Account ${account.id.slice(-6)}`
+                
+                return (
+                  <Button
+                    key={account.id}
+                    variant={selectedAccount === account.id ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedAccount(account.id)}
+                  >
+                    {displayName} ({accountMetrics.length})
+                  </Button>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Users className="h-4 w-4 text-blue-600" />
+              <div>
+                <p className="text-2xl font-bold text-blue-600">
+                  {filteredMetrics ? filteredMetrics.reduce((acc, m) => acc + m.unique_users, 0) : 0}
+                </p>
+                <p className="text-xs text-muted-foreground">Unique Users</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Eye className="h-4 w-4 text-green-600" />
+              <div>
+                <p className="text-2xl font-bold text-green-600">
+                  {filteredMetrics ? filteredMetrics.reduce((acc, m) => acc + m.page_views, 0) : 0}
+                </p>
+                <p className="text-xs text-muted-foreground">Page Views</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-4 w-4 text-purple-600" />
+              <div>
+                <p className="text-2xl font-bold text-purple-600">
+                  {filteredMetrics && filteredMetrics.length > 0 ? Math.round(filteredMetrics.reduce((acc, m) => acc + m.avg_session_duration, 0) / filteredMetrics.length) : 0}s
+                </p>
+                <p className="text-xs text-muted-foreground">Avg Session</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-4 w-4 text-orange-600" />
+              <div>
+                <p className="text-2xl font-bold text-orange-600">
+                  {filteredMetrics ? filteredMetrics.reduce((acc, m) => acc + m.total_sessions, 0) : 0}
+                </p>
+                <p className="text-xs text-muted-foreground">Total Sessions</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Products and Analytics will be implemented next */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Usage Analytics Dashboard</CardTitle>
+          <CardDescription>
+            Detailed metrics and insights coming in the next implementation phase
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            Full analytics dashboard with charts, user journeys, and behavioral insights will be available here.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

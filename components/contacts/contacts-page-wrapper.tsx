@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ContactsClient } from './contacts-client'
 import { CreateContactDialog } from './create-contact-dialog'
 import { Button } from '@/components/ui/button'
 import { UserPlus } from 'lucide-react'
 import { AIInsightsButton } from '@/components/ai/ai-insights-button'
+import { ContactsHelp } from '@/components/ui/help-system'
 import { 
   Contact, 
   ContactGroup, 
@@ -27,11 +28,37 @@ interface ContactsPageWrapperProps {
 export function ContactsPageWrapper(props: ContactsPageWrapperProps) {
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [isPremium, setIsPremium] = useState(false)
 
   const handleContactCreated = () => {
     setRefreshKey(prev => prev + 1)
     setShowCreateDialog(false)
   }
+
+  // Check premium status
+  useEffect(() => {
+    const checkPremiumStatus = async () => {
+      try {
+        const response = await fetch('/api/debug/org')
+        if (response.ok) {
+          const data = await response.json()
+          
+          if (data.organization_id) {
+            const premiumResponse = await fetch(`/api/features/premium?org_id=${data.organization_id}`)
+            if (premiumResponse.ok) {
+              const premiumData = await premiumResponse.json()
+              setIsPremium(premiumData.isPremium || false)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check premium status:', error)
+        setIsPremium(false)
+      }
+    }
+
+    checkPremiumStatus()
+  }, [])
 
   return (
     <div className="h-full flex flex-col">
@@ -44,6 +71,7 @@ export function ContactsPageWrapper(props: ContactsPageWrapperProps) {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <ContactsHelp variant="icon" size="md" />
           <AIInsightsButton 
             pageType="contacts" 
             pageContext={{}}

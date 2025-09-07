@@ -22,11 +22,21 @@ export default function HealthScoreDistribution({ accounts, loading = false }: H
           <CardDescription>Account health breakdown</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <div className="flex items-center space-x-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-muted-foreground">Loading distribution...</span>
-            </div>
+          <div className="space-y-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="animate-pulse space-y-2">
+                <div className="flex justify-between items-center">
+                  <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                  <div className="h-4 w-12 bg-gray-200 rounded"></div>
+                </div>
+                <div className="h-2 w-full bg-gray-100 rounded">
+                  <div 
+                    className="h-2 bg-gray-200 rounded"
+                    style={{ width: `${20 + (i * 15)}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>

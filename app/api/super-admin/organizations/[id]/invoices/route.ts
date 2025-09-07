@@ -198,7 +198,7 @@ async function calculateBillingAmount(supabase: ReturnType<typeof createServerCl
   const trialEndDate = org.trial_ends_at ? new Date(org.trial_ends_at) : null
   const lastBillingDate = org.last_billing_date ? new Date(org.last_billing_date) : null
   
-  let billingData = {
+  const billingData = {
     organizationId,
     organizationName: org.name,
     billingPeriodStart: new Date(now.getFullYear(), now.getMonth(), 1),

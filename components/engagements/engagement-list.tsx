@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import type { Engagement } from "@/lib/types"
+import { AIInsightsButton } from "@/components/ai/ai-insights-button"
+import { EngagementsHelp } from "@/components/ui/help-system"
 
 interface EngagementWithDetails extends Engagement {
   accounts?: { name?: string; churn_risk_score?: number | string | null; arr?: number | string | null } | null
@@ -42,6 +44,32 @@ export default function EngagementList({ engagements, onSearch, onFilter, canCre
   const [typeFilter, setTypeFilter] = useState("all")
   const [outcomeFilter, setOutcomeFilter] = useState("all")
   const [activeTab, setActiveTab] = useState("all")
+  const [isPremium, setIsPremium] = useState(false)
+
+  // Check premium status
+  useEffect(() => {
+    const checkPremiumStatus = async () => {
+      try {
+        const response = await fetch('/api/debug/org')
+        if (response.ok) {
+          const data = await response.json()
+          
+          if (data.organization_id) {
+            const premiumResponse = await fetch(`/api/features/premium?org_id=${data.organization_id}`)
+            if (premiumResponse.ok) {
+              const premiumData = await premiumResponse.json()
+              setIsPremium(premiumData.isPremium || false)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check premium status:', error)
+        setIsPremium(false)
+      }
+    }
+
+    checkPremiumStatus()
+  }, [])
 
   // ---- Normalize data once per render ----
   const normalized = engagements.map((e) => {
@@ -170,14 +198,21 @@ export default function EngagementList({ engagements, onSearch, onFilter, canCre
           <h1 className="text-3xl font-bold text-foreground">Engagements</h1>
           <p className="text-muted-foreground">Track customer interactions and touchpoints</p>
         </div>
-        {canCreate && (
-          <Button asChild>
-            <Link href="/dashboard/engagements/new">
-              <Plus className="h-4 w-4 mr-2" />
-              Log Engagement
-            </Link>
-          </Button>
-        )}
+        <div className="flex items-center gap-3">
+          <EngagementsHelp variant="icon" size="md" />
+          <AIInsightsButton
+            pageType="engagements"
+            pageContext={{}}
+          />
+          {canCreate && (
+            <Button asChild>
+              <Link href="/dashboard/engagements/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Log Engagement
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
