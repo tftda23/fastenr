@@ -142,7 +142,7 @@ async function calculateContractRisk(accountId: string, organizationId: string, 
     const daysToRenewal = Math.round(monthsToNextRenewal * 30)
 
     // Check for payment issues (simplified - would integrate with billing system)
-    let paymentIssues = 0
+    const paymentIssues = 0
     // TODO: Integrate with actual billing/payment data
     
     // Calculate risk score based on proximity to renewal

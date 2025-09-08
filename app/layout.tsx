@@ -123,6 +123,7 @@ export default function RootLayout({
           data-fastenr-key="1f0bbe1ad3c536820839a3404f631c21"
           data-fastenr-api="/api/tracking"
           data-fastenr-debug="true"
+          async
         ></script>
         <ErrorBoundary>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
