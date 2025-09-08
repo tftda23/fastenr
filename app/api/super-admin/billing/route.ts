@@ -147,16 +147,16 @@ export async function GET(request: NextRequest) {
         active_users: org.user_profiles?.[0]?.count || 0,
         trial_active: org.trial_ends_at ? new Date(org.trial_ends_at) > new Date() : false,
         trial_ends_at: org.trial_ends_at,
-        last_billing_date: org.last_billing_date,
-        billing_status: org.billing_status || 'trial',
-        payment_method_status: org.payment_method_status || 'none',
+        last_billing_date: (org as any).last_billing_date || null,
+        billing_status: (org as any).billing_status || 'trial',
+        payment_method_status: (org as any).payment_method_status || 'none',
         current_period_changes: 0, // Will be populated later
         outstanding_amount: 0, // Will be populated later
         stripe_customer_id: org.stripe_customer_id,
         needs_billing: (() => {
           const now = new Date()
           const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-          const lastBilling = org.last_billing_date ? new Date(org.last_billing_date) : null
+          const lastBilling = (org as any).last_billing_date ? new Date((org as any).last_billing_date) : null
           const trialEnd = org.trial_ends_at ? new Date(org.trial_ends_at) : null
           
           // Needs billing if:
@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get payment methods for organizations with Stripe customers
-    let paymentMethods = []
+    let paymentMethods: any[] = []
     try {
       const { data } = await supabase
         .from('payment_methods')
@@ -187,12 +187,12 @@ export async function GET(request: NextRequest) {
         .eq('is_default', true)
       paymentMethods = data || []
     } catch (pmError) {
-      console.log('Payment methods table not available:', pmError.message)
+      console.log('Payment methods table not available:', pmError instanceof Error ? pmError.message : String(pmError))
       paymentMethods = []
     }
 
     // Get recent billing events for context
-    let recentBillingEvents = []
+    let recentBillingEvents: any[] = []
     try {
       const { data } = await supabase
         .from('billing_events')
@@ -213,12 +213,12 @@ export async function GET(request: NextRequest) {
         .limit(100)
       recentBillingEvents = data || []
     } catch (beError) {
-      console.log('Billing events table not available:', beError.message)
+      console.log('Billing events table not available:', beError instanceof Error ? beError.message : String(beError))
       recentBillingEvents = []
     }
 
     // Get outstanding invoices
-    let outstandingInvoices = []
+    let outstandingInvoices: any[] = []
     try {
       const { data } = await supabase
         .from('invoices')
@@ -237,12 +237,12 @@ export async function GET(request: NextRequest) {
         .order('due_date', { ascending: true })
       outstandingInvoices = data || []
     } catch (invError) {
-      console.log('Invoices table not available:', invError.message)
+      console.log('Invoices table not available:', invError instanceof Error ? invError.message : String(invError))
       outstandingInvoices = []
     }
 
     // Combine data with payment method info
-    const enrichedSummary = billingSummary?.map(org => {
+    const enrichedSummary = billingSummary?.map((org: any) => {
       const paymentMethod = paymentMethods?.find(pm => pm.organization_id === org.organization_id)
       const orgInvoices = outstandingInvoices?.filter(inv => inv.organization_id === org.organization_id) || []
       
@@ -270,9 +270,9 @@ export async function GET(request: NextRequest) {
 
     // Calculate summary statistics
     const totalOrganizations = billingSummary?.length || 0
-    const trialsActive = billingSummary?.filter(org => org.trial_active).length || 0
-    const needsBilling = billingSummary?.filter(org => org.needs_billing).length || 0
-    const hasPaymentMethod = billingSummary?.filter(org => org.payment_method_status === 'valid').length || 0
+    const trialsActive = billingSummary?.filter((org: any) => org.trial_active).length || 0
+    const needsBilling = billingSummary?.filter((org: any) => org.needs_billing).length || 0
+    const hasPaymentMethod = billingSummary?.filter((org: any) => org.payment_method_status === 'valid').length || 0
     const totalOutstanding = outstandingInvoices?.reduce((sum, inv) => sum + inv.total_amount, 0) || 0
 
     return NextResponse.json({
@@ -386,7 +386,7 @@ async function handleGenerateInvoices(
         organizationId: orgId, 
         success: true, 
         invoiceId: invoice.id,
-        amount: billingResult.billingData.totalAmount
+        amount: billingResult.billingData?.totalAmount || 0
       })
 
     } catch (error) {
