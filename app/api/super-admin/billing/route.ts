@@ -472,7 +472,20 @@ async function calculateBillingAmount(supabase: ReturnType<typeof createServerCl
   const trialEndDate = org.trial_ends_at ? new Date(org.trial_ends_at) : null
   const lastBillingDate = org.last_billing_date ? new Date(org.last_billing_date) : null
   
-  const billingData = {
+  const billingData: {
+    organizationId: string;
+    organizationName: string;
+    billingPeriodStart: Date;
+    billingPeriodEnd: Date;
+    lineItems: Array<{
+      description: string;
+      quantity: any;
+      unit_price: number;
+      amount: number;
+    }>;
+    totalAmount: number;
+    scenario: string;
+  } = {
     organizationId,
     organizationName: org.name,
     billingPeriodStart: new Date(now.getFullYear(), now.getMonth(), 1),
@@ -545,7 +558,7 @@ async function createBillingInvoice(
       invoiceNumber = data
     }
   } catch (funcError) {
-    console.warn('Invoice number function not available, using fallback:', funcError.message)
+    console.warn('Invoice number function not available, using fallback:', funcError instanceof Error ? funcError.message : String(funcError))
     invoiceNumber = await generateFallbackInvoiceNumber(serviceClient)
   }
 

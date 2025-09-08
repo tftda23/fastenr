@@ -22,7 +22,7 @@ async function getOnboardingData() {
         onboarding_plan_id
       `)
       .or('status.eq.onboarding,onboarding_plan_id.not.is.null')
-      .order('onboarding_started_at', { ascending: false, nullsLast: true })
+      .order('onboarding_started_at', { ascending: false })
 
     if (accountsError) {
       console.error('Error fetching accounts with onboarding:', accountsError)
@@ -178,7 +178,7 @@ async function OnboardingDataWrapper() {
   
   return (
     <OnboardingClient 
-      accounts={data.accounts}
+      accounts={data.accounts as any}
       stats={data.stats}
       templates={data.templates}
       availableAccounts={allAccounts || []}

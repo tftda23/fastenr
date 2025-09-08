@@ -371,7 +371,7 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
                 <Checkbox
                   id="send-email"
                   checked={sendEmail}
-                  onCheckedChange={setSendEmail}
+                  onCheckedChange={(checked) => setSendEmail(checked === true)}
                 />
                 <Label htmlFor="send-email" className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
@@ -391,8 +391,8 @@ export default function EngagementForm({ engagement, isEditing = false }: Engage
                           setEmailTemplate(value)
                           const template = emailTemplates.find((t: any) => t.id === value)
                           if (template) {
-                            setEmailSubject(template.subject)
-                            setEmailContent(template.content)
+                            setEmailSubject((template as any).subject)
+                            setEmailContent((template as any).content)
                           }
                         }}
                       >

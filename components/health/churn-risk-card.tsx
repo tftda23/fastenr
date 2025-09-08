@@ -55,7 +55,6 @@ interface ChurnRiskCardProps {
       }
     }
     arr?: number
-    health_score?: number
     created_at?: string
   }
   onClose?: () => void

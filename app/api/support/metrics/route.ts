@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
     }
 
-    const supabase = createSecureClient(organization.id)
+    const supabase = await createSecureClient()
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
 
     // Get support metrics for the last 30 days

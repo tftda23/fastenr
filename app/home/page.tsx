@@ -839,7 +839,7 @@ export default function HomePage() {
             </p>
           </ScrollReveal>
           
-          <ScrollReveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8" animation="fade-up" delay={300} role="list" aria-label="Key customer success features">
+          <ScrollReveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8" animation="fade-up" delay={300}>
             <div className="text-center group" role="listitem">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                 <Brain className="h-8 w-8 text-white" aria-hidden="true" />

@@ -227,7 +227,7 @@ export function ContactsClient({
         {/* Contact List Tab */}
         <TabsContent value="list" className="flex-1 flex flex-col">
           <ContactsTable
-            contacts={displayContacts}
+            contacts={displayContacts as any}
             contactGroups={groups}
             accounts={accounts}
             filters={filters}
@@ -245,7 +245,7 @@ export function ContactsClient({
         <TabsContent value="groups" className="flex-1 flex flex-col">
           <ContactGroupsManager
             contactGroups={groups}
-            contacts={displayContacts.data}
+            contacts={displayContacts.data as any}
             onRefresh={refreshGroups}
           />
         </TabsContent>

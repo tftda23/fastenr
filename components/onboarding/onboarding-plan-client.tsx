@@ -358,7 +358,7 @@ export function OnboardingPlanClient({
       }
 
       // Find account contacts for this engagement
-      const accountId = plan.account_id
+      const accountId = plan.account
 
       // Create engagement data based on type
       const engagementData = {
@@ -528,17 +528,17 @@ export function OnboardingPlanClient({
                               {step.step_order}
                             </span>
                             <h4 className="font-medium">{step.title}</h4>
-                            <Badge className={getStatusColor(step.status)} variant="outline" size="sm">
+                            <Badge className={getStatusColor(step.status)} variant="outline">
                               {getStatusIcon(step.status)}
                               <span className="ml-1 capitalize">{step.status.replace('_', ' ')}</span>
                             </Badge>
                             {step.is_milestone && (
-                              <Badge variant="outline" size="sm" className="bg-yellow-100 text-yellow-800">
+                              <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
                                 Milestone
                               </Badge>
                             )}
                             {step.due_date && isOverdue(step.due_date) && step.status !== 'completed' && (
-                              <Badge variant="outline" size="sm" className="bg-red-100 text-red-800">
+                              <Badge variant="outline" className="bg-red-100 text-red-800">
                                 Overdue
                               </Badge>
                             )}
@@ -706,7 +706,7 @@ export function OnboardingPlanClient({
                           <span>Step: {activity.step.title}</span>
                         )}
                         {activity.is_customer_facing && (
-                          <Badge variant="outline" size="sm">Customer Facing</Badge>
+                          <Badge variant="outline">Customer Facing</Badge>
                         )}
                       </div>
                     </div>

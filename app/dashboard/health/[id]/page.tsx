@@ -54,67 +54,67 @@ async function getAccountHealthData(accountId: string) {
 
     return {
       ...account,
-      health_score: Math.round(healthData.score),
-      churn_risk_score: Math.round(churnData.score),
+      health_score: Math.round(healthData.overall),
+      churn_risk_score: Math.round(churnData.overall),
       health_components: {
-        engagement: Math.round(healthData.components.engagement * 100),
-        nps: Math.round(healthData.components.nps * 100),
-        activity: Math.round(healthData.components.activity * 100),
-        growth: Math.round(healthData.components.growth * 100),
+        engagement: Math.round(healthData.engagement * 100),
+        nps: Math.round(healthData.nps * 100),
+        activity: Math.round(healthData.activity * 100),
+        growth: Math.round(healthData.growth * 100),
         breakdown: {
           engagementScore: {
-            score: Math.round(healthData.components.engagement * 100),
+            score: Math.round(healthData.engagement * 100),
             weight: 0.3,
-            recentEngagements: healthData.metrics.recentEngagements || 0,
-            lastEngagementDays: healthData.metrics.daysSinceLastEngagement || 0,
-            details: healthData.explanations.engagement || 'No engagement data available'
+            recentEngagements: healthData.breakdown?.engagementScore?.recentEngagements || 0,
+            lastEngagementDays: healthData.breakdown?.engagementScore?.lastEngagementDays || 0,
+            details: healthData.breakdown?.engagementScore?.details || 'No engagement data available'
           },
           npsScore: {
-            score: Math.round(healthData.components.nps * 100),
+            score: Math.round(healthData.nps * 100),
             weight: 0.25,
-            averageNps: healthData.metrics.averageNPS || 0,
-            responseCount: healthData.metrics.npsResponses || 0,
-            details: healthData.explanations.nps || 'No NPS data available'
+            averageNps: healthData.breakdown?.npsScore?.averageNps || 0,
+            responseCount: healthData.breakdown?.npsScore?.responseCount || 0,
+            details: healthData.breakdown?.npsScore?.details || 'No NPS data available'
           },
           activityScore: {
-            score: Math.round(healthData.components.activity * 100),
+            score: Math.round(healthData.activity * 100),
             weight: 0.25,
-            totalActivities: healthData.metrics.totalActivities || 0,
-            details: healthData.explanations.activity || 'No activity data available'
+            totalActivities: healthData.breakdown?.activityScore?.totalActivities || 0,
+            details: healthData.breakdown?.activityScore?.details || 'No activity data available'
           },
           growthScore: {
-            score: Math.round(healthData.components.growth * 100),
+            score: Math.round(healthData.growth * 100),
             weight: 0.2,
-            arrGrowth: healthData.metrics.arrGrowth || 0,
-            details: healthData.explanations.growth || 'No growth data available'
+            arrGrowth: healthData.breakdown?.growthScore?.growthPercentage || 0,
+            details: healthData.breakdown?.growthScore?.details || 'No growth data available'
           }
         }
       },
       churn_components: {
-        activity: Math.round(churnData.components.activity * 100),
-        engagement: Math.round(churnData.components.engagement * 100),  
-        support: Math.round(churnData.components.support * 100),
-        contract: Math.round(churnData.components.contract * 100),
+        usage: Math.round(churnData.usage * 100),
+        relationship: Math.round(churnData.relationship * 100),  
+        satisfaction: Math.round(churnData.satisfaction * 100),
+        contract: Math.round(churnData.contract * 100),
         breakdown: {
           activityRisk: {
-            score: Math.round(churnData.components.activity * 100),
+            score: Math.round(churnData.usage * 100),
             weight: 0.3,
-            details: churnData.explanations.activity || 'No activity risk data available'
+            details: churnData.breakdown?.usageRisk?.details || 'No usage risk data available'
           },
           engagementRisk: {
-            score: Math.round(churnData.components.engagement * 100),
+            score: Math.round(churnData.relationship * 100),
             weight: 0.25,
-            details: churnData.explanations.engagement || 'No engagement risk data available'
+            details: churnData.breakdown?.relationshipRisk?.details || 'No relationship risk data available'
           },
           supportRisk: {
-            score: Math.round(churnData.components.support * 100),
+            score: Math.round(churnData.satisfaction * 100),
             weight: 0.25,
-            details: churnData.explanations.support || 'No support risk data available'
+            details: churnData.breakdown?.satisfactionRisk?.details || 'No satisfaction risk data available'
           },
           contractRisk: {
-            score: Math.round(churnData.components.contract * 100),
+            score: Math.round(churnData.contract * 100),
             weight: 0.2,
-            details: churnData.explanations.contract || 'No contract risk data available'
+            details: churnData.breakdown?.contractRisk?.details || 'No contract risk data available'
           }
         }
       }

@@ -60,7 +60,7 @@ export function NewOnboardingDialog({
   const [formData, setFormData] = useState({
     accountId: preselectedAccountId || '',
     templateId: '',
-    priority: 'medium' as const,
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
     targetDate: '',
     customNotes: ''
   })

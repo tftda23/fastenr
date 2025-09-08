@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get('origin') || request.headers.get('referer')
     if (product.allowed_domains?.length > 0 && origin) {
       const domain = new URL(origin).hostname
-      const isAllowed = product.allowed_domains.some(allowed => 
+      const isAllowed = product.allowed_domains.some((allowed: string) => 
         domain === allowed || domain.endsWith(`.${allowed}`)
       )
       
@@ -239,12 +239,10 @@ export async function POST(request: NextRequest) {
       case 'page_view':
         // Update session page views
         await supabase
-          .from('usage_sessions')
-          .update({ 
-            page_views: supabase.sql`page_views + 1`,
-            ended_at: new Date().toISOString()
+          .rpc('increment_page_views', { 
+            p_session_token: sessionId,
+            p_ended_at: new Date().toISOString()
           })
-          .eq('session_token', sessionId)
 
         // Log page view event
         await supabase
@@ -261,12 +259,10 @@ export async function POST(request: NextRequest) {
       case 'click':
         // Update session click count
         await supabase
-          .from('usage_sessions')
-          .update({ 
-            click_events: supabase.sql`click_events + 1`,
-            ended_at: new Date().toISOString()
+          .rpc('increment_click_events', { 
+            p_session_token: sessionId,
+            p_ended_at: new Date().toISOString()
           })
-          .eq('session_token', sessionId)
 
         // Log click event
         await supabase
@@ -286,12 +282,10 @@ export async function POST(request: NextRequest) {
       case 'form_interaction':
         // Update session form interactions
         await supabase
-          .from('usage_sessions')
-          .update({ 
-            form_interactions: supabase.sql`form_interactions + 1`,
-            ended_at: new Date().toISOString()
+          .rpc('increment_form_interactions', { 
+            p_session_token: sessionId,
+            p_ended_at: new Date().toISOString()
           })
-          .eq('session_token', sessionId)
 
         // Log form interaction
         await supabase

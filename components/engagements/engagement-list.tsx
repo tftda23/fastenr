@@ -201,7 +201,7 @@ export default function EngagementList({ engagements, onSearch, onFilter, canCre
         <div className="flex items-center gap-3">
           <EngagementsHelp variant="icon" size="md" />
           <AIInsightsButton
-            pageType="engagements"
+            pageType="dashboard"
             pageContext={{}}
           />
           {canCreate && (

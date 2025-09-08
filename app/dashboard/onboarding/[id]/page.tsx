@@ -144,7 +144,10 @@ export default async function OnboardingPlanDetailPage({ params }: PageProps) {
           steps={data.steps}
           activities={data.activities}
           users={data.users}
-          currentUser={data.currentUser}
+          currentUser={{
+            ...data.currentUser,
+            email: data.currentUser.email || ''
+          }}
         />
       </Suspense>
     </div>

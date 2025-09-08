@@ -50,7 +50,7 @@ export function CreateTemplateDialog({ open, onOpenChange, onSubmit }: CreateTem
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    planType: 'standard' as const,
+    planType: 'standard' as 'starter' | 'standard' | 'enterprise' | 'custom',
     estimatedDuration: 30
   })
 

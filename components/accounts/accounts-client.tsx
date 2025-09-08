@@ -90,5 +90,5 @@ export default function AccountsClient({ initialAccounts, canCreate }: AccountsC
 
   // Let dashboard layout handle all loading states for consistent UX
 
-  return <AccountList accounts={displayAccounts} onSearch={handleSearch} canCreate={canCreate} loading={loading} />
+  return <AccountList accounts={displayAccounts as any} onSearch={handleSearch} canCreate={canCreate} loading={loading} />
 }

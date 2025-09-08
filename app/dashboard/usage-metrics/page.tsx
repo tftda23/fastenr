@@ -34,7 +34,7 @@ async function getUsageMetricsData() {
 
     const productIds = trackingProducts?.map(p => p.id) || []
     let metrics = null
-    let trackedAccounts = []
+    let trackedAccounts: any[] = []
     
     if (productIds.length > 0) {
       // Fetch tracked accounts for products that use account-based tracking
@@ -114,7 +114,7 @@ export default async function UsageMetricsPage() {
         </p>
       </div>
 
-      <FeatureGate organizationId={organization.id} feature="usage_tracking">
+      <FeatureGate organizationId={organization.id} feature="advanced_analytics">
         <Suspense 
           fallback={
             <Card>
@@ -144,7 +144,7 @@ async function UsageMetricsDataWrapper() {
     <UsageMetricsClient 
       products={data.products}
       metrics={data.metrics}
-      trackedAccounts={data.trackedAccounts}
+      trackedAccounts={data.trackedAccounts || []}
       hasData={data.hasData}
       organization={data.organization}
     />

@@ -418,7 +418,7 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
 
   async function setupSupportIntegration(provider: SupportProvider | CommunicationProvider) {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("support_integrations")
         .insert({
           organization_id: organizationId,
@@ -434,7 +434,7 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
 
       if (error) throw error
 
-      toast({ title: "Integration added", description: `${(supportProviderConfig[provider] || communicationProviderConfig[provider]).name} integration configured successfully.` })
+      toast({ title: "Integration added", description: `${((supportProviderConfig as any)[provider] || (communicationProviderConfig as any)[provider])?.name || provider} integration configured successfully.` })
       setSetupDialogOpen(false)
       setSetupForm({ api_endpoint: "", workspace_id: "", subdomain: "", project_key: "", api_token: "", sync_frequency_hours: 24 })
       await loadSupportIntegrations()
@@ -445,7 +445,7 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
 
   async function toggleSupportSync(integrationId: string, enabled: boolean) {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("support_integrations")
         .update({ sync_enabled: enabled })
         .eq("id", integrationId)
@@ -505,7 +505,7 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
     deleteSupportIntegration: (id: string) => void
   }) => {
     const config = communicationProviderConfig[provider]
-    const integration = supportIntegrations.find(i => i.provider === provider)
+    const integration = supportIntegrations.find(i => i.provider === provider as any)
     const isActive = integration?.status === "connected" && integration?.sync_enabled
 
     return (
@@ -842,19 +842,19 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {selectedProvider && (() => {
-                const config = supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider]
+                const config = (supportProviderConfig as any)[selectedProvider] || (communicationProviderConfig as any)[selectedProvider]
                 return config?.logo ? <img src={config.logo} alt={config.name} className="w-5 h-5 object-contain" /> : null
               })()}
-              Setup {selectedProvider && (supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.name} Integration
+              Setup {selectedProvider && ((supportProviderConfig as any)[selectedProvider] || (communicationProviderConfig as any)[selectedProvider])?.name} Integration
             </DialogTitle>
             <DialogDescription>
-              Configure your {selectedProvider && (supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.name} integration to track metrics and improve customer success.
+              Configure your {selectedProvider && ((supportProviderConfig as any)[selectedProvider] || (communicationProviderConfig as any)[selectedProvider])?.name} integration to track metrics and improve customer success.
             </DialogDescription>
           </DialogHeader>
 
           {selectedProvider && (
             <div className="space-y-4">
-              {(supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.setupFields.includes("api_endpoint") && (
+              {((supportProviderConfig as any)[selectedProvider] || (communicationProviderConfig as any)[selectedProvider])?.setupFields.includes("api_endpoint") && (
                 <div className="space-y-2">
                   <Label htmlFor="api_endpoint">API Endpoint</Label>
                   <Input
@@ -866,7 +866,7 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
                 </div>
               )}
 
-              {(supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.setupFields.includes("workspace_id") && (
+              {((supportProviderConfig as any)[selectedProvider] || (communicationProviderConfig as any)[selectedProvider])?.setupFields.includes("workspace_id") && (
                 <div className="space-y-2">
                   <Label htmlFor="workspace_id">Workspace ID</Label>
                   <Input
@@ -878,7 +878,7 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
                 </div>
               )}
 
-              {(supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.setupFields.includes("subdomain") && (
+              {((supportProviderConfig as any)[selectedProvider] || (communicationProviderConfig as any)[selectedProvider])?.setupFields.includes("subdomain") && (
                 <div className="space-y-2">
                   <Label htmlFor="subdomain">Subdomain</Label>
                   <Input
@@ -890,7 +890,7 @@ export default function IntegrationsClient({ organizationId }: IntegrationsClien
                 </div>
               )}
 
-              {(supportProviderConfig[selectedProvider] || communicationProviderConfig[selectedProvider])?.setupFields.includes("project_key") && (
+              {((supportProviderConfig as any)[selectedProvider] || (communicationProviderConfig as any)[selectedProvider])?.setupFields.includes("project_key") && (
                 <div className="space-y-2">
                   <Label htmlFor="project_key">Project Key</Label>
                   <Input

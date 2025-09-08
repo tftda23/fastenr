@@ -282,7 +282,7 @@ export function DashboardClient({
             <HealthScoreDistribution accounts={displayAccounts} loading={loading} />
 
             {/* Recent Activity */}
-            <RecentActivity activities={displayActivities} />
+            <RecentActivity activities={displayActivities as any} />
           </div>
         </TabsContent>
 
@@ -311,7 +311,7 @@ export function DashboardClient({
             <HealthScoreDistribution accounts={displayAccounts} loading={loading} />
 
             {/* Recent Activity */}
-            <RecentActivity activities={displayActivities} />
+            <RecentActivity activities={displayActivities as any} />
           </div>
         </TabsContent>
       </Tabs>

@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createSecureClient(organization.id)
+    const supabase = await createSecureClient()
     
     // Get integration configuration
     const { data: integrations, error: configError } = await supabase
@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
       if (provider) {
         const { user, organization } = await getCurrentUserOrganization()
         if (user && organization) {
-          const supabase = createSecureClient(organization.id)
+          const supabase = await createSecureClient()
           await supabase
             .from('support_integrations')
             .update({

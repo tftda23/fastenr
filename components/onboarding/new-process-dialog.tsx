@@ -41,8 +41,8 @@ export function NewProcessDialog({ open, onOpenChange, accounts, onSubmit }: New
     name: '',
     description: '',
     accountId: '',
-    processType: 'onboarding' as const,
-    priority: 'medium' as const,
+    processType: 'onboarding' as 'onboarding' | 'offboarding',
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
     targetDate: ''
   })
 

@@ -138,7 +138,7 @@ export function BillingAccessGate({ children }: BillingAccessGateProps) {
   }
 
   // If access is granted, show the protected content
-  if (billingStatus.hasAccess) {
+  if (billingStatus?.hasAccess) {
     return <>{children}</>
   }
 

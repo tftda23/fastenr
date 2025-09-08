@@ -38,7 +38,7 @@ export default async function AccountDetailsPage({ params }: { params: { id: str
         ...account,
         health_score: healthComponents.overall,
         health_components: healthComponents
-      }
+      } as any
       
       console.log('Account details: Dynamic health score calculated:', {
         accountId: account.id,

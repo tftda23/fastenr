@@ -90,7 +90,7 @@ async function AnalyticsContent() {
         }
       }
     } catch (dynamicError) {
-      console.log('Dynamic analytics calculation failed, using fallback:', dynamicError.message)
+      console.log('Dynamic analytics calculation failed, using fallback:', dynamicError instanceof Error ? dynamicError.message : String(dynamicError))
     }
 
     // Fetch other data as fallback or supplement

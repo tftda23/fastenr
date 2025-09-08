@@ -53,7 +53,7 @@ export default async function HealthPage() {
         }
       }
     } catch (dynamicError) {
-      console.log('Dynamic health scores calculation failed, using fallback:', dynamicError.message)
+      console.log('Dynamic health scores calculation failed, using fallback:', dynamicError instanceof Error ? dynamicError.message : String(dynamicError))
     }
 
     // Fallback to original queries if dynamic calculation fails

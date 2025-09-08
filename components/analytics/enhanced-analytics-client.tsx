@@ -142,7 +142,7 @@ export function EnhancedAnalyticsClient({
     return Object.entries(typeCounts).map(([name, count]) => ({
       name,
       count,
-      percentage: Math.round((count / total) * 100)
+      percentage: Math.round(((count as number) / total) * 100)
     }))
   }, [engagementsData])
 
@@ -468,7 +468,7 @@ export function EnhancedAnalyticsClient({
                         return Object.entries(sizeGroups).map(([size, count]) => ({
                           size,
                           count,
-                          percentage: Math.round((count / accountsData.length) * 100)
+                          percentage: Math.round(((count as number) / accountsData.length) * 100)
                         }))
                       })()}>
                         <CartesianGrid strokeDasharray="3 3" />
@@ -568,7 +568,7 @@ export function EnhancedAnalyticsClient({
                           return {
                             range: range.name,
                             count,
-                            percentage: Math.round((count / accountsData.length) * 100)
+                            percentage: Math.round(((count as number) / accountsData.length) * 100)
                           }
                         })
                       })()}>
@@ -706,7 +706,7 @@ export function EnhancedAnalyticsClient({
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold">{item.count}</p>
+                      <p className="text-2xl font-bold">{item.count as number}</p>
                       <p className="text-sm text-muted-foreground">activities</p>
                     </div>
                   </div>
@@ -731,7 +731,7 @@ export function EnhancedAnalyticsClient({
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="tier" />
                       <YAxis />
-                      <Tooltip formatter={(value) => [formatCurrency(value), 'Revenue']} />
+                      <Tooltip formatter={(value) => [formatCurrency(value as number), 'Revenue']} />
                       <Bar dataKey="revenue" fill={COLORS.secondary} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -784,15 +784,15 @@ export function EnhancedAnalyticsClient({
                   </thead>
                   <tbody>
                     {revenueByTierData.map((tier, index) => {
-                      const totalRevenue = revenueByTierData.reduce((sum, t) => sum + t.revenue, 0)
-                      const percentage = ((tier.revenue / totalRevenue) * 100).toFixed(1)
+                      const totalRevenue = revenueByTierData.reduce((sum, t) => sum + (t as any).revenue, 0)
+                      const percentage = (((tier as any).revenue / (totalRevenue as number)) * 100).toFixed(1)
                       
                       return (
                         <tr key={index} className="border-b">
-                          <td className="p-2 font-medium">{tier.tier}</td>
-                          <td className="p-2 text-right">{formatCurrency(tier.revenue)}</td>
-                          <td className="p-2 text-right">{tier.accounts}</td>
-                          <td className="p-2 text-right">{formatCurrency(tier.avgRevenue)}</td>
+                          <td className="p-2 font-medium">{(tier as any).tier}</td>
+                          <td className="p-2 text-right">{formatCurrency((tier as any).revenue)}</td>
+                          <td className="p-2 text-right">{(tier as any).accounts}</td>
+                          <td className="p-2 text-right">{formatCurrency((tier as any).avgRevenue)}</td>
                           <td className="p-2 text-right">{percentage}%</td>
                         </tr>
                       )
