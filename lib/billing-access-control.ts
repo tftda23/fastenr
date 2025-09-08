@@ -54,8 +54,8 @@ export async function checkBillingAccess(): Promise<BillingAccessCheck> {
     const lastBilling = org.last_billing_date ? new Date(org.last_billing_date) : null
     const trialEnd = org.trial_ends_at ? new Date(org.trial_ends_at) : null
     
-    const needsBilling = (trialEnd && trialEnd < now && !lastBilling) || 
-                        (lastBilling && lastBilling < currentMonth)
+    const needsBilling: boolean = Boolean((trialEnd && trialEnd < now && !lastBilling) || 
+                                         (lastBilling && lastBilling < currentMonth))
 
     // Check if has payment method
     const hasPaymentMethod = org.stripe_customer_id && org.payment_method_status === 'valid'

@@ -21,31 +21,33 @@ export function useCurrencyConfig() {
           return
         }
 
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('organization_id')
           .eq('id', user.id)
           .single()
 
-        if (!profile) {
+        if (profileError || !profile?.organization_id) {
           setIsLoading(false)
           return
         }
 
         // Get currency configuration for the organization
         const { data, error } = await supabase
-          .rpc('get_org_currency_config', { org_id: profile.organization_id })
+          .from('organizations')
+          .select('currency_code, currency_symbol, currency_name, decimal_places, symbol_position, thousands_separator, decimal_separator')
+          .eq('id', profile.organization_id)
           .single()
 
         if (!error && data) {
           setConfig({
-            currency_code: data.currency_code,
-            currency_symbol: data.currency_symbol,
-            currency_name: data.currency_name,
-            decimal_places: data.decimal_places,
-            symbol_position: data.symbol_position as 'before' | 'after',
-            thousands_separator: data.thousands_separator,
-            decimal_separator: data.decimal_separator
+            currency_code: data.currency_code || DEFAULT_CURRENCY_CONFIG.currency_code,
+            currency_symbol: data.currency_symbol || DEFAULT_CURRENCY_CONFIG.currency_symbol,
+            currency_name: data.currency_name || DEFAULT_CURRENCY_CONFIG.currency_name,
+            decimal_places: data.decimal_places || DEFAULT_CURRENCY_CONFIG.decimal_places,
+            symbol_position: (data.symbol_position as 'before' | 'after') || DEFAULT_CURRENCY_CONFIG.symbol_position,
+            thousands_separator: data.thousands_separator || DEFAULT_CURRENCY_CONFIG.thousands_separator,
+            decimal_separator: data.decimal_separator || DEFAULT_CURRENCY_CONFIG.decimal_separator
           })
         }
       } catch (error) {

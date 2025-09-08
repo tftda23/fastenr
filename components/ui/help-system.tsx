@@ -313,7 +313,7 @@ export function HelpSystem({ pageContext, className, variant = 'button', size = 
     return (
       <Button
         variant="outline"
-        size={size}
+        size={size === 'md' ? 'default' : size}
         onClick={() => setIsOpen(true)}
         className={cn("gap-2", className)}
       >

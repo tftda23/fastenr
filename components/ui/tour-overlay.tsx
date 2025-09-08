@@ -24,17 +24,21 @@ export function TourOverlay() {
         
         // Set target element AFTER scroll completes
         setTimeout(() => {
-          const updatedElement = document.querySelector(currentTourStep.target) as HTMLElement
-          if (updatedElement) {
-            setTargetElement(updatedElement)
+          if (currentTourStep.target) {
+            const updatedElement = document.querySelector(currentTourStep.target) as HTMLElement
+            if (updatedElement) {
+              setTargetElement(updatedElement)
+            }
           }
         }, 1000) // Wait for scroll animation to complete
         
         // Also listen for scroll events to update position
         const handleScroll = () => {
-          const scrolledElement = document.querySelector(currentTourStep.target) as HTMLElement
-          if (scrolledElement) {
-            setTargetElement(scrolledElement)
+          if (currentTourStep.target) {
+            const scrolledElement = document.querySelector(currentTourStep.target) as HTMLElement
+            if (scrolledElement) {
+              setTargetElement(scrolledElement)
+            }
           }
         }
         
