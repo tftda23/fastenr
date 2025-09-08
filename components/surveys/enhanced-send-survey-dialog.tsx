@@ -78,6 +78,23 @@ export default function EnhancedSendSurveyDialog({ survey, open, onOpenChange }:
     type: 'survey' as const
   })
   const [emailSettings, setEmailSettings] = useState<any>(null)
+  const [organizationId, setOrganizationId] = useState<string>('')
+
+  // Load organization ID
+  useEffect(() => {
+    const loadOrganizationId = async () => {
+      try {
+        const response = await fetch('/api/debug/org')
+        if (response.ok) {
+          const data = await response.json()
+          setOrganizationId(data.organization_id || '')
+        }
+      } catch (error) {
+        console.error('Failed to load organization ID:', error)
+      }
+    }
+    loadOrganizationId()
+  }, [])
 
   // Load email settings
   useEffect(() => {
@@ -151,26 +168,29 @@ export default function EnhancedSendSurveyDialog({ survey, open, onOpenChange }:
     try {
       const emailData = template || emailTemplate
       
-      const result = await sendSurvey({
-        surveyId: survey.id,
-        recipients: finalRecipients.map(r => ({ email: r.email, name: r.name })),
-        subject: emailData.subject,
-        content: emailData.content
-      })
+      const result = await sendSurvey(
+        survey.id,
+        finalRecipients.map(r => ({ id: r.id, email: r.email, name: r.name })),
+        organizationId
+      )
 
-      setResults(result)
+      // Map the result to match the expected state type
+      setResults({
+        sent: result.sent_count,
+        failed: result.failed_count
+      })
       setProgress(100)
 
-      if (result.sent > 0) {
+      if (result.sent_count > 0) {
         toast({
           title: "Survey Sent Successfully",
-          description: `Survey sent to ${result.sent} recipients${result.failed > 0 ? ` (${result.failed} failed)` : ''}`,
-          variant: result.failed > 0 ? "destructive" : "default",
+          description: `Survey sent to ${result.sent_count} recipients${result.failed_count > 0 ? ` (${result.failed_count} failed)` : ''}`,
+          variant: result.failed_count > 0 ? "destructive" : "default",
         })
       }
 
       // Reset form after successful send
-      if (result.failed === 0) {
+      if (result.failed_count === 0) {
         setTimeout(() => {
           onOpenChange(false)
           setRecipients([])
