@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
       .eq(ownerId ? "accounts.owner_id" : "accounts.organization_id", ownerId || profile.organization_id)
 
     // Group engagements by date for trends
-    const engagementTrends = {}
+    const engagementTrends: Record<string, { date: string; count: number }> = {}
     engagements?.forEach(engagement => {
       const date = new Date(engagement.created_at).toISOString().split('T')[0]
       if (!engagementTrends[date]) {
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Get engagement types distribution
-    const engagementTypes = {}
+    const engagementTypes: Record<string, number> = {}
     engagements?.forEach(engagement => {
       const type = engagement.type || 'other'
       if (!engagementTypes[type]) {
@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Calculate revenue trends (using ARR from accounts)
-    const revenueTrends = accountsWithScores.reduce((acc, account) => {
+    const revenueTrends = accountsWithScores.reduce((acc: Record<string, { month: string; revenue: number; accounts: number }>, account) => {
       if (account.arr) {
         const month = new Date(account.created_at).toISOString().slice(0, 7) // YYYY-MM
         if (!acc[month]) {

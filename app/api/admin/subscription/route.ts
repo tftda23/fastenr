@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
           })
         } catch (recordError) {
           // Fallback to manual recording
-          console.log('Using fallback license change recording:', recordError.message)
+          console.log('Using fallback license change recording:', recordError instanceof Error ? recordError.message : String(recordError))
           
           // Create billing event manually
           await supabase.from('billing_events').insert({

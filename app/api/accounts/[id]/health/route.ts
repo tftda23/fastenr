@@ -52,7 +52,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         : null
 
       return NextResponse.json({
-        health_score: Math.round(healthData.score),
+        health_score: Math.round(healthData.overall),
         churn_risk_score: account.churn_risk_score || 0,
         nps: {
           latest_score: latestNps?.score || null,

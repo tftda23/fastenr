@@ -39,7 +39,7 @@ export async function PATCH(
       )
     }
 
-    if (step.onboarding_plans.organization_id !== organization.id) {
+    if (step.onboarding_plans?.[0]?.organization_id !== organization.id) {
       return NextResponse.json(
         { error: 'Access denied' },
         { status: 403 }

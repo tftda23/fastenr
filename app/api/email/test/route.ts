@@ -118,15 +118,15 @@ async function handlePOST(request: NextRequest): Promise<NextResponse> {
         // Enhanced logging for debugging
         console.log('Response structure analysis:', {
           hasData: !!result.data,
-          hasId: !!(result.data?.id || result.id),
-          hasError: !!(result.error || result.data?.error),
+          hasId: !!result.data?.id,
+          hasError: !!result.error,
           responseKeys: Object.keys(result || {}),
           dataKeys: result.data ? Object.keys(result.data) : 'No data property'
         })
 
         // Check for different response structures from Resend
-        const messageId = result.data?.id || result.id
-        const error = result.error || result.data?.error
+        const messageId = result.data?.id
+        const error = result.error
         
         if (error) {
           console.error('Resend API returned error:', error)
@@ -180,8 +180,8 @@ async function handlePOST(request: NextRequest): Promise<NextResponse> {
               fullResponse: result,
               analysis: {
                 hasData: !!result.data,
-                hasId: !!(result.data?.id || result.id),
-                hasError: !!(result.error || result.data?.error),
+                hasId: !!result.data?.id,
+                hasError: !!result.error,
                 responseKeys: Object.keys(result || {})
               }
             }

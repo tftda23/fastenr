@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       if (error) throw error
       billingSummary = data
     } catch (functionError) {
-      console.log('Using fallback billing summary query:', functionError.message)
+      console.log('Using fallback billing summary query:', functionError instanceof Error ? functionError.message : String(functionError))
       
       // Fallback to direct query with basic columns first
       let organizations
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
         if (error) throw error
         organizations = data
       } catch (columnError) {
-        console.log('Using basic organization query (missing columns):', columnError.message)
+        console.log('Using basic organization query (missing columns):', columnError instanceof Error ? columnError.message : String(columnError))
         
         // Even more basic fallback if new columns don't exist
         const { data, error: basicError } = await supabase

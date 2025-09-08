@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       const invoicesResult = await getOrganizationInvoices(profile.organization_id)
       invoices = invoicesResult
     } catch (libError) {
-      console.log('Using fallback invoice query:', libError.message)
+      console.log('Using fallback invoice query:', libError instanceof Error ? libError.message : String(libError))
       
       // Fallback to direct database query
       const { data, error } = await supabase

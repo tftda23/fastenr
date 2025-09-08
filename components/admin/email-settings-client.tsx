@@ -520,12 +520,10 @@ export default function EmailSettingsClient() {
                     const debug = await response.json()
                     console.log('Email Debug Info:', debug)
                     
-                    let message = 'Debug info logged to console. Check:
-'
+                    let message = 'Debug info logged to console. Check:\n'
                     if (debug.recommendations) {
                       debug.recommendations.forEach((rec: any) => {
-                        message += `• ${rec.title}: ${rec.message}
-`
+                        message += `• ${rec.title}: ${rec.message}\n`
                       })
                     }
                     
