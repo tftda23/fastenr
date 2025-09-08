@@ -7,7 +7,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 // Centralized hook to manage Supabase client connection
 // Ensures proper connection reuse and reduces PostgREST configuration calls
 
-export function useSupabase(): SupabaseClient {
+export function useSupabase() {
   const [client] = useState(() => {
     // Use the singleton client instance
     return createClient()

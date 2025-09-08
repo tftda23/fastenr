@@ -25,7 +25,7 @@ export function useCurrencyConfig() {
           .from('user_profiles')
           .select('organization_id')
           .eq('id', user.id)
-          .single()
+          .single() as { data: { organization_id: string } | null, error: any }
 
         if (profileError || !profile?.organization_id) {
           setIsLoading(false)
@@ -37,7 +37,18 @@ export function useCurrencyConfig() {
           .from('organizations')
           .select('currency_code, currency_symbol, currency_name, decimal_places, symbol_position, thousands_separator, decimal_separator')
           .eq('id', profile.organization_id)
-          .single()
+          .single() as { 
+            data: {
+              currency_code?: string;
+              currency_symbol?: string;
+              currency_name?: string;
+              decimal_places?: number;
+              symbol_position?: string;
+              thousands_separator?: string;
+              decimal_separator?: string;
+            } | null, 
+            error: any 
+          }
 
         if (!error && data) {
           setConfig({

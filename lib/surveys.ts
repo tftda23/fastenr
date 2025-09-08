@@ -99,7 +99,7 @@ export async function sendSurvey(surveyId: string, recipients: Recipient[], orga
 
   try {
     // Send actual emails using Resend
-    const emailResult = await sendSurveyEmail(emailRecipients, surveyEmailData)
+    const emailResult = await sendSurveyEmail(emailRecipients, surveyEmailData, organizationId)
     
     // Update survey status to active
     const { error: surveyError } = await (supabase as any)

@@ -84,13 +84,13 @@ export async function getOrganizationCurrencyConfig(organizationId?: string): Pr
   }
 
   return {
-    currency_code: data.currency_code,
-    currency_symbol: data.currency_symbol,
-    currency_name: data.currency_name,
-    decimal_places: data.decimal_places,
-    symbol_position: data.symbol_position as 'before' | 'after',
-    thousands_separator: data.thousands_separator,
-    decimal_separator: data.decimal_separator
+    currency_code: (data as any).currency_code,
+    currency_symbol: (data as any).currency_symbol,
+    currency_name: (data as any).currency_name,
+    decimal_places: (data as any).decimal_places,
+    symbol_position: (data as any).symbol_position as 'before' | 'after',
+    thousands_separator: (data as any).thousands_separator,
+    decimal_separator: (data as any).decimal_separator
   }
 }
 
@@ -951,9 +951,9 @@ export async function getRecentActivities(limit: number = 10, filterByUserId?: s
             title: 'Goal Updated',
             description: `${goal.title} ${goal.status ? `marked as ${goal.status}` : 'updated'}`,
             timestamp: goal.updated_at,
-            account: goal.account?.name || 'Unknown Account',
-            user: goal.creator?.full_name || 'Unknown User',
-            account_id: goal.account?.id
+            account: (goal.account as any)?.name || 'Unknown Account',
+            user: (goal.creator as any)?.full_name || 'Unknown User',
+            account_id: (goal.account as any)?.id
           })
         }
       }
@@ -985,9 +985,9 @@ export async function getRecentActivities(limit: number = 10, filterByUserId?: s
           title: 'NPS Survey Completed',
           description: `New NPS score of ${nps.score} received${nps.feedback ? ' with feedback' : ''}`,
           timestamp: nps.survey_date,
-          account: nps.account?.name || 'Unknown Account',
+          account: (nps.account as any)?.name || 'Unknown Account',
           user: nps.respondent_name || 'Anonymous',
-          account_id: nps.account?.id
+          account_id: (nps.account as any)?.id
         })
       }
     }

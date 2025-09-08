@@ -42,7 +42,7 @@ export async function createSecureClient(): Promise<SupabaseClient & { organizat
       ]
       
       if (SECURE_TABLES.includes(table)) {
-        return query.eq('organization_id', organization.id)
+        return (query as any).eq('organization_id', organization.id)
       }
       
       return query
@@ -135,10 +135,10 @@ export async function secureQuery<T = any>(
       console.log(`SECURE_QUERY: ${table} accessed by org ${targetOrgId}`)
     }
     
-    return result
+    return result as { data: T | null; error: any }
   } catch (error) {
     console.error('Secure query failed:', error)
-    return { data: null, error }
+    return { data: null, error } as { data: T | null; error: any }
   }
 }
 
