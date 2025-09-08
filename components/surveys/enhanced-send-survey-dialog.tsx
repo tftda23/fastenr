@@ -71,11 +71,16 @@ export default function EnhancedSendSurveyDialog({ survey, open, onOpenChange }:
   const [sending, setSending] = useState(false)
   const [progress, setProgress] = useState(0)
   const [results, setResults] = useState<{ sent: number; failed: number } | null>(null)
-  const [emailTemplate, setEmailTemplate] = useState({
+  const [emailTemplate, setEmailTemplate] = useState<{
+    name: string;
+    subject: string;
+    content: string;
+    type: 'survey' | 'engagement' | 'notification' | 'custom';
+  }>({
     name: `Survey Email - ${survey?.title || 'Untitled'}`,
     subject: survey?.subject || "We'd love your feedback",
     content: survey?.content || "Hi {{recipient.name}},\n\nWe'd love to get your feedback. Please take a moment to complete our survey.\n\nThank you!",
-    type: 'survey' as const
+    type: 'survey'
   })
   const [emailSettings, setEmailSettings] = useState<any>(null)
   const [organizationId, setOrganizationId] = useState<string>('')
